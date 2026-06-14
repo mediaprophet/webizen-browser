@@ -1,0 +1,22 @@
+[package]
+name = "webizen-studio"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+dioxus = { version = "0.7.9", features = ["router", "web"] }
+reqwest = { version = "0.13.4", features = ["json"] }
+serde = { version = "1.0.228", features = ["derive"] }
+serde_json = "1.0.150"
+wasm-bindgen = "0.2.123"
+js-sys = "0.3"
+web-sys = { version = "0.3.100", features = ["CanvasRenderingContext2d", "Document", "Element", "EventSource", "History", "HtmlCanvasElement", "ImageData", "MessageEvent", "Response", "Storage", "WebSocket", "BinaryType", "Window"] }
+uuid = { version = "1.10", features = ["v4", "js"] }
+futures-util = "0.3.30"
+wasm-bindgen-futures = "0.4.75"
+serde-wasm-bindgen = "0.6.5"
+
+# qualia-core-db is only needed for the native (non-wasm32) build.
+# The wasm32/web build (GitHub Pages demo) uses stub types instead.
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+qualia-core-db = { version = "0.0.12", path = "../../qualiaDB/crates/qualia-core-db" }
