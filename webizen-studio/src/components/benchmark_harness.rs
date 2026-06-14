@@ -108,6 +108,13 @@ async fn sleep_ms(ms: i32) -> Result<(), String> {
 }
 
 #[cfg(target_arch = "wasm32")]
+fn is_tauri() -> bool {
+    js_sys::Reflect::get(&js_sys::global(), &wasm_bindgen::JsValue::from_str("__TAURI__"))
+        .map(|v| !v.is_undefined() && !v.is_null())
+        .unwrap_or(false)
+}
+
+#[cfg(target_arch = "wasm32")]
 async fn measure_snapshot_call() -> Result<(Option<RuntimeSnapshotRecord>, f64), String> {
     let started = js_sys::Date::now();
     let snapshot = invoke_tauri_json::<Option<RuntimeSnapshotRecord>>(
@@ -145,6 +152,10 @@ async fn measure_reconfigure_ack(
 
 #[cfg(target_arch = "wasm32")]
 async fn run_benchmark_sweep() -> Result<BenchmarkReport, String> {
+    if !is_tauri() {
+        return Err("Benchmark requires the Webizen desktop app (Tauri runtime). \
+                    Running in a plain browser is not supported — launch the desktop build to use this tool.".to_string());
+    }
     let preview_probe = invoke_tauri_json::<LocalPreviewProbe>(
         "probe_localhost_preview",
         json!({}),
@@ -312,7 +323,16 @@ async fn run_benchmark_sweep() -> Result<BenchmarkReport, String> {
 #[component]
 pub fn BenchmarkHarness() -> Element {
     let mut running = use_signal(|| false);
-    let mut status = use_signal(|| "Ready to benchmark the local runtime path.".to_string());
+    #[cfg(target_arch = "wasm32")]
+    let mut status = use_signal(|| {
+        if is_tauri() {
+            "Ready to benchmark the local runtime path.".to_string()
+        } else {
+            "Browser mode: benchmark requires the Webizen desktop app (Tauri). Click Run to see the full error.".to_string()
+        }
+    });
+    #[cfg(not(target_arch = "wasm32"))]
+    let mut status = use_signal(|| "Benchmark harness is only active in the webview runtime.".to_string());
     let report = use_signal(|| None::<BenchmarkReport>);
 
     let run_benchmark = move |_| {

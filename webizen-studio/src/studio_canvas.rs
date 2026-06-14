@@ -500,13 +500,13 @@ fn default_panes_for_app(app_id: &str) -> Vec<PanePlacement> {
             p("agent-config",           58, 32, 36, 30),
             p("benchmark-harness",       0, 42, 56, 20),
         ],
-        _ => vec![],
+        _ => vec![p(app_id, 0, 0, 94, 62)],
     }
 }
 
 fn default_presentation_mode(app_id: Option<&str>) -> PresentationMode {
     match app_id {
-        Some("physics-sim") => PresentationMode::Spatial,
+        Some("physics-simulator") => PresentationMode::Spatial,
         _ => PresentationMode::GridBound,
     }
 }
@@ -1299,7 +1299,7 @@ fn render_placed_pane(
 
     let element_tag = find_pane(&pane.component_id)
         .map(|p| p.element_tag.clone())
-        .unwrap_or_default();
+        .unwrap_or_else(|| pane.component_id.clone());
 
     let mut selected = selected.clone();
 
