@@ -20,6 +20,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Checkout qualiaDB (path dependency for native builds)
+        uses: actions/checkout@v4
+        with:
+          repository: mediaprophet/qualiaDB
+          path: ../qualiaDB
+
       - name: Install Rust (stable + wasm32)
         uses: dtolnay/rust-toolchain@stable
         with:
