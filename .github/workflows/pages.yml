@@ -20,11 +20,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Checkout qualiaDB (path dependency for native builds)
-        uses: actions/checkout@v4
-        with:
-          repository: mediaprophet/qualiaDB
-          path: ../qualiaDB
+      - name: Sparse-clone qualiaDB (qualia-core-db path dep)
+        run: |
+          git clone --depth=1 --filter=blob:none --sparse \
+            https://github.com/mediaprophet/qualiaDB.git \
+            "$GITHUB_WORKSPACE/../qualiaDB"
+          cd "$GITHUB_WORKSPACE/../qualiaDB"
+          git sparse-checkout set crates/qualia-core-db
+          git checkout
 
       - name: Install Rust (stable + wasm32)
         uses: dtolnay/rust-toolchain@stable
