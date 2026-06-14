@@ -50,17 +50,13 @@ jobs:
         working-directory: webizen-studio
         run: dx build --release
 
-      - name: List build output
-        working-directory: webizen-studio
-        run: ls -la dist/ 2>/dev/null || (echo "dist/ not found, checking for other output dirs:" && find . -name "index.html" -not -path "./.git/*" 2>/dev/null | head -20)
-
       - name: Setup Pages
         uses: actions/configure-pages@v4
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: webizen-studio/dist
+          path: webizen-studio/target/dx/webizen-studio/release/web/public
 
   deploy:
     environment:
