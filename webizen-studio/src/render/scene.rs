@@ -65,7 +65,7 @@ pub struct ScreenPoint {
 
 /// A look-at perspective camera. `focal_scale` multiplies `min(viewport)` to set
 /// the effective focal length, matching the original physics-surface tuning.
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub struct Camera {
     pub eye: Vec3,
     pub target: Vec3,

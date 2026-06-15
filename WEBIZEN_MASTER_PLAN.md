@@ -18,24 +18,24 @@ This project was restarted specifically to **eliminate Node.js**. The whole app 
 3. The `legacy/` folder is **reference-only**. We read it to understand *what a feature does and why*; we never import its SvelteKit/TypeScript code. Every feature is re-authored in Rust/Dioxus.
 4. Every JavaScript library the legacy app used is replaced by a **Rust crate** (table below). The only JS permitted is the thin, unavoidable browser-API surface reached through `web-sys`/`wasm-bindgen` (e.g. `BarcodeDetector`, `WebSocket`, `Canvas`, WebGPU) — those are *browser APIs*, not Node and not bundled libraries.
 
-### 0.1 JavaScript-dependency → Rust-crate replacement map
+### 0.1 Capability map: legacy dependency → **QualiaDB-native** (not external crates)
 
-Every legacy feature that depended on a JS library re-targets a Rust equivalent. This table is the gate: if an implementation task reaches for a JS lib, it's wrong.
+**Correction (2026-06-15):** an earlier draft of this plan wrongly proposed external Rust crates (`oxigraph`, `candle`, `llama-cpp-rs`, etc.). That is wrong. Per `QUALIA_DB_LOGIC_AUDIT.md`, QualiaDB has **collapsed hundreds of libraries into one engine** and the QApps are "UI thin-clients wrapping these massive internal logic compute units." The rule is therefore stronger than "no Node": **no external compute/engine crate either** — SPARQL, LLM, logic, RDF(-star), physics, crypto, and DLT all come from `qualia-core-db`. The browser/UI side only ever does *presentation* (Dioxus + `web-sys` browser APIs) and *transport* (Tauri `invoke` / WS to the daemon).
 
-| Legacy JS dependency | Purpose | Rust/Dioxus replacement |
+| Legacy dependency (JS or otherwise) | Purpose | Correct source — **QualiaDB module** (verified in `qualia-core-db/src`) |
 |---|---|---|
-| **Babylon.js** | 3D anatomy / model viewer | `webizen-runtime` `Renderer` trait → **wgpu** (WebGPU in browser, native on desktop). glTF via **`gltf`** crate. (Foundation already laid in `src/render`.) |
-| **Chart.js** | Financial/health charts | Hand-rolled **SVG in Dioxus** (the dashboard already does sparklines/bars this way) or **`plotters`** with a canvas/SVG backend. |
-| **ZXing-js / BarcodeDetector** | Diet barcode scanning | **`rxing`** (Rust port of ZXing) for decode; camera frames via `web-sys` `getUserMedia`/`BarcodeDetector` (browser API, not a JS lib). |
-| **oxigraph-wasm** | SPARQL execution | **`oxigraph`** is a *Rust* crate — depend on it directly, or implement SPARQL in QualiaDB's N3 engine (see §7 decision). |
-| **llama.cpp via JS / Node bindings** | LLM inference | **`candle`** (pure Rust) or `llama-cpp-rs` FFI, native-side only, exposed via Tauri command + streaming events. |
-| **whisper JS** | Audio transcription | **`whisper-rs`** (FFI) or `candle-whisper`. |
-| **Tesseract.js** | OCR | **`rusty-tesseract`**/`leptess` (native) or a Rust OCR; image decode via `image` crate. |
-| **Tesseract/PDF.js** | PDF parsing | already native: `pdf-extract` (Rust) in `webizen-desktop`. |
-| **Chart/【DLT】 OpenTimestamps JS** | Bitcoin anchoring | **`opentimestamps`** Rust crate or direct OTS calendar HTTP from Rust. |
-| **Shoelace (web components, CDN `<script>`)** | UI widgets (current Dioxus app) | **DECISION REQUIRED** — see §9.1. Either keep (standards-based custom elements, no Node) or replace with native Dioxus components for a zero-third-party-JS guarantee. |
+| **llama.cpp / candle / GGUF-JS** | LLM inference | `llm_agent`, `gguf_bridge`, `gguf_sharder`, `ggml_quants`, `lora/`, `resident_model`, `directml_bridge`/`metal_bridge`/`npu_ffi`, `shaders/` — **internal wgpu LLM**. No candle, no llama.cpp. |
+| **oxigraph / SPARQL-JS** | SPARQL / SPARQL-star | `sparql_library` (SPARQL 1.1, federated, `sparql_mm`, WS streaming) + `query_engine`/`query_compiler`. No oxigraph. |
+| **rdflib / N3-JS** | RDF, RDF-star, N3, OWL, SHACL | `rdf_star`, `modalities/` (N3/OWL), `shacl_compiler`, `ontology_loader`. |
+| **JSON-LD / format libs** | Document/container format | `q42_lex`/`q42_reader`/`q42_volume`/`q42_lexicon`, `yaml_ld_q42`, `cbor_compiler` — the **q42 format** (48-byte NQuin). See `WEBIZEN_HYPERMEDIA_FORMAT.md`. |
+| **Babylon.js / three.js** | 3D / anatomy viewer | `webizen-runtime` wgpu + the `render` `Renderer` trait, with math/physics from QualiaDB `geometric_algebra/` (SIMD), `domains/physical`, `quantum_dft`, `ode_solver`, and diffusion `shaders/`. No Babylon/three. |
+| **Whisper-JS / Tesseract.js / PDF.js** | Audio/OCR/PDF ingestion | `ingest`/`ingestion`, `dicom_ingest`, `specialized_libs` ML layers; PDF already routed via `qualia-client-core` `ingest_pdf`. |
+| **OpenTimestamps-JS** | DLT / provenance anchoring | `provenance`, `fiduciary_crypto`, `zk_proofs`. |
+| **Chart.js** | Charts | **Presentation only** — hand-rolled SVG in Dioxus (dashboard already does this). Data comes from QualiaDB queries. |
+| **ZXing-js** | Barcode | Browser `BarcodeDetector`/`getUserMedia` via `web-sys` (W3C API, allowed); decoded value handed to QualiaDB. |
+| **Shoelace (CDN web components)** | UI widgets | Decision §11.1 — keep (standards web components, no Node) or go native Dioxus. |
 
-> Note: WebRTC, WebSocket, WebGPU, Canvas, localStorage, IndexedDB, `getUserMedia`, `BarcodeDetector` are **W3C browser APIs** reached via `web-sys`. Using them is *not* a Node.js/JS-library violation; they are the platform.
+> Allowed on the UI side because they are the *platform*, not engines: W3C browser APIs via `web-sys` (WebGPU, WebRTC, WebSocket, Canvas, localStorage/IndexedDB, `getUserMedia`, `BarcodeDetector`) and pure-presentation crates (Dioxus, SVG). Everything that *computes* goes to QualiaDB.
 
 ---
 
@@ -152,36 +152,40 @@ Current `is_native_host()` only checks `window.__TAURI__`. Generalize to:
 
 Re-implementations of `port_requirements.md`, each pure-Rust. Priority: **P0** = MVP for a credible local install; **P1** = strong; **P2** = later.
 
-| # | Feature (legacy source) | Rust/Dioxus implementation | Engine work? | Prio |
-|---|---|---|---|---|
-| F1 | LLM inference + streaming chat | `candle` (Rust) native; Tauri command + event stream; Dioxus chat UI | model runtime | P0 |
-| F2 | Chat session history / branching | Local store via `qualia-core-db` WAL; Dioxus session list | minor | P0 |
-| F3 | Universal ingestion (PDF/lit/image-OCR/web/audio) | `pdf-extract`✓, `rxing`, `rusty-tesseract`, `image`, `whisper-rs`; CBOR-LD via Rust | ingestion APIs | P0 |
-| F4 | SPARQL query + graph browser | `oxigraph` crate **or** QualiaDB N3; Dioxus playground (SVG graph) | SPARQL exec | P0 |
-| F5 | Full DID / VC management | Ed25519 (`ed25519-dalek`✓), W3C VC in Rust; Dioxus credential UI | partial | P0 |
-| F6 | Health Vault (records, meds, FHIR, SHACL) | Rust models + SHACL via QualiaDB; offline RxNorm cache (Rust); Dioxus | SHACL/rules | P1 |
-| F7 | Sanctuary Mode (duress, dead-man switch, OTS) | `aes-gcm`, `pbkdf2` (Rust); `opentimestamps` crate; Dioxus | DLT anchor | P1 |
-| F8 | Multi-chain wallet ("care credits") | Rust: `ldk-node` (Lightning), Cashu, etc.; Nym routing; Dioxus | wallet state | P1 |
-| F9 | Voice/video calls (WebRTC) | `web-sys` WebRTC (browser API) / native plugin; DTLS-SRTP; Dioxus overlay | signalling | P1 |
-| F10 | 3D Anatomy viewer + health↔anatomy map | **wgpu `Renderer`** + `gltf` crate (NOT Babylon); N3 organ-intensity rules | N3 inference | P1 |
-| F11 | Cooperative projects/obligation/ledger | Rust deontic via QualiaDB; SVG/`plotters` charts (NOT Chart.js) | ontology+N3 | P2 |
-| F12 | Verified directory & contacts (FOAF/ODRL) | Rust models in QualiaDB; Dioxus contact grid | minor | P2 |
-| F13 | QApp manifest v2 + sandboxing | Extend `qapp_studio`/manifest in Rust; capability grants | VM perms | P2 |
-| F14 | Tripwire / synthesis (Prolog rules) | QualiaDB N3/Prolog; Dioxus dashboards | engine-heavy | P2 |
-| F15 | Wire remaining 271 QApps to `qapp_engine` | Mechanical: add `EnginePanel` per discipline (pattern proven) | none | P1 |
+UI is always a Dioxus thin-client; the "engine" column names the **QualiaDB module** that actually computes.
+
+| # | Feature (legacy source) | Dioxus UI + **QualiaDB module** | Prio |
+|---|---|---|---|
+| F1 | LLM inference + streaming chat | chat UI ← `llm_agent` + `gguf_bridge`/`lora`/`resident_model` + wgpu `shaders/` (internal LLM); stream via Tauri events | P0 |
+| F2 | Chat session history / branching | session list ← `wal`/`temporal_graph` (provenance-stamped turns) | P0 |
+| F3 | Universal ingestion (PDF/lit/image/web/audio) | drop-zone UI ← `ingest`/`ingestion`, `dicom_ingest`, `cbor_compiler` | P0 |
+| F4 | SPARQL / SPARQL-star + graph browser | query playground + SVG graph ← `sparql_library`, `query_engine`, `rdf_star` | P0 |
+| F5 | Full DID / VC management | credential UI ← `webizen_identifiers`, `identifier`, `key_vault`, `fiduciary_crypto` | P0 |
+| F6 | Health Vault (records, meds, FHIR, SHACL) | vault UI ← `clinical_engine`, `comorbidity_eval`, `shacl_compiler`, `domains` | P1 |
+| F7 | Sanctuary Mode (duress, dead-man switch, anchoring) | UI ← `key_vault`, `fiduciary_crypto`, `zk_proofs`, `provenance` (DLT anchor) | P1 |
+| F8 | Multi-chain wallet ("care credits") | wallet UI ← `ilp_dispatcher`, `fiduciary_crypto`, `nym_adapter` | P1 |
+| F9 | Voice/video calls (WebRTC) | call overlay ← `web-sys` WebRTC (W3C) + `webizen_sync`/`nym_adapter` signalling | P1 |
+| F10 | 3D Anatomy viewer + health↔anatomy map | wgpu `Renderer` ← `geometric_algebra` (SIMD math) + `modalities` N3 organ-intensity rules over the health graph | P1 |
+| F11 | Cooperative projects/obligation/ledger | project UI + SVG charts ← `deontic_logic`, `modalities`, `provenance` | P2 |
+| F12 | Verified directory & contacts (FOAF/ODRL) | contact grid ← `agency`, `webizen_identifiers`, `deontic_logic` | P2 |
+| F13 | QApp manifest v2 + hypermedia container | ← `extension_manifest`, `extension_bus`, `q42_*`, `webtorrent_seeder` (see `WEBIZEN_HYPERMEDIA_FORMAT.md`) | P2 |
+| F14 | Tripwire / synthesis (logic rules) | dashboards ← `modalities` (paraconsistent/ASP/deontic), `neuro_symbolic_sieve` | P2 |
+| F15 | Wire remaining 271 QApps to `qapp_engine` | mechanical: `EnginePanel` per discipline (pattern proven) | P1 |
 
 ---
 
-## 7. QualiaDB Engine Work (separate from UI)
+## 7. QualiaDB Engine Surface (already exists — to be *exposed*, not rebuilt)
 
-These block features above and live in `qualia-core-db` (sibling repo), not here:
-- SPARQL executor (or oxigraph adoption decision) → F4, F6.
-- N3/Prolog rule execution on health & cooperative graphs → F10, F11, F14.
-- Obligation-attribution aggregation + inline numeric datatype → F11.
-- CRDT/WebTorrent P2P maturity → cooperative P2P (P2).
-- OpenTimestamps anchoring hook → F7.
+These capabilities are **already implemented** in `qualia-core-db` (sibling repo). The work is to surface them through Tauri commands + Dioxus UI, not to add engines:
+- `sparql_library` / `query_engine` / `rdf_star` → F4 query & graph browsing.
+- `modalities/` (N3, OWL, deontic, epistemic, paraconsistent, ASP, LTL) → F6/F10/F11/F14 rules.
+- `llm_agent` + `gguf_bridge` + `lora` + wgpu `shaders/` → F1 inference (no external LLM).
+- `geometric_algebra/` (SIMD) + `domains/physical` + `quantum_dft` + `ode_solver` → F10 / 3D engine math & physics.
+- `provenance` / `fiduciary_crypto` / `zk_proofs` → F5/F7 anchoring & credentials.
+- `webtorrent_seeder` / `webtorrent_routes` / `p2p` / `crdt` → distribution & sync.
+- `q42_*` / `yaml_ld_q42` / `cbor_compiler` → the hypermedia container format (§ below).
 
-The studio↔engine **contract already exists** (`qapp_engine` + `qapp_analyze` Tauri command); new engine features extend that command surface rather than inventing new transport.
+If a *new* engine primitive is genuinely missing, it is added in `qualia-core-db`, never reimplemented UI-side. The studio↔engine **contract already exists** (`qapp_engine` + `qapp_analyze` Tauri command); new capabilities extend that command surface rather than inventing new transport.
 
 ---
 
@@ -235,10 +239,11 @@ Coordination rules: each agent works on its own files/worktree; shared touch-poi
 ## 11. Open Decisions (need the user)
 
 1. **Shoelace.** Keep the CDN web-components (standards-based, no Node, but third-party JS in the page) or invest in native Dioxus components for a zero-third-party-JS guarantee? *Recommendation: keep for now (it's web components, not Node), revisit if "absolutely no JS in the page" is required.*
-2. **SPARQL:** adopt the `oxigraph` Rust crate vs. implement in QualiaDB's N3 engine. *Recommendation: oxigraph crate for speed-to-MVP; migrate to native later.*
-3. **LLM runtime:** `candle` (pure Rust, simpler build) vs. `llama-cpp-rs` (faster, FFI). *Recommendation: candle for MVP.*
-4. **Browser-pane exclusion:** runtime-gate only, or also a `browser-pane` cargo feature for a slimmer public wasm?
-5. **Projection scope:** project the *whole* app to the system browser, or only selected QApps/panels?
+2. **Browser-pane exclusion:** runtime-gate only, or also a `browser-pane` cargo feature for a slimmer public wasm?
+3. **Projection scope:** project the *whole* app to the system browser, or only selected QApps/panels?
+4. **Hypermedia container format:** ratify the `.q42app` design in `WEBIZEN_HYPERMEDIA_FORMAT.md` (q42-native, WebTorrent-distributable).
+
+> Resolved (no longer open): SPARQL and LLM are **QualiaDB-native** (`sparql_library`, `llm_agent`) — no oxigraph, candle, or llama.cpp.
 
 ---
 
