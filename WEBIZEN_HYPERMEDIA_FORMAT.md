@@ -1,13 +1,15 @@
 # Webizen Hypermedia QApp Format (`.q42app`)
 
 **Author:** Claude (Opus 4.8) · **Date:** 2026-06-15 · **Status:** Design proposal for ratification (Master Plan §11.4)
-**Grounding:** built entirely on existing `qualia-core-db` modules. No new serialization stack, no Node, no external engine.
+**Grounding:** extends existing `qualia-core-db` **and `qualia-client-core`** modules. No new serialization stack, no Node, no external engine.
+
+> ✅ **Correction (2026-06-15, after the client-crate audit):** an existing QApp container system was found in `qualia-client-core` — `qapp_manifest` (`QappManifest`, `CapabilityClaims`, `CompiledCapability` with clearance + `permitted_domains[8]` sandbox), `qapp_registry` (`QappPackageManifest`: capability, engine bindings, `health_path`/`query_path`/`websocket_path`, intent, `supports_launch_from_chat`/`return_to_chat`, PINN-model requirements), and `qapps_protocol` (a loopback HTTP server serving qapp assets from `{storage}/Qapps/`). `.q42app` is therefore **an extension of this manifest**, not a greenfield format — it adds: q42-volume packaging, a *declarative Dioxus-pane UI section*, author-DID signing, WebTorrent distribution, and the capability-verb bindings below. Field names below should be reconciled with `QappPackageManifest` during ratification.
 
 ---
 
 ## 1. Why a format at all
 
-Today a "QApp" is a hardcoded Dioxus component compiled into the studio binary. That cannot be distributed, versioned, signed, sandboxed, or authored by anyone but us. The audit (`QUALIA_DB_LOGIC_AUDIT.md`) is explicit: QApps are **thin UI clients over QualiaDB compute**. So a QApp's *essence* is not code — it is:
+Today the **built-in** QApps are hardcoded Dioxus components compiled into the studio binary (the existing `qapp_manifest`/`qapp_registry` system handles *installed HTML/WebView* qapps separately, but not the 274 disciplines). Neither path lets a discipline (or a third party) ship a **declarative, signed, distributable** QApp. The audit (`QUALIA_DB_LOGIC_AUDIT.md`) is explicit: QApps are **thin UI clients over QualiaDB compute**. So a QApp's *essence* is not code — it is:
 
 1. a **declarative UI** (which panes, how arranged, what they bind to),
 2. a set of **capability bindings** (which QualiaDB queries / rules / models / solvers it invokes),

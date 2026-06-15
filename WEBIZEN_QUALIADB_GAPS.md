@@ -28,11 +28,29 @@
 
 ---
 
+## 1b. Client crates — these close several "gaps" (audited 2026-06-15)
+
+The earlier audit was core-db-centric. `qualia-client-core` (the crate `webizen-desktop` actually calls via `api::*`) and its siblings already provide a lot of what the feature matrix needs — these are **present, surface them**, not build:
+
+| Capability | Module(s) | Effect on plan |
+|---|---|---|
+| **LLM chat system** (sessions, inference, retrieval, relay, agents, files, ontology, graph) | `qualia-client-core/chat_{session,inference,retrieval,relay,agents,files,ontology,graph}`, `inference_backend`, `model_lifecycle`, `model_preferences` | **F1/F2 largely present** — downgrade from "build" to "surface in Dioxus". |
+| **Anatomy representation context** | `anatomy_context` (`AnatomyGraphContext`, `build_anatomy_graph_context_json`, DICOM overlay spec) | **The concrete `SceneSource` for the 3D engine** — F10's data source exists; align `render::qualia::SemanticScene` to its JSON. |
+| **QApp container system** (manifest, capability claims, clearance, sandbox domains, asset server) | `qapp_manifest` (`QappManifest`/`CapabilityClaims`/`CompiledCapability`), `qapp_registry` (`QappPackageManifest`), `qapps_protocol` (loopback asset server), `qapp_mcp`, `qapp_version` | **The hypermedia format already has a foundation** — `.q42app` must *extend* this, not invent (see corrected `WEBIZEN_HYPERMEDIA_FORMAT.md`). |
+| **Social contacts / invites** | `social_connect` (`ConnectInvitePayload`, `ChatContact`, `generate/accept_connect_invite`, signed invites, DID-keyed contacts), `guardianship` | **F12 + the social-network peer source** — SocialWebNet/WireGuard peers can be provisioned from these DID contacts. |
+| **Solid + OIDC micro-IdP** | `qualia-solid-bridge` (`oidc_micro_idp::oidc_routes`, `solid_proxy`, `ldp_translator`) | Identity/auth + Solid Pod; an OIDC IdP endpoint already exists. |
+| **WellFare / health** (whole crate) | `wellfare-core` (`models`, `n3_rules`, `shapes`, `store`, `wasm`, `webizen`) | **F6/F7 have a dedicated crate** — health vault + sanctuary logic foundation. |
+| **QPU dispatch / oracle / pipeline** | `qualia-client-core/qpu_{dispatcher,oracle,pipeline}` | quantum QApps already wired client-side. |
+| **Resource import / ingestion** | `resource_import`, `engine/ingestion`, `q42_compress` | F3 ingestion plumbing. |
+| **Compute extensions** | `qualia-extensions` (`pinn_extension`, `snn_extension`, `qpu_extension`, `webgpu_extension`) | PINN/SNN/QPU/WebGPU **compute** (see note in §2). |
+
+---
+
 ## 2. Confirmed MISSING (0 file matches — genuine gaps to build)
 
 | Gap | Probe | Where it should be built | Blocks |
 |---|---|---|---|
-| **3D rendering** (render pipeline / vertex+fragment shaders / surface config) | 0 | **`webizen-render`** (new) — *presentation*, not engine; uses QualiaDB `geometric_algebra` for math | 3D anatomy (F10), GPU benchmark, physics viz |
+| **3D rendering** (render pipeline / vertex+fragment shaders / surface config) | 0 | **`webizen-render`** (new) — *presentation*, not engine; uses QualiaDB `geometric_algebra` for math. NB: `qualia-extensions/webgpu_extension` is GPU **compute** (fluid/EM physics), not render — the gap holds; the renderer can *share* its wgpu device. | 3D anatomy (F10), GPU benchmark, physics viz |
 | **glTF / `.glb` asset loading** | 0 | `webizen-render` (a codec) | anatomy atlas, model import |
 | **HCAI negotiation endpoint** (inbound agreement server) | 0 | new `qualia-core-db` surface or `webizen-desktop/webai/` (legacy located it here); enforce via `deontic_logic` | the entire inbound gatekeeper (F16) — *this is the chokepoint the browser is built around* |
 | **Audio transcription (Whisper)** | 0 | `qualia-core-db` (neural layer / `llm_agent` multimodal) | ingestion F3 (audio) |
@@ -52,15 +70,16 @@
 
 ---
 
-## 4. Implications for the plan
+## 4. Implications for the plan (revised after the client-crate audit)
 
-1. **3D engine work is validated.** Rendering genuinely does not exist in QualiaDB (compute does). `webizen-render` (the scene-graph + `Renderer` + future `WgpuRenderer` I've started) is the correct, non-duplicative home — it delegates *math* to `geometric_algebra` and *physics* to the solvers, and only owns *presentation*.
-2. **The HCAI negotiation endpoint is the highest-leverage engine gap.** It is the single inbound door the whole browser thesis depends on (F16), and it returns 0 matches. Build it next to `deontic_logic`, mirroring the legacy `webai/hcai_agreement.rs` design.
-3. **The frontdoor serving side** (own `did.json` + `/.well-known/QDP`) and **WebRTC ingress** are the two transport surfaces to confirm/build for "becomes a browser."
-4. **Ingestion multimodality** (Whisper audio, OCR) are real engine gaps — but P2 (not MVP-blocking).
-5. **WireGuard datapath** (§6.5 of `WEBIZEN_NETWORK.md`) — the *logic* exists; confirm the OS datapath integration.
+1. **3D engine work is validated.** Rendering exists nowhere in QualiaDB — even `qualia-extensions/webgpu_extension` is compute. `webizen-render` (scene-graph + `Renderer` + future `WgpuRenderer`) is the correct, non-duplicative home; math delegates to `geometric_algebra`, physics to the solvers, and it owns only *presentation*. Its concrete first data source is **`anatomy_context`** — align `render::qualia::SemanticScene` to `AnatomyGraphContext`.
+2. **Less to build than first thought.** The client crates already cover **LLM chat (F1/F2)**, **anatomy data (F10)**, the **QApp container foundation**, **social contacts (F12)**, **Solid/OIDC**, and a whole **WellFare/health crate (F6/F7)**. These move from "build" to "**surface in Dioxus**".
+3. **The hypermedia format must extend, not invent.** `qapp_manifest`/`qapp_registry`/`qapps_protocol` already give a manifest, capability claims, clearance/sandbox domains, chat handoff, and an asset server. `.q42app` formalises + q42-packages + signs + UI-declares on top (corrected in `WEBIZEN_HYPERMEDIA_FORMAT.md`).
+4. **The HCAI negotiation endpoint is the highest-leverage true gap** (0 matches) — the single inbound door the browser thesis depends on (F16). Build next to `deontic_logic`, mirroring legacy `webai/hcai_agreement.rs`.
+5. **Frontdoor serving** (own `did.json` + `/.well-known/QDP`) and **WebRTC ingress** are the two transport surfaces to confirm/build; **WireGuard datapath** (`WEBIZEN_NETWORK.md` §6.5) — logic exists, confirm OS datapath.
+6. **Whisper audio + OCR** are real engine gaps but P2 (not MVP-blocking).
 
-**Recommended build order (engine-side):** HCAI endpoint → QDP/`did.json` serving → WireGuard command surface + datapath → WebRTC ingress → (later) Whisper/OCR. Everything else is *surfacing* existing capability through Tauri commands + Dioxus UI, per the master plan.
+**Revised build order:** *surface* already-present client capabilities (chat, anatomy, contacts, QApp manifest) in Dioxus → HCAI endpoint → QDP/`did.json` serving → WireGuard command surface + datapath → WebRTC ingress → `webizen-render` `WgpuRenderer` → (later) Whisper/OCR.
 
 ---
 
