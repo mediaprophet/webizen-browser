@@ -3,7 +3,7 @@
 **Author:** Claude (Opus 4.8) · **Date:** 2026-06-15 · **Status:** Architecture incorporated from `legacy/devnotes/` (QDP / Front Door / HCAI / Nym / WebRTC). Maps the SvelteKit-era design onto the Rust/Dioxus stack.
 **Source notes:** `legacy/devnotes/notes.md`, `orchastration-webai.md` §3.12–§3.13, `orchastration-webai-implementation.md`, `port_requirements.md`.
 
-> ⚠️ **WireGuard note up front:** WireGuard does **not** appear anywhere in the legacy notes. The "socially-defined network" the notes describe is **QDP DNS + Front Door DIDs + HCAI Agreement negotiation + Nym Mixnet + WebRTC (DTLS-SRTP) + WebTorrent**. WireGuard would be a *new* transport choice (a trusted-peer "social VPN" overlay). It is addressed as an explicit decision in §6 — incorporated as an option, not asserted as existing design.
+> ✅ **WireGuard correction (2026-06-15):** An earlier draft of this doc said WireGuard wasn't in the design — that was wrong. It is absent from the legacy *SvelteKit frontend* notes, but it is **already implemented in the engine**: `qualia-core-db/src/daemon_swarm.rs` defines a **`SocialWebNet`** — a WireGuard overlay where peer public keys are distributed via **DNSSEC CBOR-LD semantic payloads** tied to the Q42 DNS overlay and Front Door DIDs. WireGuard is therefore a *first-class existing transport*, not a new option. See §2.5 and §6.
 
 ---
 
@@ -21,8 +21,9 @@ This is what Master-Plan profile **(B) the local install** delivers. Profiles (A
 
 ```
 ┌──────────────────────────────────────────────────────────────────────┐
-│ 5. TRANSPORT   Nym Mixnet (anon) · WebRTC/DTLS-SRTP (sessions) ·       │
-│                WebTorrent+DHT (content) · [WireGuard? §6]              │
+│ 5. TRANSPORT   SocialWebNet/WireGuard (DID-keyed peer mesh, keys via   │
+│                DNSSEC) · Nym Mixnet (anon) · WebRTC (P2P SuperBlock     │
+│                streaming + sessions) · WebTorrent+DHT (content)        │
 ├──────────────────────────────────────────────────────────────────────┤
 │ 4. GATEKEEPER  HCAI Agreement Negotiation — the ONLY inbound door.     │
 │                "Signature is not authorization": structural            │
@@ -48,7 +49,33 @@ This is what Master-Plan profile **(B) the local install** delivers. Profiles (A
 - **Identity (Front Door DIDs):** each domain gets a *purpose-built* DID "only for that domain… to ensure it doesn't lead to unintended consequences" (notes.md) — i.e. unlinkable per-context identity.
 - **Frontdoor:** `did.json` exposes exactly one service (`HCAIAgreementNegotiation`); no API, no graph endpoint. For DNS-only registrars, the DID is encoded into `_did` TXT/NS records.
 - **Gatekeeper (HCAI):** inbound agents receive a machine-enforceable signed policy (NQuin triples in `urn:webai:policy-graph`: `noDataRetention`, `noContextPersistence`, `sessionScopedOnly`, `dutyOfCareVersion`, `penaltyOnViolation`). The **Operator** (the liable human/company behind the agent), not the agent, is bound. Three invariants: structural minimisation is the only authorization; refusal is costless (browser fully functional with zero bound agents); consent is instantly revocable.
-- **Transport:** Nym for anonymous/contextual comms (VerifiedComms chat bound to `q_hash(active_url)`); WebRTC DTLS-SRTP for live sessions; WebTorrent/DHT for ontology & content distribution.
+- **Transport:** **SocialWebNet/WireGuard** for the trusted peer mesh (§2.5); Nym for anonymous/contextual comms (VerifiedComms chat bound to `q_hash(active_url)`); WebRTC for P2P SuperBlock streaming and live sessions; WebTorrent/DHT for ontology & content distribution.
+
+---
+
+## 2.5 The DNS solution in detail (QDP + DNSSEC semantic payloads)
+
+This is the "new form of DNS solution" — two complementary pieces, both grounded in q42.
+
+**(a) QDP — the IETF Internet-Draft.** `draft-webcivics-qdp-protocol` (Timothy Holborn / WebCivics, Standards-Track) formally specifies:
+- Discovery endpoint **`https://<domain>/.well-known/QDP`** returning RDF (Turtle + JSON-LD).
+- An **agent-type ontology** (`QDP:` namespace): `PersonAgent`, `OrganizationAgent`, `AutomatedAgent` (AI), `EssentialService` (humanitarian), `ContentProvider` (with `schema:isAdultOriented` / `QDP:contentRating`), plus `QDP:hasService`, `sparqlEndpoint`, `hasSolidPod`, `hasEcashAccount`, etc.
+- A **query API**: `GET /?domain=<d>&field=<prefix:prop>` and `GET /?domain=<d>&ecash`.
+- **DNS verification via Front Door DIDs**: a `_qdp.<domain>` TXT record carries `qdp:signer <did:…>`, where the DID **MUST** be a per-domain Front Door DID (contextually isolated, anti-correlation).
+- SHACL constraints, Security/Privacy considerations, IANA well-known + media-type registrations.
+
+The client side is implemented in `qualia-client-core/dns_resolver.rs` as a **4-tier cascade** (header-documented): `did:q42:` → NS-record encoding → HTTP `/.well-known/QDP` → DNS TXT, with `did:web:`/`did:key:` passthrough.
+
+**(b) DNSSEC CBOR-LD semantic payloads — the WireGuard key layer.** `qualia-core-db/daemon_swarm.rs` carries a **`DnssecSemanticPayload`** (CBOR-LD, ≤512 B for DNSSEC limits) in DNSSEC TXT (16) / CERT (37) records:
+```
+DnssecSemanticPayload { wireguard_pubkey:[u8;32], did_q42:u64,
+                        routing_mask:u64 /*5th-vector HW mask*/,
+                        semantic_handshake:String, peer_capabilities:u16,
+                        semantic_context:u64 }
+```
+A `DnssecResolver` (trusted anchors + validation) fetches these; `SocialWebNetInterface::establish_wireguard_tunnel(peer_payload, endpoint, port)` then brings up a **WireGuard tunnel to a peer discovered purely via DNS**, keyed by the peer's Q42 DID. WorkerCells (512 MB "Fractal Sharding" isolates) each hold a DNSSEC resolver + WireGuard interface + Q42 lexicon + CBOR-LD parser.
+
+**Net:** the DNS root becomes a DNSSEC-anchored, q42-encoded directory that distributes both *discovery* (QDP/Front Door DID) and *transport keys* (WireGuard pubkeys) — a DID-keyed social VPN mesh provisioned from DNS. This is the heart of the "socially-defined network."
 
 ---
 
@@ -62,7 +89,7 @@ Everything is QualiaDB-native (`qualia-core-db`) or `qualia-client-core` — no 
 | Identity | `identifier`, `webizen_identifiers`, `key_vault`, `fiduciary_crypto` | `generate_front_door`, `get_front_doors`, `generate_front_door_invite` ✅ |
 | Frontdoor | `webizen_server`, `web_civics`, `provenance` | (did.json serving — to add) |
 | Gatekeeper (HCAI) | `deontic_logic`, `modalities`, `agency`, `provenance` | `apply_semantic_handshake`, `accept_vault_handshake`, `evaluate_data_request` ✅ |
-| Transport | `nym_adapter`, `p2p`, `webtorrent_seeder`/`webtorrent_routes`, `daemon_swarm`, `acoustic_ble_mesh` | `toggle_nym_relay`, `fetch_torrent_telemetry` ✅ |
+| Transport | **`daemon_swarm` (SocialWebNet/WireGuard + DnssecResolver)**, `nym_adapter`, `p2p`, `webtorrent_seeder`/`webtorrent_routes`, `acoustic_ble_mesh` | `toggle_nym_relay`, `fetch_torrent_telemetry` ✅ (WireGuard tunnel mgmt — not yet surfaced as a command) |
 
 **Key finding:** a large slice of the social-network layer is *already ported* to the Rust/Tauri stack — the omnibox already routes `qdp://`/`did:q42:` through `submit_omnibox_query` → `resolve_qdp_did`, and Front Door + Nym + semantic-handshake commands exist. The gaps are the **outbound `did.json` frontdoor server** and the **HCAI negotiation endpoint** as first-class surfaces, plus the Dioxus UI for all of it.
 
@@ -92,17 +119,17 @@ On top of the Master Plan's local-install work (settings/about/tray/projection),
 
 ---
 
-## 6. The WireGuard decision (new — needs the user)
+## 6. WireGuard / SocialWebNet — existing capability to surface
 
-WireGuard is **not** in the legacy design; the notes use Nym (anonymity) + WebRTC (sessions) + WebTorrent (content). Where it *could* fit and the trade-offs:
+**Status: implemented in the engine, not yet exposed to the browser.** `qualia-core-db/daemon_swarm.rs` already provides `SocialWebNetInterface`, `SocialWebNetPeer`, `DnssecResolver`, `DnssecSemanticPayload`, `init_wireguard_interface()` and `establish_wireguard_tunnel()`. So this is not a "should we add WireGuard" question — it exists and is integrated with the DNS/DID layer (§2.5). The work is to **surface and operationalise** it:
 
-| Option | Role | Assessment |
-|---|---|---|
-| **A. No WireGuard (as-designed)** | Nym + WebRTC + WebTorrent cover anon, sessions, content | Matches the notes; nothing missing for the described threat model. Recommended unless a concrete need below applies. |
-| **B. WireGuard as a "social VPN" overlay** | A persistent encrypted mesh between *already-trusted* peers (your own devices; contacts you've completed an HCAI agreement with) | Complements rather than replaces: Nym stays for anonymous/unknown inbound, WebRTC for calls, WireGuard for durable trusted links (e.g. multi-device personal-graph sync, a cooperative's member mesh). Peer config keyed by Front Door DIDs. |
-| **C. WireGuard as primary transport** | Replace WebRTC/Nym | Not recommended — loses Nym's anonymity guarantees and WebRTC's browser-native call path; contradicts the threat model (trafficking/DV survivors need unlinkability, which a static-key VPN mesh weakens). |
+1. **Tauri commands** to drive it from the Dioxus UI: `social_webnet_init`, `social_webnet_add_peer(did_q42)`, `social_webnet_status`, `social_webnet_tunnel_down`. (None exist yet — the WireGuard surface has no command, unlike Nym which has `toggle_nym_relay`.)
+2. **Peer provisioning from the Front Door DID directory** — resolve a contact's `DnssecSemanticPayload` (their WireGuard pubkey + Q42 DID) via the `DnssecResolver` and call `establish_wireguard_tunnel`.
+3. **HCAI gating** — a tunnel to a peer is authorised by the same HCAI agreement that defines the relationship; `routing_mask` enforces what the link may carry.
+4. **Role clarity** (the layers are complementary, not competing): SocialWebNet/WireGuard = durable links between *trusted/known* peers (multi-device personal-graph sync, a cooperative's member mesh); Nym = anonymity for *unknown/inbound*; WebRTC = P2P SuperBlock streaming + calls; WebTorrent = content.
+5. **Datapath verification** — confirm whether `establish_wireguard_tunnel` shells out to the OS WireGuard (`wg`/`wg-quick`, kernel/wintun) or expects a userspace impl; the desktop bundle must ship/locate the datapath on Windows/macOS/Linux. **This is the one genuine open implementation question** (not a design decision).
 
-**Architectural fit if B is chosen:** WireGuard is a *transport*, like WebRTC (which the design already uses), so it does not violate the "no external compute engine" rule. A Rust userspace implementation (`boringtun`) keeps it dependency-light and cross-platform. It would slot under Transport (layer 5), with tunnel peers provisioned from the Front Door DID directory and gated by the same HCAI agreement that authorises the relationship. **Open question for ratification:** does QualiaDB intend to own the overlay transport (so WireGuard becomes a `qualia-core-db` module alongside `nym_adapter`/`p2p`), or is it a `webizen-desktop` transport plugin?
+> Earlier this doc framed WireGuard as a new choice. Correction: it is an existing `qualia-core-db` transport (`daemon_swarm`); the only open item is the OS datapath integration in §6.5.
 
 ---
 
