@@ -5,7 +5,7 @@ pub fn DeonticLogicEditor() -> Element {
     rsx! {
         div {
             style: "flex: 1; padding: 2rem; background: rgba(40, 20, 20, 0.8); backdrop-filter: blur(15px); border-radius: 16px; border: 1px solid rgba(255, 100, 100, 0.2); color: #FFF;",
-            
+
             h2 {
                 style: "font-family: 'Outfit', sans-serif; font-size: 2.2rem; color: #FF6B6B; margin-bottom: 0.5rem;",
                 "Deontic Logic Editor"
@@ -14,7 +14,7 @@ pub fn DeonticLogicEditor() -> Element {
 
             div {
                 style: "display: flex; flex-direction: column; gap: 1rem;",
-                
+
                 div {
                     style: "display: flex; gap: 1rem; align-items: stretch;",
                     div {

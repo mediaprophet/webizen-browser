@@ -1,17 +1,17 @@
 use dioxus::prelude::*;
-use serde::Deserialize;
 #[cfg(target_arch = "wasm32")]
 use js_sys::Uint8ClampedArray;
+use serde::Deserialize;
 #[cfg(target_arch = "wasm32")]
 use serde::de::DeserializeOwned;
 #[cfg(target_arch = "wasm32")]
 use serde_json::json;
 #[cfg(target_arch = "wasm32")]
-use wasm_bindgen::prelude::*;
-#[cfg(target_arch = "wasm32")]
 use wasm_bindgen::Clamped;
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::JsCast;
+#[cfg(target_arch = "wasm32")]
+use wasm_bindgen::prelude::*;
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen_futures::JsFuture;
 #[cfg(target_arch = "wasm32")]
@@ -184,33 +184,36 @@ pub fn DiffusionVisualizer() -> Element {
                     ledger_health.set(Some(health));
                 }
 
-                let callback = Closure::<dyn FnMut(JsValue)>::wrap(Box::new(move |event: JsValue| {
-                    let payload = js_sys::Reflect::get(&event, &JsValue::from_str("payload"));
-                    let mut latest_epoch = latest_epoch;
-                    let mut dimensions = dimensions;
-                    let mut status = status;
+                let callback =
+                    Closure::<dyn FnMut(JsValue)>::wrap(Box::new(move |event: JsValue| {
+                        let payload = js_sys::Reflect::get(&event, &JsValue::from_str("payload"));
+                        let mut latest_epoch = latest_epoch;
+                        let mut dimensions = dimensions;
+                        let mut status = status;
 
-                    if let Ok(payload) = payload {
-                        match serde_wasm_bindgen::from_value::<RuntimeSnapshotRecord>(payload) {
-                            Ok(snapshot) => {
-                                latest_epoch.set(snapshot.epoch);
-                                dimensions.set(snapshot.dimensions);
-                                wasm_bindgen_futures::spawn_local(async move {
-                                    if let Err(err) = draw_snapshot(snapshot).await {
-                                        status.set(format!("Blit failed: {err}"));
-                                    } else {
-                                        status.set("Streaming deterministic epochs".to_string());
-                                    }
-                                });
+                        if let Ok(payload) = payload {
+                            match serde_wasm_bindgen::from_value::<RuntimeSnapshotRecord>(payload) {
+                                Ok(snapshot) => {
+                                    latest_epoch.set(snapshot.epoch);
+                                    dimensions.set(snapshot.dimensions);
+                                    wasm_bindgen_futures::spawn_local(async move {
+                                        if let Err(err) = draw_snapshot(snapshot).await {
+                                            status.set(format!("Blit failed: {err}"));
+                                        } else {
+                                            status
+                                                .set("Streaming deterministic epochs".to_string());
+                                        }
+                                    });
+                                }
+                                Err(err) => status.set(format!("Snapshot decode failed: {err}")),
                             }
-                            Err(err) => status.set(format!("Snapshot decode failed: {err}")),
+                        } else {
+                            status.set("Diffusion event payload missing".to_string());
                         }
-                    } else {
-                        status.set("Diffusion event payload missing".to_string());
-                    }
-                }));
+                    }));
 
-                match tauri_listen("diffusion-epoch-ready", callback.as_ref().unchecked_ref()).await {
+                match tauri_listen("diffusion-epoch-ready", callback.as_ref().unchecked_ref()).await
+                {
                     Ok(_unlisten) => {
                         callback.forget();
                     }

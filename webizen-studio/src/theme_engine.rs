@@ -125,7 +125,10 @@ pub fn resolve_theme(binding: Option<&ThemeBinding>, catalog: &[ThemeDefinition]
 
         if let Some(definition) = catalog.iter().find(|theme| theme.id == *theme_id) {
             resolved.class_name = definition.class_name.clone();
-            push_stylesheet(&mut resolved.stylesheets, definition.stylesheet_href.clone());
+            push_stylesheet(
+                &mut resolved.stylesheets,
+                definition.stylesheet_href.clone(),
+            );
             resolved.tokens.extend(definition.tokens.clone());
         }
     }

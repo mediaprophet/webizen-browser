@@ -14,7 +14,7 @@ See [LICENSE](./LICENSE) for full terms.
 
 ## Webizen Studio
 
-A Dioxus/wasm32 application providing 244+ interactive QApp components across all academic disciplines, backed by QualiaDB's epistemic graph engine.
+A Dioxus/wasm32 application providing 274 interactive academic-discipline QApp components (plus ~40 platform, AI, scientific, and developer QApps) backed by QualiaDB's epistemic graph engine.
 
 **Demo:** https://mediaprophet.github.io/webizen-browser/
 

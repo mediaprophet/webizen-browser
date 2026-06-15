@@ -2,7 +2,10 @@ use dioxus::prelude::*;
 
 #[component]
 pub fn SparqlExplorer() -> Element {
-    let mut query = use_signal(|| "SELECT ?subject ?predicate ?object\nWHERE {\n  ?subject ?predicate ?object\n}\nLIMIT 10".to_string());
+    let mut query = use_signal(|| {
+        "SELECT ?subject ?predicate ?object\nWHERE {\n  ?subject ?predicate ?object\n}\nLIMIT 10"
+            .to_string()
+    });
     let mut results = use_signal(|| Vec::<(String, String, String)>::new());
     let mut is_loading = use_signal(|| false);
 
@@ -10,8 +13,16 @@ pub fn SparqlExplorer() -> Element {
         is_loading.set(true);
         // Mock query execution
         let mock_data = vec![
-            ("did:q42:alice".to_string(), "foaf:knows".to_string(), "did:q42:bob".to_string()),
-            ("did:q42:bob".to_string(), "foaf:name".to_string(), "\"Bob\"".to_string()),
+            (
+                "did:q42:alice".to_string(),
+                "foaf:knows".to_string(),
+                "did:q42:bob".to_string(),
+            ),
+            (
+                "did:q42:bob".to_string(),
+                "foaf:name".to_string(),
+                "\"Bob\"".to_string(),
+            ),
         ];
         results.set(mock_data);
         is_loading.set(false);

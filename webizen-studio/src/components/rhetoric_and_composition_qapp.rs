@@ -12,13 +12,13 @@ pub fn RhetoricAndCompositionQapp() -> Element {
 
     rsx! {
         div {
-            style: "padding: 20px; background: #1e1e2e; color: #cdd6f4; border-radius: 12px; font-family: monospace; display: flex; flex-direction: column; gap: 16px; height: 100%; box-sizing: border-box; overflow-y: auto;",
-            h2 { style: "margin: 0; color: #cba6f7; border-bottom: 1px solid #313244; padding-bottom: 8px;", "Rhetoric & Composition QApp" }
+            style: "padding: 20px; background: var(--qualia-surface); color: var(--qualia-text); border-radius: 12px; font-family: monospace; display: flex; flex-direction: column; gap: 16px; height: 100%; box-sizing: border-box; overflow-y: auto;",
+            h2 { style: "margin: 0; color: var(--qualia-accent); border-bottom: 1px solid var(--qualia-border); padding-bottom: 8px;", "Rhetoric & Composition QApp" }
 
             div { style: "display: flex; flex-direction: column; gap: 8px;",
-                label { style: "font-size: 0.85rem; color: #a6adc8;", "Rhetorical Tradition" }
+                label { style: "font-size: 0.85rem; color: var(--qualia-text-muted);", "Rhetorical Tradition" }
                 select {
-                    style: "background: #313244; color: #cdd6f4; border: 1px solid #45475a; border-radius: 6px; padding: 6px 8px; font-family: monospace; width: 100%; box-sizing: border-box;",
+                    style: "background: var(--qualia-border); color: var(--qualia-text); border: 1px solid var(--qualia-border); border-radius: 6px; padding: 6px 8px; font-family: monospace; width: 100%; box-sizing: border-box;",
                     onchange: move |e| rhetorical_tradition.set(e.value()),
                     option { selected: true, "Classical Greek" }
                     option { "Roman" }
@@ -31,9 +31,9 @@ pub fn RhetoricAndCompositionQapp() -> Element {
             }
 
             div { style: "display: flex; flex-direction: column; gap: 8px;",
-                label { style: "font-size: 0.85rem; color: #a6adc8;", "Rhetorical Appeal" }
+                label { style: "font-size: 0.85rem; color: var(--qualia-text-muted);", "Rhetorical Appeal" }
                 select {
-                    style: "background: #313244; color: #cdd6f4; border: 1px solid #45475a; border-radius: 6px; padding: 6px 8px; font-family: monospace; width: 100%; box-sizing: border-box;",
+                    style: "background: var(--qualia-border); color: var(--qualia-text); border: 1px solid var(--qualia-border); border-radius: 6px; padding: 6px 8px; font-family: monospace; width: 100%; box-sizing: border-box;",
                     onchange: move |e| appeal.set(e.value()),
                     option { "Ethos" }
                     option { "Pathos" }
@@ -44,9 +44,9 @@ pub fn RhetoricAndCompositionQapp() -> Element {
             }
 
             div { style: "display: flex; flex-direction: column; gap: 8px;",
-                label { style: "font-size: 0.85rem; color: #a6adc8;", "Genre" }
+                label { style: "font-size: 0.85rem; color: var(--qualia-text-muted);", "Genre" }
                 select {
-                    style: "background: #313244; color: #cdd6f4; border: 1px solid #45475a; border-radius: 6px; padding: 6px 8px; font-family: monospace; width: 100%; box-sizing: border-box;",
+                    style: "background: var(--qualia-border); color: var(--qualia-text); border: 1px solid var(--qualia-border); border-radius: 6px; padding: 6px 8px; font-family: monospace; width: 100%; box-sizing: border-box;",
                     onchange: move |e| genre.set(e.value()),
                     option { selected: true, "Deliberative" }
                     option { "Forensic" }
@@ -58,9 +58,9 @@ pub fn RhetoricAndCompositionQapp() -> Element {
             }
 
             div { style: "display: flex; flex-direction: column; gap: 8px;",
-                label { style: "font-size: 0.85rem; color: #a6adc8;", "Discourse Mode" }
+                label { style: "font-size: 0.85rem; color: var(--qualia-text-muted);", "Discourse Mode" }
                 select {
-                    style: "background: #313244; color: #cdd6f4; border: 1px solid #45475a; border-radius: 6px; padding: 6px 8px; font-family: monospace; width: 100%; box-sizing: border-box;",
+                    style: "background: var(--qualia-border); color: var(--qualia-text); border: 1px solid var(--qualia-border); border-radius: 6px; padding: 6px 8px; font-family: monospace; width: 100%; box-sizing: border-box;",
                     onchange: move |e| discourse_mode.set(e.value()),
                     option { selected: true, "Argument" }
                     option { "Narration" }
@@ -72,9 +72,9 @@ pub fn RhetoricAndCompositionQapp() -> Element {
             }
 
             div { style: "display: flex; flex-direction: column; gap: 8px;",
-                label { style: "font-size: 0.85rem; color: #a6adc8;", "Stasis Question" }
+                label { style: "font-size: 0.85rem; color: var(--qualia-text-muted);", "Stasis Question" }
                 select {
-                    style: "background: #313244; color: #cdd6f4; border: 1px solid #45475a; border-radius: 6px; padding: 6px 8px; font-family: monospace; width: 100%; box-sizing: border-box;",
+                    style: "background: var(--qualia-border); color: var(--qualia-text); border: 1px solid var(--qualia-border); border-radius: 6px; padding: 6px 8px; font-family: monospace; width: 100%; box-sizing: border-box;",
                     onchange: move |e| stasis_question.set(e.value()),
                     option { selected: true, "Fact" }
                     option { "Definition" }
@@ -85,33 +85,33 @@ pub fn RhetoricAndCompositionQapp() -> Element {
             }
 
             div { style: "display: flex; flex-direction: column; gap: 8px;",
-                label { style: "font-size: 0.85rem; color: #a6adc8;", "Text Excerpt" }
+                label { style: "font-size: 0.85rem; color: var(--qualia-text-muted);", "Text Excerpt" }
                 textarea {
-                    style: "background: #313244; color: #cdd6f4; border: 1px solid #45475a; border-radius: 6px; padding: 6px 8px; font-family: monospace; width: 100%; box-sizing: border-box; min-height: 70px; resize: vertical;",
+                    style: "background: var(--qualia-border); color: var(--qualia-text); border: 1px solid var(--qualia-border); border-radius: 6px; padding: 6px 8px; font-family: monospace; width: 100%; box-sizing: border-box; min-height: 70px; resize: vertical;",
                     placeholder: "Paste text excerpt for analysis...",
                     oninput: move |e| text_excerpt.set(e.value()),
                 }
             }
 
             div { style: "display: flex; flex-direction: column; gap: 8px;",
-                label { style: "font-size: 0.85rem; color: #a6adc8;", "Compositional Notes" }
+                label { style: "font-size: 0.85rem; color: var(--qualia-text-muted);", "Compositional Notes" }
                 textarea {
-                    style: "background: #313244; color: #cdd6f4; border: 1px solid #45475a; border-radius: 6px; padding: 6px 8px; font-family: monospace; width: 100%; box-sizing: border-box; min-height: 60px; resize: vertical;",
+                    style: "background: var(--qualia-border); color: var(--qualia-text); border: 1px solid var(--qualia-border); border-radius: 6px; padding: 6px 8px; font-family: monospace; width: 100%; box-sizing: border-box; min-height: 60px; resize: vertical;",
                     placeholder: "Compositional analysis notes...",
                     oninput: move |e| compositional_notes.set(e.value()),
                 }
             }
 
             div {
-                style: "background: #11111b; padding: 16px; border-radius: 8px; border-left: 4px solid #cba6f7; flex: 1;",
-                h3 { style: "margin-top: 0; color: #cba6f7; font-size: 0.9rem;", "QualiaDB Output" }
-                div { style: "font-size: 0.8rem; color: #a6adc8; display: flex; flex-direction: column; gap: 4px;",
+                style: "background: var(--qualia-bg); padding: 16px; border-radius: 8px; border-left: 4px solid var(--qualia-accent); flex: 1;",
+                h3 { style: "margin-top: 0; color: var(--qualia-accent); font-size: 0.9rem;", "QualiaDB Output" }
+                div { style: "font-size: 0.8rem; color: var(--qualia-text-muted); display: flex; flex-direction: column; gap: 4px;",
                     div { "Tradition: {rhetorical_tradition()}" }
                     div { "Appeal: {appeal()}" }
                     div { "Genre: {genre()}" }
                     div { "Stasis: {stasis_question()}" }
                 }
-                div { style: "font-size: 0.75rem; color: #585b70; margin-top: 8px;", "QualiaDB → discourse sieve | epistemic logic | neuro-symbolic" }
+                div { style: "font-size: 0.75rem; color: var(--qualia-text-muted); margin-top: 8px;", "QualiaDB → discourse sieve | epistemic logic | neuro-symbolic" }
             }
         }
     }

@@ -6,7 +6,10 @@ use wasm_bindgen::prelude::*;
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(js_namespace = ["window", "__TAURI__", "core"], js_name = invoke, catch)]
-    async fn tauri_invoke(cmd: &str, args: js_sys::Object) -> Result<wasm_bindgen::JsValue, wasm_bindgen::JsValue>;
+    async fn tauri_invoke(
+        cmd: &str,
+        args: js_sys::Object,
+    ) -> Result<wasm_bindgen::JsValue, wasm_bindgen::JsValue>;
 }
 
 async fn invoke_tauri(cmd: &str, args: serde_json::Value) -> Result<String, String> {
@@ -18,7 +21,7 @@ async fn invoke_tauri(cmd: &str, args: serde_json::Value) -> Result<String, Stri
             } else {
                 Ok(serde_wasm_bindgen::from_value::<String>(val).unwrap_or_default())
             }
-        },
+        }
         Err(e) => Err(format!("{:?}", e)),
     }
 }
@@ -32,12 +35,14 @@ pub struct BrowserTab {
 
 #[component]
 pub fn WebBrowserPane() -> Element {
-    let mut tabs = use_signal(|| vec![BrowserTab {
-        id: Uuid::new_v4().to_string(),
-        title: "New Tab".to_string(),
-        url: "https://duckduckgo.com/".to_string(),
-    }]);
-    
+    let mut tabs = use_signal(|| {
+        vec![BrowserTab {
+            id: Uuid::new_v4().to_string(),
+            title: "New Tab".to_string(),
+            url: "https://duckduckgo.com/".to_string(),
+        }]
+    });
+
     let mut active_tab_id = use_signal(|| tabs.read()[0].id.clone());
     let mut omnibox_input = use_signal(String::new);
 
@@ -65,17 +70,31 @@ pub fn WebBrowserPane() -> Element {
 
     let save_qlink = move || {
         let current_id = active_tab_id.read().clone();
-        let active_url = tabs.read().iter().find(|t| t.id == current_id).map(|t| t.url.clone()).unwrap_or_default();
-        let title = tabs.read().iter().find(|t| t.id == current_id).map(|t| t.title.clone()).unwrap_or_default();
+        let active_url = tabs
+            .read()
+            .iter()
+            .find(|t| t.id == current_id)
+            .map(|t| t.url.clone())
+            .unwrap_or_default();
+        let title = tabs
+            .read()
+            .iter()
+            .find(|t| t.id == current_id)
+            .map(|t| t.title.clone())
+            .unwrap_or_default();
         spawn(async move {
-            let _ = invoke_tauri("save_qlink", json!({ "url": active_url, "title": title, "context_assertions": null })).await;
+            let _ = invoke_tauri(
+                "save_qlink",
+                json!({ "url": active_url, "title": title, "context_assertions": null }),
+            )
+            .await;
         });
     };
 
     rsx! {
         div {
             class: "flex flex-col w-full h-full bg-surface text-text-main overflow-hidden",
-            
+
             // Tab Strip
             div {
                 class: "flex flex-row overflow-x-auto bg-black/50 p-1 gap-1 border-b border-border/50 min-h-[36px]",

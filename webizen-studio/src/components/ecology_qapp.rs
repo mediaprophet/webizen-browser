@@ -12,14 +12,14 @@ pub fn EcologyQapp() -> Element {
 
     rsx! {
         div {
-            style: "padding: 20px; background: #1e1e2e; color: #cdd6f4; border-radius: 12px; font-family: monospace; display: flex; flex-direction: column; gap: 16px; height: 100%; box-sizing: border-box;",
-            h2 { style: "margin: 0; color: #94e2d5; border-bottom: 1px solid #313244; padding-bottom: 8px;", "Ecology QApp" }
+            style: "padding: 20px; background: var(--qualia-surface); color: var(--qualia-text); border-radius: 12px; font-family: monospace; display: flex; flex-direction: column; gap: 16px; height: 100%; box-sizing: border-box;",
+            h2 { style: "margin: 0; color: var(--qualia-accent); border-bottom: 1px solid var(--qualia-border); padding-bottom: 8px;", "Ecology QApp" }
 
             div { style: "display: grid; grid-template-columns: 1fr 1fr; gap: 12px;",
                 div {
-                    label { style: "font-size: 0.8rem; color: #a6adc8;", "Ecosystem Type" }
+                    label { style: "font-size: 0.8rem; color: var(--qualia-text-muted);", "Ecosystem Type" }
                     select {
-                        style: "width: 100%; padding: 6px; background: #181825; border: 1px solid #45475a; color: #cdd6f4; border-radius: 4px; margin-top: 4px; box-sizing: border-box;",
+                        style: "width: 100%; padding: 6px; background: var(--qualia-bg); border: 1px solid var(--qualia-border); color: var(--qualia-text); border-radius: 4px; margin-top: 4px; box-sizing: border-box;",
                         onchange: move |e| ecosystem_type.set(e.value()),
                         option { "Tropical Forest" }
                         option { "Temperate Forest" }
@@ -36,9 +36,9 @@ pub fn EcologyQapp() -> Element {
                     }
                 }
                 div {
-                    label { style: "font-size: 0.8rem; color: #a6adc8;", "Trophic Level" }
+                    label { style: "font-size: 0.8rem; color: var(--qualia-text-muted);", "Trophic Level" }
                     select {
-                        style: "width: 100%; padding: 6px; background: #181825; border: 1px solid #45475a; color: #cdd6f4; border-radius: 4px; margin-top: 4px; box-sizing: border-box;",
+                        style: "width: 100%; padding: 6px; background: var(--qualia-bg); border: 1px solid var(--qualia-border); color: var(--qualia-text); border-radius: 4px; margin-top: 4px; box-sizing: border-box;",
                         onchange: move |e| trophic_level.set(e.value()),
                         option { "Producer" }
                         option { "Primary Consumer" }
@@ -50,9 +50,9 @@ pub fn EcologyQapp() -> Element {
                     }
                 }
                 div {
-                    label { style: "font-size: 0.8rem; color: #a6adc8;", "Interaction Type" }
+                    label { style: "font-size: 0.8rem; color: var(--qualia-text-muted);", "Interaction Type" }
                     select {
-                        style: "width: 100%; padding: 6px; background: #181825; border: 1px solid #45475a; color: #cdd6f4; border-radius: 4px; margin-top: 4px; box-sizing: border-box;",
+                        style: "width: 100%; padding: 6px; background: var(--qualia-bg); border: 1px solid var(--qualia-border); color: var(--qualia-text); border-radius: 4px; margin-top: 4px; box-sizing: border-box;",
                         onchange: move |e| interaction_type.set(e.value()),
                         option { "Predation" }
                         option { "Competition" }
@@ -65,7 +65,7 @@ pub fn EcologyQapp() -> Element {
                     }
                 }
                 div {
-                    label { style: "font-size: 0.8rem; color: #a6adc8;", "Biodiversity Index (Shannon H): {biodiversity_index:.3}" }
+                    label { style: "font-size: 0.8rem; color: var(--qualia-text-muted);", "Biodiversity Index (Shannon H): {biodiversity_index:.3}" }
                     input {
                         r#type: "range",
                         min: "0.0",
@@ -77,18 +77,18 @@ pub fn EcologyQapp() -> Element {
                     }
                 }
                 div {
-                    label { style: "font-size: 0.8rem; color: #a6adc8;", "Population N" }
+                    label { style: "font-size: 0.8rem; color: var(--qualia-text-muted);", "Population N" }
                     input {
                         r#type: "number",
                         value: "{population_n}",
                         min: "1",
                         step: "10",
-                        style: "width: 100%; padding: 6px; background: #181825; border: 1px solid #45475a; color: #cdd6f4; border-radius: 4px; margin-top: 4px; box-sizing: border-box;",
+                        style: "width: 100%; padding: 6px; background: var(--qualia-bg); border: 1px solid var(--qualia-border); color: var(--qualia-text); border-radius: 4px; margin-top: 4px; box-sizing: border-box;",
                         oninput: move |e| population_n.set(e.value().parse().unwrap_or(1000)),
                     }
                 }
                 div {
-                    label { style: "font-size: 0.8rem; color: #a6adc8;", "Carrying Capacity K: {carrying_capacity_k}" }
+                    label { style: "font-size: 0.8rem; color: var(--qualia-text-muted);", "Carrying Capacity K: {carrying_capacity_k}" }
                     input {
                         r#type: "range",
                         min: "100",
@@ -102,9 +102,9 @@ pub fn EcologyQapp() -> Element {
             }
 
             div {
-                label { style: "font-size: 0.8rem; color: #a6adc8;", "Field Notes" }
+                label { style: "font-size: 0.8rem; color: var(--qualia-text-muted);", "Field Notes" }
                 textarea {
-                    style: "width: 100%; padding: 8px; background: #181825; border: 1px solid #45475a; color: #cdd6f4; border-radius: 4px; margin-top: 4px; min-height: 60px; box-sizing: border-box; resize: vertical;",
+                    style: "width: 100%; padding: 8px; background: var(--qualia-bg); border: 1px solid var(--qualia-border); color: var(--qualia-text); border-radius: 4px; margin-top: 4px; min-height: 60px; box-sizing: border-box; resize: vertical;",
                     placeholder: "Enter field observations, sampling methodology, transect data...",
                     oninput: move |e| field_notes.set(e.value()),
                     "{field_notes}"
@@ -112,21 +112,21 @@ pub fn EcologyQapp() -> Element {
             }
 
             div {
-                style: "background: #11111b; padding: 16px; border-radius: 8px; border-left: 4px solid #94e2d5; flex: 1;",
-                h3 { style: "margin-top: 0; color: #94e2d5; font-size: 0.9rem;", "Output / Analysis" }
+                style: "background: var(--qualia-bg); padding: 16px; border-radius: 8px; border-left: 4px solid var(--qualia-accent); flex: 1;",
+                h3 { style: "margin-top: 0; color: var(--qualia-accent); font-size: 0.9rem;", "Output / Analysis" }
                 div { style: "display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 0.8rem;",
-                    div { style: "color: #a6adc8;", "Ecosystem:" }
-                    div { style: "color: #cdd6f4;", "{ecosystem_type}" }
-                    div { style: "color: #a6adc8;", "Trophic Level:" }
-                    div { style: "color: #cdd6f4;", "{trophic_level}" }
-                    div { style: "color: #a6adc8;", "Interaction:" }
-                    div { style: "color: #cdd6f4;", "{interaction_type}" }
-                    div { style: "color: #a6adc8;", "N / K:" }
-                    div { style: "color: #cdd6f4;", "{population_n} / {carrying_capacity_k}" }
-                    div { style: "color: #a6adc8;", "Biodiversity H:" }
-                    div { style: "color: #cdd6f4;", "{biodiversity_index:.3}" }
+                    div { style: "color: var(--qualia-text-muted);", "Ecosystem:" }
+                    div { style: "color: var(--qualia-text);", "{ecosystem_type}" }
+                    div { style: "color: var(--qualia-text-muted);", "Trophic Level:" }
+                    div { style: "color: var(--qualia-text);", "{trophic_level}" }
+                    div { style: "color: var(--qualia-text-muted);", "Interaction:" }
+                    div { style: "color: var(--qualia-text);", "{interaction_type}" }
+                    div { style: "color: var(--qualia-text-muted);", "N / K:" }
+                    div { style: "color: var(--qualia-text);", "{population_n} / {carrying_capacity_k}" }
+                    div { style: "color: var(--qualia-text-muted);", "Biodiversity H:" }
+                    div { style: "color: var(--qualia-text);", "{biodiversity_index:.3}" }
                 }
-                div { style: "font-size: 0.75rem; color: #585b70; margin-top: 12px; border-top: 1px solid #313244; padding-top: 8px;",
+                div { style: "font-size: 0.75rem; color: var(--qualia-text-muted); margin-top: 12px; border-top: 1px solid var(--qualia-border); padding-top: 8px;",
                     "QualiaDB → graph theory food-web | ODE Lotka-Volterra | ecological sieve"
                 }
             }

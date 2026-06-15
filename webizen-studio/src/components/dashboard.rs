@@ -1,13 +1,15 @@
-use dioxus::prelude::*;
 use crate::Route;
 use crate::theme_engine::{self, ResolvedTheme, ThemeDefinition};
+use dioxus::prelude::*;
 use std::collections::HashMap;
 
 // ── Helper functions ──────────────────────────────────────────────────────────
 
 fn hex_is_dark(hex: &str) -> bool {
     let hex = hex.trim_start_matches('#');
-    if hex.len() < 6 { return true; }
+    if hex.len() < 6 {
+        return true;
+    }
     let r = u8::from_str_radix(&hex[0..2], 16).unwrap_or(0) as f32;
     let g = u8::from_str_radix(&hex[2..4], 16).unwrap_or(0) as f32;
     let b = u8::from_str_radix(&hex[4..6], 16).unwrap_or(0) as f32;
@@ -16,7 +18,9 @@ fn hex_is_dark(hex: &str) -> bool {
 
 fn hex_to_rgba(hex: &str, alpha: f32) -> String {
     let hex = hex.trim_start_matches('#');
-    if hex.len() < 6 { return format!("rgba(0,0,0,{alpha})"); }
+    if hex.len() < 6 {
+        return format!("rgba(0,0,0,{alpha})");
+    }
     let r = u8::from_str_radix(&hex[0..2], 16).unwrap_or(0);
     let g = u8::from_str_radix(&hex[2..4], 16).unwrap_or(0);
     let b = u8::from_str_radix(&hex[4..6], 16).unwrap_or(0);
@@ -29,15 +33,26 @@ fn hex_to_rgba(hex: &str, alpha: f32) -> String {
 fn persist_custom_theme(theme: &ThemeDefinition) {
     use web_sys::window;
     let Some(win) = window() else { return };
-    let Ok(Some(storage)) = win.local_storage() else { return };
-    let Ok(json) = serde_json::to_string(theme) else { return };
+    let Ok(Some(storage)) = win.local_storage() else {
+        return;
+    };
+    let Ok(json) = serde_json::to_string(theme) else {
+        return;
+    };
     let _ = storage.set_item(&format!("webizen_theme_{}", theme.id), &json);
 
-    let existing = storage.get_item("webizen_custom_ids").ok().flatten().unwrap_or_default();
+    let existing = storage
+        .get_item("webizen_custom_ids")
+        .ok()
+        .flatten()
+        .unwrap_or_default();
     let mut ids: Vec<String> = serde_json::from_str(&existing).unwrap_or_default();
     if !ids.contains(&theme.id) {
         ids.push(theme.id.clone());
-        let _ = storage.set_item("webizen_custom_ids", &serde_json::to_string(&ids).unwrap_or_default());
+        let _ = storage.set_item(
+            "webizen_custom_ids",
+            &serde_json::to_string(&ids).unwrap_or_default(),
+        );
     }
 }
 
@@ -48,17 +63,25 @@ fn persist_custom_theme(_theme: &ThemeDefinition) {}
 fn read_custom_themes() -> Vec<ThemeDefinition> {
     use web_sys::window;
     let Some(win) = window() else { return vec![] };
-    let Ok(Some(storage)) = win.local_storage() else { return vec![] };
-    let Some(ids_json) = storage.get_item("webizen_custom_ids").ok().flatten() else { return vec![] };
+    let Ok(Some(storage)) = win.local_storage() else {
+        return vec![];
+    };
+    let Some(ids_json) = storage.get_item("webizen_custom_ids").ok().flatten() else {
+        return vec![];
+    };
     let ids: Vec<String> = serde_json::from_str(&ids_json).unwrap_or_default();
-    ids.iter().filter_map(|id| {
-        let json = storage.get_item(&format!("webizen_theme_{id}")).ok()??;
-        serde_json::from_str(&json).ok()
-    }).collect()
+    ids.iter()
+        .filter_map(|id| {
+            let json = storage.get_item(&format!("webizen_theme_{id}")).ok()??;
+            serde_json::from_str(&json).ok()
+        })
+        .collect()
 }
 
 #[cfg(not(target_arch = "wasm32"))]
-fn read_custom_themes() -> Vec<ThemeDefinition> { vec![] }
+fn read_custom_themes() -> Vec<ThemeDefinition> {
+    vec![]
+}
 
 // ── SVG sparkline data ────────────────────────────────────────────────────────
 
@@ -101,7 +124,10 @@ pub fn Dashboard() -> Element {
     let mut engine_active = use_signal(|| true);
     let mut temperature = use_signal(|| 50u32);
 
-    let current_id = theme_state().theme_key.clone().unwrap_or("human-warmth".to_string());
+    let current_id = theme_state()
+        .theme_key
+        .clone()
+        .unwrap_or("human-warmth".to_string());
 
     let all_themes: Vec<ThemeDefinition> = {
         let mut v = theme_engine::builtin_theme_catalog();
@@ -112,15 +138,16 @@ pub fn Dashboard() -> Element {
     let theme_options: Vec<(String, String)> = all_themes
         .iter()
         .map(|t| {
-            let label = t.id
-                .split('-')
-                .map(|w| {
-                    let mut c = w.chars();
-                    c.next().map(|ch| ch.to_uppercase().collect::<String>() + c.as_str())
-                        .unwrap_or_default()
-                })
-                .collect::<Vec<_>>()
-                .join(" ");
+            let label =
+                t.id.split('-')
+                    .map(|w| {
+                        let mut c = w.chars();
+                        c.next()
+                            .map(|ch| ch.to_uppercase().collect::<String>() + c.as_str())
+                            .unwrap_or_default()
+                    })
+                    .collect::<Vec<_>>()
+                    .join(" ");
             (t.id.clone(), label)
         })
         .collect();
@@ -129,7 +156,10 @@ pub fn Dashboard() -> Element {
         let id = evt.value();
         let mut catalog = theme_engine::builtin_theme_catalog();
         catalog.extend(custom_themes());
-        let binding = theme_engine::ThemeBinding { theme_id: Some(id), ..Default::default() };
+        let binding = theme_engine::ThemeBinding {
+            theme_id: Some(id),
+            ..Default::default()
+        };
         theme_state.set(theme_engine::resolve_theme(Some(&binding), &catalog));
     };
 
@@ -138,9 +168,18 @@ pub fn Dashboard() -> Element {
         let bg = new_bg();
         let acc = new_accent();
         let dark = hex_is_dark(&bg);
-        let text = if dark { "#f0f0f0".to_string() } else { "#1a1a1a".to_string() };
-        let text_muted = if dark { "#a0a0b0".to_string() } else { "#5a5a6a".to_string() };
-        let id = name.to_lowercase()
+        let text = if dark {
+            "#f0f0f0".to_string()
+        } else {
+            "#1a1a1a".to_string()
+        };
+        let text_muted = if dark {
+            "#a0a0b0".to_string()
+        } else {
+            "#5a5a6a".to_string()
+        };
+        let id = name
+            .to_lowercase()
             .chars()
             .map(|c| if c.is_alphanumeric() { c } else { '-' })
             .collect::<String>()
@@ -148,9 +187,15 @@ pub fn Dashboard() -> Element {
             .to_string();
         let surface_alpha = if dark { 0.65_f32 } else { 0.75_f32 };
         let bg_gradient = if dark {
-            format!("radial-gradient(ellipse at 25% 20%, {} 0%, transparent 50%), linear-gradient(160deg, {bg} 0%, {bg} 100%)", hex_to_rgba(&acc, 0.14))
+            format!(
+                "radial-gradient(ellipse at 25% 20%, {} 0%, transparent 50%), linear-gradient(160deg, {bg} 0%, {bg} 100%)",
+                hex_to_rgba(&acc, 0.14)
+            )
         } else {
-            format!("radial-gradient(ellipse at 20% 15%, {} 0%, transparent 55%), linear-gradient(160deg, {bg} 0%, {bg} 100%)", hex_to_rgba(&acc, 0.20))
+            format!(
+                "radial-gradient(ellipse at 20% 15%, {} 0%, transparent 55%), linear-gradient(160deg, {bg} 0%, {bg} 100%)",
+                hex_to_rgba(&acc, 0.20)
+            )
         };
 
         let theme = ThemeDefinition {
@@ -174,7 +219,10 @@ pub fn Dashboard() -> Element {
 
         let mut catalog = theme_engine::builtin_theme_catalog();
         catalog.extend(custom_themes());
-        let binding = theme_engine::ThemeBinding { theme_id: Some(id), ..Default::default() };
+        let binding = theme_engine::ThemeBinding {
+            theme_id: Some(id),
+            ..Default::default()
+        };
         theme_state.set(theme_engine::resolve_theme(Some(&binding), &catalog));
         show_creator.set(false);
     };

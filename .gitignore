@@ -6,3 +6,4 @@ dist/
 **/.dx/
 legacy/
 *.env
+legacy.zip

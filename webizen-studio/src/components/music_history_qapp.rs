@@ -24,15 +24,15 @@ pub fn MusicHistoryQapp() -> Element {
 
     rsx! {
         div {
-            style: "padding: 20px; background: #1e1e2e; color: #cdd6f4; border-radius: 12px; font-family: monospace; display: flex; flex-direction: column; gap: 16px; height: 100%; box-sizing: border-box;",
-            h2 { style: "margin: 0; color: #a6e3a1; border-bottom: 1px solid #313244; padding-bottom: 8px;", "Music History" }
+            style: "padding: 20px; background: var(--qualia-surface); color: var(--qualia-text); border-radius: 12px; font-family: monospace; display: flex; flex-direction: column; gap: 16px; height: 100%; box-sizing: border-box;",
+            h2 { style: "margin: 0; color: var(--qualia-accent); border-bottom: 1px solid var(--qualia-border); padding-bottom: 8px;", "Music History" }
 
             div {
-                label { style: "font-size: 0.8rem; color: #a6adc8;", "Historical Era" }
+                label { style: "font-size: 0.8rem; color: var(--qualia-text-muted);", "Historical Era" }
                 select {
                     value: "{era}",
                     onchange: move |e| era.set(e.value()),
-                    style: "width: 100%; padding: 8px; background: #181825; border: 1px solid #45475a; color: #cdd6f4; border-radius: 4px; margin-top: 4px;",
+                    style: "width: 100%; padding: 8px; background: var(--qualia-bg); border: 1px solid var(--qualia-border); color: var(--qualia-text); border-radius: 4px; margin-top: 4px;",
                     for (name, dates) in eras {
                         option { value: "{name}", "{name} ({dates})" }
                     }
@@ -42,47 +42,47 @@ pub fn MusicHistoryQapp() -> Element {
             div {
                 style: "display: grid; grid-template-columns: 1fr 1fr; gap: 12px;",
                 div {
-                    label { style: "font-size: 0.8rem; color: #a6adc8;", "Composer" }
+                    label { style: "font-size: 0.8rem; color: var(--qualia-text-muted);", "Composer" }
                     input {
-                        type: "text", placeholder: "e.g. J.S. Bach, Clara Schumann…",
+                        r#type: "text", placeholder: "e.g. J.S. Bach, Clara Schumann…",
                         value: "{composer}",
                         oninput: move |e| composer.set(e.value()),
-                        style: "width: 100%; padding: 8px; background: #181825; border: 1px solid #45475a; color: #cdd6f4; border-radius: 4px; margin-top: 4px; box-sizing: border-box;"
+                        style: "width: 100%; padding: 8px; background: var(--qualia-bg); border: 1px solid var(--qualia-border); color: var(--qualia-text); border-radius: 4px; margin-top: 4px; box-sizing: border-box;"
                     }
                 }
                 div {
-                    label { style: "font-size: 0.8rem; color: #a6adc8;", "Work / Opus" }
+                    label { style: "font-size: 0.8rem; color: var(--qualia-text-muted);", "Work / Opus" }
                     input {
-                        type: "text", placeholder: "e.g. Mass in B minor, BWV 232…",
+                        r#type: "text", placeholder: "e.g. Mass in B minor, BWV 232…",
                         value: "{work}",
                         oninput: move |e| work.set(e.value()),
-                        style: "width: 100%; padding: 8px; background: #181825; border: 1px solid #45475a; color: #cdd6f4; border-radius: 4px; margin-top: 4px; box-sizing: border-box;"
+                        style: "width: 100%; padding: 8px; background: var(--qualia-bg); border: 1px solid var(--qualia-border); color: var(--qualia-text); border-radius: 4px; margin-top: 4px; box-sizing: border-box;"
                     }
                 }
                 div {
-                    label { style: "font-size: 0.8rem; color: #a6adc8;", "Geographic / Court Origin" }
+                    label { style: "font-size: 0.8rem; color: var(--qualia-text-muted);", "Geographic / Court Origin" }
                     input {
-                        type: "text", placeholder: "e.g. Leipzig, Vienna, Paris, Versailles…",
+                        r#type: "text", placeholder: "e.g. Leipzig, Vienna, Paris, Versailles…",
                         value: "{geographic_origin}",
                         oninput: move |e| geographic_origin.set(e.value()),
-                        style: "width: 100%; padding: 8px; background: #181825; border: 1px solid #45475a; color: #cdd6f4; border-radius: 4px; margin-top: 4px; box-sizing: border-box;"
+                        style: "width: 100%; padding: 8px; background: var(--qualia-bg); border: 1px solid var(--qualia-border); color: var(--qualia-text); border-radius: 4px; margin-top: 4px; box-sizing: border-box;"
                     }
                 }
                 div {
-                    label { style: "font-size: 0.8rem; color: #a6adc8;", "Style Characteristic" }
+                    label { style: "font-size: 0.8rem; color: var(--qualia-text-muted);", "Style Characteristic" }
                     input {
-                        type: "text", placeholder: "e.g. basso continuo, Gesamtkunstwerk…",
+                        r#type: "text", placeholder: "e.g. basso continuo, Gesamtkunstwerk…",
                         value: "{style_characteristic}",
                         oninput: move |e| style_characteristic.set(e.value()),
-                        style: "width: 100%; padding: 8px; background: #181825; border: 1px solid #45475a; color: #cdd6f4; border-radius: 4px; margin-top: 4px; box-sizing: border-box;"
+                        style: "width: 100%; padding: 8px; background: var(--qualia-bg); border: 1px solid var(--qualia-border); color: var(--qualia-text); border-radius: 4px; margin-top: 4px; box-sizing: border-box;"
                     }
                 }
             }
 
             div {
-                label { style: "font-size: 0.8rem; color: #a6adc8;", "Year / Approx. Date: {year}" }
+                label { style: "font-size: 0.8rem; color: var(--qualia-text-muted);", "Year / Approx. Date: {year}" }
                 input {
-                    type: "range", min: "500", max: "2026",
+                    r#type: "range", min: "500", max: "2026",
                     value: "{year}",
                     oninput: move |e| year.set(e.value().parse().unwrap_or(1700)),
                     style: "width: 100%; margin-top: 4px;"
@@ -90,33 +90,33 @@ pub fn MusicHistoryQapp() -> Element {
             }
 
             div {
-                style: "background: #11111b; padding: 16px; border-radius: 8px; border-left: 4px solid #a6e3a1; flex: 1;",
-                h3 { style: "margin-top: 0; color: #a6e3a1; font-size: 0.9rem;", "Allen Interval — Historical Placement" }
+                style: "background: var(--qualia-bg); padding: 16px; border-radius: 8px; border-left: 4px solid var(--qualia-accent); flex: 1;",
+                h3 { style: "margin-top: 0; color: var(--qualia-accent); font-size: 0.9rem;", "Allen Interval — Historical Placement" }
                 div {
                     style: "display: flex; align-items: center; gap: 12px; flex-wrap: wrap;",
                     span {
-                        style: "background: #313244; padding: 4px 10px; border-radius: 4px; font-size: 0.85rem;",
+                        style: "background: var(--qualia-border); padding: 4px 10px; border-radius: 4px; font-size: 0.85rem;",
                         "Era: {era}"
                     }
                     span {
-                        style: "background: #313244; padding: 4px 10px; border-radius: 4px; font-size: 0.85rem;",
+                        style: "background: var(--qualia-border); padding: 4px 10px; border-radius: 4px; font-size: 0.85rem;",
                         "Year: {year}"
                     }
                     if !geographic_origin().is_empty() {
                         span {
-                            style: "background: #313244; padding: 4px 10px; border-radius: 4px; font-size: 0.85rem;",
+                            style: "background: var(--qualia-border); padding: 4px 10px; border-radius: 4px; font-size: 0.85rem;",
                             "{geographic_origin}"
                         }
                     }
                 }
                 if !composer().is_empty() {
                     div {
-                        style: "margin-top: 8px; font-size: 0.85rem; color: #cdd6f4;",
+                        style: "margin-top: 8px; font-size: 0.85rem; color: var(--qualia-text);",
                         "{composer}"
                         if !work().is_empty() { " — {work}" }
                     }
                 }
-                div { style: "font-size: 0.75rem; color: #585b70; margin-top: 8px;", "QualiaDB → Allen Interval engine | musicological knowledge graph" }
+                div { style: "font-size: 0.75rem; color: var(--qualia-text-muted); margin-top: 8px;", "QualiaDB → Allen Interval engine | musicological knowledge graph" }
             }
         }
     }

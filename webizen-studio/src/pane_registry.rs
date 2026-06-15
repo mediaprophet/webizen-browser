@@ -1,15 +1,18 @@
-﻿/// Pane Registry — maps semantic type hashes to human-readable component identifiers.
+/// Pane Registry — maps semantic type hashes to human-readable component identifiers.
 ///
 /// When the Studio canvas encounters a `PanePlacement`, it looks up the `component_id`
 /// in this registry to determine which Shoelace/Dioxus widget to render.
 /// This implements the SolidOS "Pane Dispatcher" pattern from redesign-web-platform.md §5.
-
 use serde::{Deserialize, Serialize};
 
 #[cfg(not(target_arch = "wasm32"))]
-fn q42(s: &str) -> Option<u64> { Some(qualia_core_db::q_hash(s)) }
+fn q42(s: &str) -> Option<u64> {
+    Some(qualia_core_db::q_hash(s))
+}
 #[cfg(target_arch = "wasm32")]
-fn q42(_s: &str) -> Option<u64> { None }
+fn q42(_s: &str) -> Option<u64> {
+    None
+}
 
 /// A registered pane type that the Studio knows how to render.
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
@@ -38,12 +41,12 @@ pub enum PaneCategory {
     Layout,
     Media,
     System,
-    Computational,  // Scientific solvers, numerical methods, domain engines
-    Intelligence,   // LLM, LoRA, agent, inference monitoring
-    Governance,     // Security, rights, credentials, deontic logic
-    Knowledge,      // Ontology, SPARQL, RDF, N3, Solid
-    Network,        // P2P, WebTorrent, eBPF, mesh
-    Data,           // WAL, provenance, storage, CRDT
+    Computational, // Scientific solvers, numerical methods, domain engines
+    Intelligence,  // LLM, LoRA, agent, inference monitoring
+    Governance,    // Security, rights, credentials, deontic logic
+    Knowledge,     // Ontology, SPARQL, RDF, N3, Solid
+    Network,       // P2P, WebTorrent, eBPF, mesh
+    Data,          // WAL, provenance, storage, CRDT
 }
 
 /// The built-in pane palette available to all users.
@@ -57,7 +60,8 @@ pub fn builtin_pane_definitions() -> Vec<PaneDefinition> {
             element_tag: "sl-card".into(),
             icon: "card-heading".into(),
             category: PaneCategory::DataDisplay,
-            default_w: 4, default_h: 3,
+            default_w: 4,
+            default_h: 3,
             rdf_type_hash: None,
         },
         PaneDefinition {
@@ -66,7 +70,8 @@ pub fn builtin_pane_definitions() -> Vec<PaneDefinition> {
             element_tag: "sl-details".into(),
             icon: "chevron-expand".into(),
             category: PaneCategory::DataDisplay,
-            default_w: 6, default_h: 2,
+            default_w: 6,
+            default_h: 2,
             rdf_type_hash: None,
         },
         PaneDefinition {
@@ -75,7 +80,8 @@ pub fn builtin_pane_definitions() -> Vec<PaneDefinition> {
             element_tag: "sl-progress-bar".into(),
             icon: "bar-chart-fill".into(),
             category: PaneCategory::DataDisplay,
-            default_w: 6, default_h: 1,
+            default_w: 6,
+            default_h: 1,
             rdf_type_hash: None,
         },
         PaneDefinition {
@@ -84,7 +90,8 @@ pub fn builtin_pane_definitions() -> Vec<PaneDefinition> {
             element_tag: "sl-badge".into(),
             icon: "patch-check".into(),
             category: PaneCategory::DataDisplay,
-            default_w: 2, default_h: 1,
+            default_w: 2,
+            default_h: 1,
             rdf_type_hash: None,
         },
         PaneDefinition {
@@ -93,7 +100,8 @@ pub fn builtin_pane_definitions() -> Vec<PaneDefinition> {
             element_tag: "sl-rating".into(),
             icon: "star-half".into(),
             category: PaneCategory::DataDisplay,
-            default_w: 4, default_h: 1,
+            default_w: 4,
+            default_h: 1,
             rdf_type_hash: None,
         },
         PaneDefinition {
@@ -102,10 +110,10 @@ pub fn builtin_pane_definitions() -> Vec<PaneDefinition> {
             element_tag: "sl-qr-code".into(),
             icon: "qr-code".into(),
             category: PaneCategory::DataDisplay,
-            default_w: 3, default_h: 3,
+            default_w: 3,
+            default_h: 3,
             rdf_type_hash: None,
         },
-
         // --- Data Input ---
         PaneDefinition {
             component_id: "dynamic-form".into(),
@@ -113,7 +121,8 @@ pub fn builtin_pane_definitions() -> Vec<PaneDefinition> {
             element_tag: "qualia-dynamic-form".into(),
             icon: "ui-radios-grid".into(),
             category: PaneCategory::DataInput,
-            default_w: 6, default_h: 4,
+            default_w: 6,
+            default_h: 4,
             rdf_type_hash: None,
         },
         PaneDefinition {
@@ -122,7 +131,8 @@ pub fn builtin_pane_definitions() -> Vec<PaneDefinition> {
             element_tag: "sl-input".into(),
             icon: "input-cursor-text".into(),
             category: PaneCategory::DataInput,
-            default_w: 4, default_h: 1,
+            default_w: 4,
+            default_h: 1,
             rdf_type_hash: None,
         },
         PaneDefinition {
@@ -131,7 +141,8 @@ pub fn builtin_pane_definitions() -> Vec<PaneDefinition> {
             element_tag: "sl-textarea".into(),
             icon: "textarea-resize".into(),
             category: PaneCategory::DataInput,
-            default_w: 6, default_h: 3,
+            default_w: 6,
+            default_h: 3,
             rdf_type_hash: None,
         },
         PaneDefinition {
@@ -140,7 +151,8 @@ pub fn builtin_pane_definitions() -> Vec<PaneDefinition> {
             element_tag: "sl-checkbox".into(),
             icon: "check2-square".into(),
             category: PaneCategory::DataInput,
-            default_w: 3, default_h: 1,
+            default_w: 3,
+            default_h: 1,
             rdf_type_hash: None,
         },
         PaneDefinition {
@@ -149,7 +161,8 @@ pub fn builtin_pane_definitions() -> Vec<PaneDefinition> {
             element_tag: "sl-switch".into(),
             icon: "toggles".into(),
             category: PaneCategory::DataInput,
-            default_w: 3, default_h: 1,
+            default_w: 3,
+            default_h: 1,
             rdf_type_hash: None,
         },
         PaneDefinition {
@@ -158,7 +171,8 @@ pub fn builtin_pane_definitions() -> Vec<PaneDefinition> {
             element_tag: "sl-select".into(),
             icon: "menu-button-wide".into(),
             category: PaneCategory::DataInput,
-            default_w: 4, default_h: 1,
+            default_w: 4,
+            default_h: 1,
             rdf_type_hash: None,
         },
         PaneDefinition {
@@ -167,7 +181,8 @@ pub fn builtin_pane_definitions() -> Vec<PaneDefinition> {
             element_tag: "sl-color-picker".into(),
             icon: "palette".into(),
             category: PaneCategory::DataInput,
-            default_w: 3, default_h: 3,
+            default_w: 3,
+            default_h: 3,
             rdf_type_hash: None,
         },
         PaneDefinition {
@@ -176,10 +191,10 @@ pub fn builtin_pane_definitions() -> Vec<PaneDefinition> {
             element_tag: "sl-range".into(),
             icon: "sliders".into(),
             category: PaneCategory::DataInput,
-            default_w: 6, default_h: 1,
+            default_w: 6,
+            default_h: 1,
             rdf_type_hash: None,
         },
-
         // --- Layout ---
         PaneDefinition {
             component_id: "tab-group".into(),
@@ -187,7 +202,8 @@ pub fn builtin_pane_definitions() -> Vec<PaneDefinition> {
             element_tag: "sl-tab-group".into(),
             icon: "layout-text-window".into(),
             category: PaneCategory::Layout,
-            default_w: 12, default_h: 6,
+            default_w: 12,
+            default_h: 6,
             rdf_type_hash: None,
         },
         PaneDefinition {
@@ -196,7 +212,8 @@ pub fn builtin_pane_definitions() -> Vec<PaneDefinition> {
             element_tag: "sl-split-panel".into(),
             icon: "layout-split".into(),
             category: PaneCategory::Layout,
-            default_w: 12, default_h: 4,
+            default_w: 12,
+            default_h: 4,
             rdf_type_hash: None,
         },
         PaneDefinition {
@@ -205,7 +222,8 @@ pub fn builtin_pane_definitions() -> Vec<PaneDefinition> {
             element_tag: "sl-dialog".into(),
             icon: "window-stack".into(),
             category: PaneCategory::Layout,
-            default_w: 6, default_h: 4,
+            default_w: 6,
+            default_h: 4,
             rdf_type_hash: None,
         },
         PaneDefinition {
@@ -214,10 +232,10 @@ pub fn builtin_pane_definitions() -> Vec<PaneDefinition> {
             element_tag: "sl-divider".into(),
             icon: "dash-lg".into(),
             category: PaneCategory::Layout,
-            default_w: 12, default_h: 1,
+            default_w: 12,
+            default_h: 1,
             rdf_type_hash: None,
         },
-
         // --- Media ---
         PaneDefinition {
             component_id: "image-comparer".into(),
@@ -225,7 +243,8 @@ pub fn builtin_pane_definitions() -> Vec<PaneDefinition> {
             element_tag: "sl-image-comparer".into(),
             icon: "images".into(),
             category: PaneCategory::Media,
-            default_w: 6, default_h: 4,
+            default_w: 6,
+            default_h: 4,
             rdf_type_hash: None,
         },
         PaneDefinition {
@@ -234,7 +253,8 @@ pub fn builtin_pane_definitions() -> Vec<PaneDefinition> {
             element_tag: "sl-carousel".into(),
             icon: "collection-play".into(),
             category: PaneCategory::Media,
-            default_w: 8, default_h: 4,
+            default_w: 8,
+            default_h: 4,
             rdf_type_hash: None,
         },
         PaneDefinition {
@@ -243,10 +263,10 @@ pub fn builtin_pane_definitions() -> Vec<PaneDefinition> {
             element_tag: "sl-avatar".into(),
             icon: "person-circle".into(),
             category: PaneCategory::Media,
-            default_w: 2, default_h: 2,
+            default_w: 2,
+            default_h: 2,
             rdf_type_hash: None,
         },
-
         // --- System ---
         PaneDefinition {
             component_id: "alert-notification".into(),
@@ -254,7 +274,8 @@ pub fn builtin_pane_definitions() -> Vec<PaneDefinition> {
             element_tag: "sl-alert".into(),
             icon: "bell".into(),
             category: PaneCategory::System,
-            default_w: 6, default_h: 2,
+            default_w: 6,
+            default_h: 2,
             rdf_type_hash: None,
         },
         PaneDefinition {
@@ -263,7 +284,8 @@ pub fn builtin_pane_definitions() -> Vec<PaneDefinition> {
             element_tag: "sl-spinner".into(),
             icon: "arrow-clockwise".into(),
             category: PaneCategory::System,
-            default_w: 2, default_h: 2,
+            default_w: 2,
+            default_h: 2,
             rdf_type_hash: None,
         },
         PaneDefinition {
@@ -272,7 +294,8 @@ pub fn builtin_pane_definitions() -> Vec<PaneDefinition> {
             element_tag: "sl-skeleton".into(),
             icon: "layout-wtf".into(),
             category: PaneCategory::System,
-            default_w: 6, default_h: 2,
+            default_w: 6,
+            default_h: 2,
             rdf_type_hash: None,
         },
         PaneDefinition {
@@ -281,7 +304,8 @@ pub fn builtin_pane_definitions() -> Vec<PaneDefinition> {
             element_tag: "qualia-system-diagnostics".into(),
             icon: "cpu".into(),
             category: PaneCategory::System,
-            default_w: 6, default_h: 4,
+            default_w: 6,
+            default_h: 4,
             rdf_type_hash: None,
         },
         PaneDefinition {
@@ -290,7 +314,8 @@ pub fn builtin_pane_definitions() -> Vec<PaneDefinition> {
             element_tag: "qualia-error-logs".into(),
             icon: "exclamation-triangle".into(),
             category: PaneCategory::System,
-            default_w: 12, default_h: 4,
+            default_w: 12,
+            default_h: 4,
             rdf_type_hash: None,
         },
         PaneDefinition {
@@ -299,7 +324,8 @@ pub fn builtin_pane_definitions() -> Vec<PaneDefinition> {
             element_tag: "qualia-sensor-data".into(),
             icon: "activity".into(),
             category: PaneCategory::DataDisplay,
-            default_w: 6, default_h: 3,
+            default_w: 6,
+            default_h: 3,
             rdf_type_hash: None,
         },
         PaneDefinition {
@@ -308,10 +334,10 @@ pub fn builtin_pane_definitions() -> Vec<PaneDefinition> {
             element_tag: "qualia-web-module".into(),
             icon: "window-dock".into(),
             category: PaneCategory::System,
-            default_w: 8, default_h: 6,
+            default_w: 8,
+            default_h: 6,
             rdf_type_hash: q42("q42:WebModule"),
         },
-        
         // --- Webizen Integrations ---
         PaneDefinition {
             component_id: "web-browser-pane".into(),
@@ -319,7 +345,8 @@ pub fn builtin_pane_definitions() -> Vec<PaneDefinition> {
             element_tag: "web-browser-pane".into(),
             icon: "globe2".into(),
             category: PaneCategory::System,
-            default_w: 12, default_h: 8,
+            default_w: 12,
+            default_h: 8,
             rdf_type_hash: None,
         },
         PaneDefinition {
@@ -328,7 +355,8 @@ pub fn builtin_pane_definitions() -> Vec<PaneDefinition> {
             element_tag: "dialectical-sidebar-pane".into(),
             icon: "chat-left-dots".into(),
             category: PaneCategory::Intelligence,
-            default_w: 4, default_h: 8,
+            default_w: 4,
+            default_h: 8,
             rdf_type_hash: None,
         },
         PaneDefinition {
@@ -337,7 +365,8 @@ pub fn builtin_pane_definitions() -> Vec<PaneDefinition> {
             element_tag: "cognitive-monitor-pane".into(),
             icon: "activity".into(),
             category: PaneCategory::Intelligence,
-            default_w: 4, default_h: 4,
+            default_w: 4,
+            default_h: 4,
             rdf_type_hash: None,
         },
         PaneDefinition {
@@ -346,7 +375,8 @@ pub fn builtin_pane_definitions() -> Vec<PaneDefinition> {
             element_tag: "contextual-workspace".into(),
             icon: "diagram-3".into(),
             category: PaneCategory::Layout,
-            default_w: 12, default_h: 8,
+            default_w: 12,
+            default_h: 8,
             rdf_type_hash: q42("q42:ContextualWorkspace"),
         },
         PaneDefinition {
@@ -355,7 +385,8 @@ pub fn builtin_pane_definitions() -> Vec<PaneDefinition> {
             element_tag: "neuro-symbolic-chat".into(),
             icon: "chat-dots".into(),
             category: PaneCategory::DataInput,
-            default_w: 8, default_h: 6,
+            default_w: 8,
+            default_h: 6,
             rdf_type_hash: None,
         },
         PaneDefinition {
@@ -364,7 +395,8 @@ pub fn builtin_pane_definitions() -> Vec<PaneDefinition> {
             element_tag: "llm-harness".into(),
             icon: "cpu-fill".into(),
             category: PaneCategory::System,
-            default_w: 6, default_h: 4,
+            default_w: 6,
+            default_h: 4,
             rdf_type_hash: None,
         },
         PaneDefinition {
@@ -373,7 +405,8 @@ pub fn builtin_pane_definitions() -> Vec<PaneDefinition> {
             element_tag: "health-vital-monitor".into(),
             icon: "heart-pulse".into(),
             category: PaneCategory::DataDisplay,
-            default_w: 6, default_h: 4,
+            default_w: 6,
+            default_h: 4,
             rdf_type_hash: None,
         },
         PaneDefinition {
@@ -382,7 +415,8 @@ pub fn builtin_pane_definitions() -> Vec<PaneDefinition> {
             element_tag: "personal-ontology-builder".into(),
             icon: "diagram-3".into(),
             category: PaneCategory::DataInput,
-            default_w: 6, default_h: 4,
+            default_w: 6,
+            default_h: 4,
             rdf_type_hash: None,
         },
         PaneDefinition {
@@ -391,10 +425,10 @@ pub fn builtin_pane_definitions() -> Vec<PaneDefinition> {
             element_tag: "hardware-configurator".into(),
             icon: "tools".into(),
             category: PaneCategory::DataInput,
-            default_w: 8, default_h: 6,
+            default_w: 8,
+            default_h: 6,
             rdf_type_hash: None,
         },
-
         // ── Computational ─────────────────────────────────────────────────────
         PaneDefinition {
             component_id: "physics-simulator".into(),
@@ -402,7 +436,8 @@ pub fn builtin_pane_definitions() -> Vec<PaneDefinition> {
             element_tag: "physics-simulator".into(),
             icon: "lightning-charge".into(),
             category: PaneCategory::Computational,
-            default_w: 8, default_h: 6,
+            default_w: 8,
+            default_h: 6,
             rdf_type_hash: q42("q42:PhysicsSimulator"),
         },
         PaneDefinition {
@@ -411,7 +446,8 @@ pub fn builtin_pane_definitions() -> Vec<PaneDefinition> {
             element_tag: "chemistry-modeler".into(),
             icon: "droplet".into(),
             category: PaneCategory::Computational,
-            default_w: 8, default_h: 6,
+            default_w: 8,
+            default_h: 6,
             rdf_type_hash: q42("q42:ChemistryModeler"),
         },
         PaneDefinition {
@@ -420,7 +456,8 @@ pub fn builtin_pane_definitions() -> Vec<PaneDefinition> {
             element_tag: "ode-solver".into(),
             icon: "graph-up".into(),
             category: PaneCategory::Computational,
-            default_w: 8, default_h: 5,
+            default_w: 8,
+            default_h: 5,
             rdf_type_hash: q42("q42:OdeSolver"),
         },
         PaneDefinition {
@@ -429,7 +466,8 @@ pub fn builtin_pane_definitions() -> Vec<PaneDefinition> {
             element_tag: "matrix-lab".into(),
             icon: "grid-3x3".into(),
             category: PaneCategory::Computational,
-            default_w: 8, default_h: 5,
+            default_w: 8,
+            default_h: 5,
             rdf_type_hash: q42("q42:MatrixLab"),
         },
         PaneDefinition {
@@ -438,7 +476,8 @@ pub fn builtin_pane_definitions() -> Vec<PaneDefinition> {
             element_tag: "statistical-analysis".into(),
             icon: "bar-chart-line".into(),
             category: PaneCategory::Computational,
-            default_w: 8, default_h: 5,
+            default_w: 8,
+            default_h: 5,
             rdf_type_hash: q42("q42:StatisticalAnalysis"),
         },
         PaneDefinition {
@@ -447,7 +486,8 @@ pub fn builtin_pane_definitions() -> Vec<PaneDefinition> {
             element_tag: "bioinformatics-lab".into(),
             icon: "bezier2".into(),
             category: PaneCategory::Computational,
-            default_w: 10, default_h: 6,
+            default_w: 10,
+            default_h: 6,
             rdf_type_hash: q42("q42:BioinformaticsLab"),
         },
         PaneDefinition {
@@ -456,7 +496,8 @@ pub fn builtin_pane_definitions() -> Vec<PaneDefinition> {
             element_tag: "qpu-optimizer".into(),
             icon: "cpu".into(),
             category: PaneCategory::Computational,
-            default_w: 8, default_h: 6,
+            default_w: 8,
+            default_h: 6,
             rdf_type_hash: q42("q42:QpuOptimizer"),
         },
         PaneDefinition {
@@ -465,7 +506,8 @@ pub fn builtin_pane_definitions() -> Vec<PaneDefinition> {
             element_tag: "quantum-dft".into(),
             icon: "soundwave".into(),
             category: PaneCategory::Computational,
-            default_w: 8, default_h: 5,
+            default_w: 8,
+            default_h: 5,
             rdf_type_hash: q42("q42:QuantumDft"),
         },
         PaneDefinition {
@@ -474,7 +516,8 @@ pub fn builtin_pane_definitions() -> Vec<PaneDefinition> {
             element_tag: "qaoa-explorer".into(),
             icon: "sliders".into(),
             category: PaneCategory::Computational,
-            default_w: 8, default_h: 5,
+            default_w: 8,
+            default_h: 5,
             rdf_type_hash: q42("q42:QaoaExplorer"),
         },
         PaneDefinition {
@@ -483,7 +526,8 @@ pub fn builtin_pane_definitions() -> Vec<PaneDefinition> {
             element_tag: "portfolio-analyzer".into(),
             icon: "currency-exchange".into(),
             category: PaneCategory::Computational,
-            default_w: 8, default_h: 5,
+            default_w: 8,
+            default_h: 5,
             rdf_type_hash: q42("q42:PortfolioAnalyzer"),
         },
         PaneDefinition {
@@ -492,7 +536,8 @@ pub fn builtin_pane_definitions() -> Vec<PaneDefinition> {
             element_tag: "risk-engine".into(),
             icon: "graph-up-arrow".into(),
             category: PaneCategory::Computational,
-            default_w: 6, default_h: 4,
+            default_w: 6,
+            default_h: 4,
             rdf_type_hash: q42("q42:RiskEngine"),
         },
         PaneDefinition {
@@ -501,10 +546,10 @@ pub fn builtin_pane_definitions() -> Vec<PaneDefinition> {
             element_tag: "gbm-simulator".into(),
             icon: "shuffle".into(),
             category: PaneCategory::Computational,
-            default_w: 8, default_h: 4,
+            default_w: 8,
+            default_h: 4,
             rdf_type_hash: q42("q42:GbmSimulator"),
         },
-
         // ── Intelligence ──────────────────────────────────────────────────────
         PaneDefinition {
             component_id: "llm-harness".into(),
@@ -512,7 +557,8 @@ pub fn builtin_pane_definitions() -> Vec<PaneDefinition> {
             element_tag: "llm-harness".into(),
             icon: "cpu-fill".into(),
             category: PaneCategory::Intelligence,
-            default_w: 6, default_h: 4,
+            default_w: 6,
+            default_h: 4,
             rdf_type_hash: None,
         },
         PaneDefinition {
@@ -521,7 +567,8 @@ pub fn builtin_pane_definitions() -> Vec<PaneDefinition> {
             element_tag: "lora-manager".into(),
             icon: "layers-half".into(),
             category: PaneCategory::Intelligence,
-            default_w: 6, default_h: 4,
+            default_w: 6,
+            default_h: 4,
             rdf_type_hash: q42("q42:LoraManager"),
         },
         PaneDefinition {
@@ -530,7 +577,8 @@ pub fn builtin_pane_definitions() -> Vec<PaneDefinition> {
             element_tag: "inference-monitor".into(),
             icon: "activity".into(),
             category: PaneCategory::Intelligence,
-            default_w: 8, default_h: 4,
+            default_w: 8,
+            default_h: 4,
             rdf_type_hash: None,
         },
         PaneDefinition {
@@ -539,7 +587,8 @@ pub fn builtin_pane_definitions() -> Vec<PaneDefinition> {
             element_tag: "agent-config".into(),
             icon: "robot".into(),
             category: PaneCategory::Intelligence,
-            default_w: 6, default_h: 4,
+            default_w: 6,
+            default_h: 4,
             rdf_type_hash: None,
         },
         PaneDefinition {
@@ -548,7 +597,8 @@ pub fn builtin_pane_definitions() -> Vec<PaneDefinition> {
             element_tag: "model-lifecycle".into(),
             icon: "arrow-repeat".into(),
             category: PaneCategory::Intelligence,
-            default_w: 6, default_h: 3,
+            default_w: 6,
+            default_h: 3,
             rdf_type_hash: None,
         },
         PaneDefinition {
@@ -557,10 +607,10 @@ pub fn builtin_pane_definitions() -> Vec<PaneDefinition> {
             element_tag: "qpu-providers".into(),
             icon: "cloud-check".into(),
             category: PaneCategory::Intelligence,
-            default_w: 6, default_h: 4,
+            default_w: 6,
+            default_h: 4,
             rdf_type_hash: None,
         },
-
         // ── Governance ────────────────────────────────────────────────────────
         PaneDefinition {
             component_id: "agreements-rights".into(),
@@ -568,7 +618,8 @@ pub fn builtin_pane_definitions() -> Vec<PaneDefinition> {
             element_tag: "agreements-rights".into(),
             icon: "file-earmark-check".into(),
             category: PaneCategory::Governance,
-            default_w: 8, default_h: 6,
+            default_w: 8,
+            default_h: 6,
             rdf_type_hash: q42("q42:AgreementsRights"),
         },
         PaneDefinition {
@@ -577,7 +628,8 @@ pub fn builtin_pane_definitions() -> Vec<PaneDefinition> {
             element_tag: "key-vault-manager".into(),
             icon: "key".into(),
             category: PaneCategory::Governance,
-            default_w: 6, default_h: 4,
+            default_w: 6,
+            default_h: 4,
             rdf_type_hash: q42("q42:KeyVault"),
         },
         PaneDefinition {
@@ -586,7 +638,8 @@ pub fn builtin_pane_definitions() -> Vec<PaneDefinition> {
             element_tag: "zk-proof-studio".into(),
             icon: "eye-slash".into(),
             category: PaneCategory::Governance,
-            default_w: 8, default_h: 5,
+            default_w: 8,
+            default_h: 5,
             rdf_type_hash: q42("q42:ZkProofStudio"),
         },
         PaneDefinition {
@@ -595,7 +648,8 @@ pub fn builtin_pane_definitions() -> Vec<PaneDefinition> {
             element_tag: "deontic-logic-editor".into(),
             icon: "journal-text".into(),
             category: PaneCategory::Governance,
-            default_w: 8, default_h: 5,
+            default_w: 8,
+            default_h: 5,
             rdf_type_hash: q42("q42:DeonticLogicEditor"),
         },
         PaneDefinition {
@@ -604,10 +658,10 @@ pub fn builtin_pane_definitions() -> Vec<PaneDefinition> {
             element_tag: "shacl-validator".into(),
             icon: "check2-all".into(),
             category: PaneCategory::Governance,
-            default_w: 8, default_h: 5,
+            default_w: 8,
+            default_h: 5,
             rdf_type_hash: q42("q42:ShaclValidator"),
         },
-
         // ── Knowledge ─────────────────────────────────────────────────────────
         PaneDefinition {
             component_id: "sparql-explorer".into(),
@@ -615,7 +669,8 @@ pub fn builtin_pane_definitions() -> Vec<PaneDefinition> {
             element_tag: "sparql-explorer".into(),
             icon: "code-slash".into(),
             category: PaneCategory::Knowledge,
-            default_w: 10, default_h: 6,
+            default_w: 10,
+            default_h: 6,
             rdf_type_hash: q42("q42:SparqlExplorer"),
         },
         PaneDefinition {
@@ -624,7 +679,8 @@ pub fn builtin_pane_definitions() -> Vec<PaneDefinition> {
             element_tag: "n3-logic-studio".into(),
             icon: "braces".into(),
             category: PaneCategory::Knowledge,
-            default_w: 8, default_h: 6,
+            default_w: 8,
+            default_h: 6,
             rdf_type_hash: q42("q42:N3LogicStudio"),
         },
         PaneDefinition {
@@ -633,7 +689,8 @@ pub fn builtin_pane_definitions() -> Vec<PaneDefinition> {
             element_tag: "rdf-star-editor".into(),
             icon: "diagram-2".into(),
             category: PaneCategory::Knowledge,
-            default_w: 8, default_h: 5,
+            default_w: 8,
+            default_h: 5,
             rdf_type_hash: q42("q42:RdfStarEditor"),
         },
         PaneDefinition {
@@ -642,7 +699,8 @@ pub fn builtin_pane_definitions() -> Vec<PaneDefinition> {
             element_tag: "solid-ldp-browser".into(),
             icon: "folder-symlink".into(),
             category: PaneCategory::Knowledge,
-            default_w: 8, default_h: 6,
+            default_w: 8,
+            default_h: 6,
             rdf_type_hash: q42("q42:SolidLdpBrowser"),
         },
         PaneDefinition {
@@ -651,10 +709,10 @@ pub fn builtin_pane_definitions() -> Vec<PaneDefinition> {
             element_tag: "nexus-canvas".into(),
             icon: "radioactive".into(),
             category: PaneCategory::Knowledge,
-            default_w: 12, default_h: 8,
+            default_w: 12,
+            default_h: 8,
             rdf_type_hash: q42("q42:NexusCanvas"),
         },
-
         // ── Network ───────────────────────────────────────────────────────────
         PaneDefinition {
             component_id: "webtorrent-seeder".into(),
@@ -662,7 +720,8 @@ pub fn builtin_pane_definitions() -> Vec<PaneDefinition> {
             element_tag: "webtorrent-seeder".into(),
             icon: "share".into(),
             category: PaneCategory::Network,
-            default_w: 6, default_h: 4,
+            default_w: 6,
+            default_h: 4,
             rdf_type_hash: None,
         },
         PaneDefinition {
@@ -671,7 +730,8 @@ pub fn builtin_pane_definitions() -> Vec<PaneDefinition> {
             element_tag: "p2p-dashboard".into(),
             icon: "diagram-3-fill".into(),
             category: PaneCategory::Network,
-            default_w: 8, default_h: 5,
+            default_w: 8,
+            default_h: 5,
             rdf_type_hash: None,
         },
         PaneDefinition {
@@ -680,7 +740,8 @@ pub fn builtin_pane_definitions() -> Vec<PaneDefinition> {
             element_tag: "ebpf-filter-manager".into(),
             icon: "funnel".into(),
             category: PaneCategory::Network,
-            default_w: 6, default_h: 4,
+            default_w: 6,
+            default_h: 4,
             rdf_type_hash: None,
         },
         PaneDefinition {
@@ -689,10 +750,10 @@ pub fn builtin_pane_definitions() -> Vec<PaneDefinition> {
             element_tag: "acoustic-ble-mesh".into(),
             icon: "broadcast".into(),
             category: PaneCategory::Network,
-            default_w: 6, default_h: 4,
+            default_w: 6,
+            default_h: 4,
             rdf_type_hash: None,
         },
-
         // ── Data & Storage ────────────────────────────────────────────────────
         PaneDefinition {
             component_id: "wal-inspector".into(),
@@ -700,7 +761,8 @@ pub fn builtin_pane_definitions() -> Vec<PaneDefinition> {
             element_tag: "wal-inspector".into(),
             icon: "journal-code".into(),
             category: PaneCategory::Data,
-            default_w: 8, default_h: 5,
+            default_w: 8,
+            default_h: 5,
             rdf_type_hash: None,
         },
         PaneDefinition {
@@ -709,7 +771,8 @@ pub fn builtin_pane_definitions() -> Vec<PaneDefinition> {
             element_tag: "q42-volume-manager".into(),
             icon: "database".into(),
             category: PaneCategory::Data,
-            default_w: 6, default_h: 4,
+            default_w: 6,
+            default_h: 4,
             rdf_type_hash: None,
         },
         PaneDefinition {
@@ -718,7 +781,8 @@ pub fn builtin_pane_definitions() -> Vec<PaneDefinition> {
             element_tag: "provenance-graph".into(),
             icon: "diagram-2-fill".into(),
             category: PaneCategory::Data,
-            default_w: 8, default_h: 5,
+            default_w: 8,
+            default_h: 5,
             rdf_type_hash: q42("q42:ProvenanceGraph"),
         },
         PaneDefinition {
@@ -727,10 +791,10 @@ pub fn builtin_pane_definitions() -> Vec<PaneDefinition> {
             element_tag: "storage-driver-config".into(),
             icon: "hdd-stack".into(),
             category: PaneCategory::Data,
-            default_w: 6, default_h: 4,
+            default_w: 6,
+            default_h: 4,
             rdf_type_hash: None,
         },
-
         // ── Developer Tools ───────────────────────────────────────────────────
         PaneDefinition {
             component_id: "mcp-inspector".into(),
@@ -738,7 +802,8 @@ pub fn builtin_pane_definitions() -> Vec<PaneDefinition> {
             element_tag: "mcp-inspector".into(),
             icon: "plugin".into(),
             category: PaneCategory::System,
-            default_w: 8, default_h: 6,
+            default_w: 8,
+            default_h: 6,
             rdf_type_hash: None,
         },
         PaneDefinition {
@@ -747,7 +812,8 @@ pub fn builtin_pane_definitions() -> Vec<PaneDefinition> {
             element_tag: "benchmark-harness".into(),
             icon: "stopwatch".into(),
             category: PaneCategory::System,
-            default_w: 8, default_h: 5,
+            default_w: 8,
+            default_h: 5,
             rdf_type_hash: None,
         },
         PaneDefinition {
@@ -756,7 +822,8 @@ pub fn builtin_pane_definitions() -> Vec<PaneDefinition> {
             element_tag: "cli-bridge".into(),
             icon: "terminal".into(),
             category: PaneCategory::System,
-            default_w: 8, default_h: 5,
+            default_w: 8,
+            default_h: 5,
             rdf_type_hash: None,
         },
         PaneDefinition {
@@ -765,10 +832,10 @@ pub fn builtin_pane_definitions() -> Vec<PaneDefinition> {
             element_tag: "extension-bus".into(),
             icon: "puzzle".into(),
             category: PaneCategory::System,
-            default_w: 6, default_h: 4,
+            default_w: 6,
+            default_h: 4,
             rdf_type_hash: None,
         },
-
         // ── Medical ───────────────────────────────────────────────────────────
         PaneDefinition {
             component_id: "clinical-risk-scorer".into(),
@@ -776,7 +843,8 @@ pub fn builtin_pane_definitions() -> Vec<PaneDefinition> {
             element_tag: "clinical-risk-scorer".into(),
             icon: "clipboard2-pulse".into(),
             category: PaneCategory::DataDisplay,
-            default_w: 6, default_h: 4,
+            default_w: 6,
+            default_h: 4,
             rdf_type_hash: q42("q42:ClinicalRiskScorer"),
         },
         PaneDefinition {
@@ -785,7 +853,8 @@ pub fn builtin_pane_definitions() -> Vec<PaneDefinition> {
             element_tag: "dicom-viewer".into(),
             icon: "image-alt".into(),
             category: PaneCategory::DataDisplay,
-            default_w: 8, default_h: 6,
+            default_w: 8,
+            default_h: 6,
             rdf_type_hash: q42("q42:DicomViewer"),
         },
         PaneDefinition {
@@ -794,7 +863,8 @@ pub fn builtin_pane_definitions() -> Vec<PaneDefinition> {
             element_tag: "comorbidity-analyzer".into(),
             icon: "shield-plus".into(),
             category: PaneCategory::DataDisplay,
-            default_w: 6, default_h: 4,
+            default_w: 6,
+            default_h: 4,
             rdf_type_hash: q42("q42:ComorbidityAnalyzer"),
         },
     ]
@@ -802,22 +872,24 @@ pub fn builtin_pane_definitions() -> Vec<PaneDefinition> {
 
 /// Look up a pane definition by component_id.
 pub fn find_pane(component_id: &str) -> Option<PaneDefinition> {
-    builtin_pane_definitions().into_iter().find(|p| p.component_id == component_id)
+    builtin_pane_definitions()
+        .into_iter()
+        .find(|p| p.component_id == component_id)
 }
 
 /// Category display name for sidebar grouping.
 pub fn category_label(cat: &PaneCategory) -> &'static str {
     match cat {
-        PaneCategory::DataDisplay   => "Data Display",
-        PaneCategory::DataInput     => "Data Input",
-        PaneCategory::Layout        => "Layout",
-        PaneCategory::Media         => "Media",
-        PaneCategory::System        => "System",
+        PaneCategory::DataDisplay => "Data Display",
+        PaneCategory::DataInput => "Data Input",
+        PaneCategory::Layout => "Layout",
+        PaneCategory::Media => "Media",
+        PaneCategory::System => "System",
         PaneCategory::Computational => "Computational",
-        PaneCategory::Intelligence  => "AI & Inference",
-        PaneCategory::Governance    => "Governance",
-        PaneCategory::Knowledge     => "Knowledge",
-        PaneCategory::Network       => "Network",
-        PaneCategory::Data          => "Data & Storage",
+        PaneCategory::Intelligence => "AI & Inference",
+        PaneCategory::Governance => "Governance",
+        PaneCategory::Knowledge => "Knowledge",
+        PaneCategory::Network => "Network",
+        PaneCategory::Data => "Data & Storage",
     }
 }

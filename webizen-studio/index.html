@@ -51,6 +51,14 @@
     #main {
       display: contents;
     }
+    .boot-error {
+      max-width: 520px;
+      text-align: center;
+      padding: 0 1.5rem;
+    }
+    .boot-error h2 { color: #f87171; margin: 0 0 0.5rem; font-size: 1.1rem; }
+    .boot-error p { color: #a1a1aa; font-size: 0.85rem; line-height: 1.5; margin: 0.25rem 0; }
+    .boot-error code { color: #06b6d4; }
   </style>
 </head>
 <body>
@@ -60,5 +68,29 @@
     <div class="logo"><span class="hexagon">⬡</span> Webizen</div>
     <div class="subtitle">Human-Centric Internet Initiating...</div>
   </div>
+  <script>
+    // If the WASM app has not mounted (replaced #main's children) within 12s,
+    // the runtime almost certainly panicked or failed to load. Surface a
+    // diagnosable message instead of an infinite spinner.
+    (function () {
+      var BOOT_TIMEOUT_MS = 12000;
+      var bootStart = Date.now();
+      setTimeout(function () {
+        var main = document.getElementById('main');
+        // Heuristic: the placeholder still owns the spinner -> app never mounted.
+        if (main && main.querySelector('.spinner')) {
+          main.innerHTML =
+            '<div class="boot-error">' +
+            '<h2>Webizen failed to start</h2>' +
+            '<p>The application did not finish loading after ' +
+            Math.round((Date.now() - bootStart) / 1000) + 's.</p>' +
+            '<p>Open the browser console (<code>F12</code>) for the panic message. ' +
+            'A hard refresh (<code>Ctrl/Cmd + Shift + R</code>) often helps if a stale ' +
+            'build is cached.</p>' +
+            '</div>';
+        }
+      }, BOOT_TIMEOUT_MS);
+    })();
+  </script>
 </body>
 </html>

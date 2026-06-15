@@ -12,14 +12,14 @@ pub fn EnvironmentalScienceQapp() -> Element {
 
     rsx! {
         div {
-            style: "padding: 20px; background: #1e1e2e; color: #cdd6f4; border-radius: 12px; font-family: monospace; display: flex; flex-direction: column; gap: 16px; height: 100%; box-sizing: border-box;",
-            h2 { style: "margin: 0; color: #a6e3a1; border-bottom: 1px solid #313244; padding-bottom: 8px;", "Environmental Science QApp" }
+            style: "padding: 20px; background: var(--qualia-surface); color: var(--qualia-text); border-radius: 12px; font-family: monospace; display: flex; flex-direction: column; gap: 16px; height: 100%; box-sizing: border-box;",
+            h2 { style: "margin: 0; color: var(--qualia-accent); border-bottom: 1px solid var(--qualia-border); padding-bottom: 8px;", "Environmental Science QApp" }
 
             div { style: "display: grid; grid-template-columns: 1fr 1fr; gap: 12px;",
                 div {
-                    label { style: "font-size: 0.8rem; color: #a6adc8;", "Domain" }
+                    label { style: "font-size: 0.8rem; color: var(--qualia-text-muted);", "Domain" }
                     select {
-                        style: "width: 100%; padding: 6px; background: #181825; border: 1px solid #45475a; color: #cdd6f4; border-radius: 4px; margin-top: 4px; box-sizing: border-box;",
+                        style: "width: 100%; padding: 6px; background: var(--qualia-bg); border: 1px solid var(--qualia-border); color: var(--qualia-text); border-radius: 4px; margin-top: 4px; box-sizing: border-box;",
                         onchange: move |e| domain.set(e.value()),
                         option { "Climate Science" }
                         option { "Pollution" }
@@ -34,9 +34,9 @@ pub fn EnvironmentalScienceQapp() -> Element {
                     }
                 }
                 div {
-                    label { style: "font-size: 0.8rem; color: #a6adc8;", "Pollutant Class" }
+                    label { style: "font-size: 0.8rem; color: var(--qualia-text-muted);", "Pollutant Class" }
                     select {
-                        style: "width: 100%; padding: 6px; background: #181825; border: 1px solid #45475a; color: #cdd6f4; border-radius: 4px; margin-top: 4px; box-sizing: border-box;",
+                        style: "width: 100%; padding: 6px; background: var(--qualia-bg); border: 1px solid var(--qualia-border); color: var(--qualia-text); border-radius: 4px; margin-top: 4px; box-sizing: border-box;",
                         onchange: move |e| pollutant_class.set(e.value()),
                         option { "GHGs" }
                         option { "NOx" }
@@ -51,7 +51,7 @@ pub fn EnvironmentalScienceQapp() -> Element {
                     }
                 }
                 div {
-                    label { style: "font-size: 0.8rem; color: #a6adc8;", "CO₂ (ppm): {co2_ppm:.0}" }
+                    label { style: "font-size: 0.8rem; color: var(--qualia-text-muted);", "CO₂ (ppm): {co2_ppm:.0}" }
                     input {
                         r#type: "range",
                         min: "280",
@@ -63,18 +63,18 @@ pub fn EnvironmentalScienceQapp() -> Element {
                     }
                 }
                 div {
-                    label { style: "font-size: 0.8rem; color: #a6adc8;", "Pollutant Concentration" }
+                    label { style: "font-size: 0.8rem; color: var(--qualia-text-muted);", "Pollutant Concentration" }
                     input {
                         r#type: "number",
                         value: "{concentration}",
                         step: "0.1",
                         min: "0",
-                        style: "width: 100%; padding: 6px; background: #181825; border: 1px solid #45475a; color: #cdd6f4; border-radius: 4px; margin-top: 4px; box-sizing: border-box;",
+                        style: "width: 100%; padding: 6px; background: var(--qualia-bg); border: 1px solid var(--qualia-border); color: var(--qualia-text); border-radius: 4px; margin-top: 4px; box-sizing: border-box;",
                         oninput: move |e| concentration.set(e.value().parse().unwrap_or(400.0)),
                     }
                 }
                 div {
-                    label { style: "font-size: 0.8rem; color: #a6adc8;", "Temperature Anomaly (°C): {temperature_anomaly_c:.2}" }
+                    label { style: "font-size: 0.8rem; color: var(--qualia-text-muted);", "Temperature Anomaly (°C): {temperature_anomaly_c:.2}" }
                     input {
                         r#type: "range",
                         min: "-2.0",
@@ -86,9 +86,9 @@ pub fn EnvironmentalScienceQapp() -> Element {
                     }
                 }
                 div {
-                    label { style: "font-size: 0.8rem; color: #a6adc8;", "Mitigation Strategy" }
+                    label { style: "font-size: 0.8rem; color: var(--qualia-text-muted);", "Mitigation Strategy" }
                     select {
-                        style: "width: 100%; padding: 6px; background: #181825; border: 1px solid #45475a; color: #cdd6f4; border-radius: 4px; margin-top: 4px; box-sizing: border-box;",
+                        style: "width: 100%; padding: 6px; background: var(--qualia-bg); border: 1px solid var(--qualia-border); color: var(--qualia-text); border-radius: 4px; margin-top: 4px; box-sizing: border-box;",
                         onchange: move |e| mitigation_strategy.set(e.value()),
                         option { "Carbon Capture" }
                         option { "Renewable Energy" }
@@ -103,9 +103,9 @@ pub fn EnvironmentalScienceQapp() -> Element {
             }
 
             div {
-                label { style: "font-size: 0.8rem; color: #a6adc8;", "Monitoring Notes" }
+                label { style: "font-size: 0.8rem; color: var(--qualia-text-muted);", "Monitoring Notes" }
                 textarea {
-                    style: "width: 100%; padding: 8px; background: #181825; border: 1px solid #45475a; color: #cdd6f4; border-radius: 4px; margin-top: 4px; min-height: 60px; box-sizing: border-box; resize: vertical;",
+                    style: "width: 100%; padding: 8px; background: var(--qualia-bg); border: 1px solid var(--qualia-border); color: var(--qualia-text); border-radius: 4px; margin-top: 4px; min-height: 60px; box-sizing: border-box; resize: vertical;",
                     placeholder: "Enter sensor data, monitoring station details, policy context...",
                     oninput: move |e| monitoring_notes.set(e.value()),
                     "{monitoring_notes}"
@@ -113,21 +113,21 @@ pub fn EnvironmentalScienceQapp() -> Element {
             }
 
             div {
-                style: "background: #11111b; padding: 16px; border-radius: 8px; border-left: 4px solid #a6e3a1; flex: 1;",
-                h3 { style: "margin-top: 0; color: #a6e3a1; font-size: 0.9rem;", "Output / Analysis" }
+                style: "background: var(--qualia-bg); padding: 16px; border-radius: 8px; border-left: 4px solid var(--qualia-accent); flex: 1;",
+                h3 { style: "margin-top: 0; color: var(--qualia-accent); font-size: 0.9rem;", "Output / Analysis" }
                 div { style: "display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 0.8rem;",
-                    div { style: "color: #a6adc8;", "Domain:" }
-                    div { style: "color: #cdd6f4;", "{domain}" }
-                    div { style: "color: #a6adc8;", "Pollutant:" }
-                    div { style: "color: #cdd6f4;", "{pollutant_class}" }
-                    div { style: "color: #a6adc8;", "CO₂:" }
-                    div { style: "color: #cdd6f4;", "{co2_ppm:.0} ppm" }
-                    div { style: "color: #a6adc8;", "Temp Anomaly:" }
-                    div { style: "color: #cdd6f4;", "+{temperature_anomaly_c:.2}°C" }
-                    div { style: "color: #a6adc8;", "Mitigation:" }
-                    div { style: "color: #cdd6f4;", "{mitigation_strategy}" }
+                    div { style: "color: var(--qualia-text-muted);", "Domain:" }
+                    div { style: "color: var(--qualia-text);", "{domain}" }
+                    div { style: "color: var(--qualia-text-muted);", "Pollutant:" }
+                    div { style: "color: var(--qualia-text);", "{pollutant_class}" }
+                    div { style: "color: var(--qualia-text-muted);", "CO₂:" }
+                    div { style: "color: var(--qualia-text);", "{co2_ppm:.0} ppm" }
+                    div { style: "color: var(--qualia-text-muted);", "Temp Anomaly:" }
+                    div { style: "color: var(--qualia-text);", "+{temperature_anomaly_c:.2}°C" }
+                    div { style: "color: var(--qualia-text-muted);", "Mitigation:" }
+                    div { style: "color: var(--qualia-text);", "{mitigation_strategy}" }
                 }
-                div { style: "font-size: 0.75rem; color: #585b70; margin-top: 12px; border-top: 1px solid #313244; padding-top: 8px;",
+                div { style: "font-size: 0.75rem; color: var(--qualia-text-muted); margin-top: 12px; border-top: 1px solid var(--qualia-border); padding-top: 8px;",
                     "QualiaDB → ODE climate solver | Allen Interval temporal | geospatial sieve"
                 }
             }

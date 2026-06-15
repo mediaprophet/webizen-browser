@@ -5,7 +5,7 @@ pub fn AgreementsRights() -> Element {
     rsx! {
         div {
             style: "flex: 1; padding: 2.5rem; background: linear-gradient(180deg, rgba(30,20,40,0.9) 0%, rgba(20,20,30,0.9) 100%); backdrop-filter: blur(20px); border-radius: 16px; border: 1px solid rgba(255,0,128,0.2); color: #FFF;",
-            
+
             h2 {
                 style: "font-family: 'Inter', sans-serif; font-size: 2.2rem; background: linear-gradient(90deg, #FF0080, #7928CA); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 0.5rem;",
                 "Agreements & Rights"
@@ -14,7 +14,7 @@ pub fn AgreementsRights() -> Element {
 
             div {
                 style: "display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;",
-                
+
                 div {
                     style: "background: rgba(0,0,0,0.4); padding: 1.5rem; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);",
                     h3 { style: "color: #FF0080; margin-top: 0;", "Active Agreements" }

@@ -3,11 +3,11 @@ use dioxus::prelude::*;
 #[component]
 pub fn SolidLdpBrowser() -> Element {
     let mut current_path = use_signal(|| "solid://alice.q42/profile/".to_string());
-    
+
     rsx! {
         div {
             style: "flex: 1; display: flex; flex-direction: column; padding: 2rem; background: rgba(20, 25, 30, 0.8); backdrop-filter: blur(15px); border-radius: 16px; border: 1px solid rgba(0, 200, 255, 0.2); color: var(--qualia-text);",
-            
+
             div {
                 style: "display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;",
                 h2 {

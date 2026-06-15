@@ -4,21 +4,28 @@ use qualia_core_db::NQuin;
 
 #[cfg(target_arch = "wasm32")]
 #[derive(Clone, Default)]
-struct NQuin { subject: u64, predicate: u64, object: u64, context: u64, metadata: u64, parity: u64 }
+struct NQuin {
+    subject: u64,
+    predicate: u64,
+    object: u64,
+    context: u64,
+    metadata: u64,
+    parity: u64,
+}
 use serde::{Deserialize, Serialize};
 #[cfg(target_arch = "wasm32")]
-use wasm_bindgen::closure::Closure;
-#[cfg(target_arch = "wasm32")]
 use wasm_bindgen::JsCast;
+#[cfg(target_arch = "wasm32")]
+use wasm_bindgen::closure::Closure;
 #[cfg(target_arch = "wasm32")]
 use web_sys::{EventSource, MessageEvent};
 
 use crate::pane_registry::{
-    builtin_pane_definitions, category_label, find_pane, PaneCategory, PaneDefinition,
+    PaneCategory, PaneDefinition, builtin_pane_definitions, category_label, find_pane,
 };
 use crate::theme_engine::{
-    builtin_theme_catalog, collect_stylesheets, join_theme_classes, render_scope_tokens,
-    resolve_theme, ResolvedTheme, ThemeBinding, ThemeDefinition,
+    ResolvedTheme, ThemeBinding, ThemeDefinition, builtin_theme_catalog, collect_stylesheets,
+    join_theme_classes, render_scope_tokens, resolve_theme,
 };
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
@@ -29,7 +36,11 @@ pub enum LayoutStrategy {
         snap_step: u16,
         gutter: u16,
     },
-    CssGrid { cols: u8, rows: u8, gap: u8 },
+    CssGrid {
+        cols: u8,
+        rows: u8,
+        gap: u8,
+    },
     FlexBox,
     Masonry,
 }
@@ -155,7 +166,10 @@ pub struct WebizenWorkspace {
 fn p(cid: &str, x: u16, y: u16, w: u16, h: u16) -> PanePlacement {
     PanePlacement {
         component_id: cid.to_string(),
-        x, y, w, h,
+        x,
+        y,
+        w,
+        h,
         data_bindings: vec![],
         binds_rpc: None,
         requires_capability: vec![],
@@ -171,59 +185,59 @@ fn p(cid: &str, x: u16, y: u16, w: u16, h: u16) -> PanePlacement {
 
 fn app_display_name(app_id: &str) -> &'static str {
     match app_id {
-        "context-studio"     => "Context Studio",
-        "qapp-studio"        => "QApp Studio",
-        "profile-identity"   => "Profile & Identity",
-        "hardware-config"    => "Hardware Configurator",
-        "chat"               => "Neuro-Symbolic Chat",
-        "llm-harness"        => "LLM Model Harness",
-        "lora-manager"       => "LoRA Adapter Manager",
-        "agent-config"       => "Agent Configuration",
-        "inference-monitor"  => "Inference Monitor",
-        "model-lifecycle"    => "Model Lifecycle",
-        "ontology-builder"   => "Ontology Builder",
-        "sparql-explorer"    => "SPARQL Explorer",
-        "n3-logic-studio"    => "N3 Logic Studio",
-        "rdf-star-editor"    => "RDF-Star Editor",
-        "solid-browser"      => "Solid LDP Browser",
-        "physics-sim"        => "Physics Simulator",
-        "chemistry-modeler"  => "Chemistry Modeler",
-        "ode-lab"            => "ODE & Calculus Lab",
-        "matrix-lab"         => "Matrix & Linear Algebra",
-        "stats-lab"          => "Statistical Analysis Lab",
+        "context-studio" => "Context Studio",
+        "qapp-studio" => "QApp Studio",
+        "profile-identity" => "Profile & Identity",
+        "hardware-config" => "Hardware Configurator",
+        "chat" => "Neuro-Symbolic Chat",
+        "llm-harness" => "LLM Model Harness",
+        "lora-manager" => "LoRA Adapter Manager",
+        "agent-config" => "Agent Configuration",
+        "inference-monitor" => "Inference Monitor",
+        "model-lifecycle" => "Model Lifecycle",
+        "ontology-builder" => "Ontology Builder",
+        "sparql-explorer" => "SPARQL Explorer",
+        "n3-logic-studio" => "N3 Logic Studio",
+        "rdf-star-editor" => "RDF-Star Editor",
+        "solid-browser" => "Solid LDP Browser",
+        "physics-sim" => "Physics Simulator",
+        "chemistry-modeler" => "Chemistry Modeler",
+        "ode-lab" => "ODE & Calculus Lab",
+        "matrix-lab" => "Matrix & Linear Algebra",
+        "stats-lab" => "Statistical Analysis Lab",
         "bioinformatics-lab" => "Bioinformatics Lab",
-        "qpu-optimizer"      => "QPU Optimizer",
-        "quantum-dft"        => "Quantum DFT Lab",
-        "qaoa-explorer"      => "QAOA Explorer",
-        "qpu-providers"      => "QPU Provider Manager",
-        "health-vitals"      => "Health Vital Monitor",
-        "clinical-risk"      => "Clinical Risk Scorer",
-        "dicom-viewer"       => "DICOM Viewer",
-        "anatomy-browser"    => "Anatomy Context Browser",
-        "comorbidity"        => "Comorbidity Analyzer",
-        "portfolio"          => "Portfolio Analyzer",
-        "risk-engine"        => "Risk Engine",
-        "gbm-sim"            => "GBM Simulator",
-        "tax-schema"         => "Tax Schema Editor",
-        "agreements"         => "Agreements & Rights",
-        "key-vault"          => "Key Vault Manager",
-        "zk-studio"          => "ZK Proof Studio",
-        "deontic-editor"     => "Deontic Logic Editor",
-        "shacl-validator"    => "SHACL Validator",
-        "wal-inspector"      => "WAL Inspector",
-        "q42-volume"         => "Q42 Volume Manager",
-        "provenance-graph"   => "Provenance Graph",
-        "storage-config"     => "Storage Driver Config",
-        "webtorrent"         => "WebTorrent Seeder",
-        "p2p-dashboard"      => "P2P Node Dashboard",
-        "ebpf-filter"        => "eBPF Filter Manager",
-        "acoustic-ble"       => "Acoustic BLE Mesh",
-        "mcp-inspector"      => "MCP Tool Inspector",
-        "benchmark"          => "Benchmark Harness",
-        "cli-bridge"         => "CLI Bridge",
-        "extension-bus"      => "Extension Bus",
-        "nexus"              => "Nexus — Quantum Research Cooperative",
-        _                    => "QApp Editor",
+        "qpu-optimizer" => "QPU Optimizer",
+        "quantum-dft" => "Quantum DFT Lab",
+        "qaoa-explorer" => "QAOA Explorer",
+        "qpu-providers" => "QPU Provider Manager",
+        "health-vitals" => "Health Vital Monitor",
+        "clinical-risk" => "Clinical Risk Scorer",
+        "dicom-viewer" => "DICOM Viewer",
+        "anatomy-browser" => "Anatomy Context Browser",
+        "comorbidity" => "Comorbidity Analyzer",
+        "portfolio" => "Portfolio Analyzer",
+        "risk-engine" => "Risk Engine",
+        "gbm-sim" => "GBM Simulator",
+        "tax-schema" => "Tax Schema Editor",
+        "agreements" => "Agreements & Rights",
+        "key-vault" => "Key Vault Manager",
+        "zk-studio" => "ZK Proof Studio",
+        "deontic-editor" => "Deontic Logic Editor",
+        "shacl-validator" => "SHACL Validator",
+        "wal-inspector" => "WAL Inspector",
+        "q42-volume" => "Q42 Volume Manager",
+        "provenance-graph" => "Provenance Graph",
+        "storage-config" => "Storage Driver Config",
+        "webtorrent" => "WebTorrent Seeder",
+        "p2p-dashboard" => "P2P Node Dashboard",
+        "ebpf-filter" => "eBPF Filter Manager",
+        "acoustic-ble" => "Acoustic BLE Mesh",
+        "mcp-inspector" => "MCP Tool Inspector",
+        "benchmark" => "Benchmark Harness",
+        "cli-bridge" => "CLI Bridge",
+        "extension-bus" => "Extension Bus",
+        "nexus" => "Nexus — Quantum Research Cooperative",
+        _ => "QApp Editor",
     }
 }
 
@@ -236,269 +250,269 @@ fn app_display_name(app_id: &str) -> &'static str {
 fn default_panes_for_app(app_id: &str) -> Vec<PanePlacement> {
     match app_id {
         "context-studio" => vec![
-            p("contextual-workspace",    0,  0, 62, 62),
-            p("neuro-symbolic-chat",    64,  0, 30, 30),
-            p("sparql-explorer",        64, 32, 30, 30),
+            p("contextual-workspace", 0, 0, 62, 62),
+            p("neuro-symbolic-chat", 64, 0, 30, 30),
+            p("sparql-explorer", 64, 32, 30, 30),
         ],
         "chat" => vec![
-            p("neuro-symbolic-chat",     0,  0, 62, 62),
-            p("inference-monitor",      64,  0, 30, 30),
-            p("lora-manager",           64, 32, 30, 30),
+            p("neuro-symbolic-chat", 0, 0, 62, 62),
+            p("inference-monitor", 64, 0, 30, 30),
+            p("lora-manager", 64, 32, 30, 30),
         ],
         "llm-harness" => vec![
-            p("llm-harness",             0,  0, 56, 62),
-            p("inference-monitor",      58,  0, 36, 20),
-            p("model-lifecycle",        58, 22, 36, 20),
-            p("lora-manager",           58, 44, 36, 18),
+            p("llm-harness", 0, 0, 56, 62),
+            p("inference-monitor", 58, 0, 36, 20),
+            p("model-lifecycle", 58, 22, 36, 20),
+            p("lora-manager", 58, 44, 36, 18),
         ],
         "lora-manager" => vec![
-            p("lora-manager",            0,  0, 56, 36),
-            p("llm-harness",             0, 38, 56, 24),
-            p("inference-monitor",      58,  0, 36, 30),
-            p("agent-config",           58, 32, 36, 30),
+            p("lora-manager", 0, 0, 56, 36),
+            p("llm-harness", 0, 38, 56, 24),
+            p("inference-monitor", 58, 0, 36, 30),
+            p("agent-config", 58, 32, 36, 30),
         ],
         "agent-config" => vec![
-            p("agent-config",            0,  0, 56, 40),
-            p("inference-monitor",      58,  0, 36, 30),
-            p("model-lifecycle",        58, 32, 36, 30),
+            p("agent-config", 0, 0, 56, 40),
+            p("inference-monitor", 58, 0, 36, 30),
+            p("model-lifecycle", 58, 32, 36, 30),
         ],
         "inference-monitor" => vec![
-            p("inference-monitor",       0,  0, 94, 30),
-            p("system-diagnostics",      0, 32, 46, 30),
-            p("benchmark-harness",      48, 32, 46, 30),
+            p("inference-monitor", 0, 0, 94, 30),
+            p("system-diagnostics", 0, 32, 46, 30),
+            p("benchmark-harness", 48, 32, 46, 30),
         ],
         "model-lifecycle" => vec![
-            p("model-lifecycle",         0,  0, 56, 36),
-            p("llm-harness",            58,  0, 36, 20),
-            p("lora-manager",           58, 22, 36, 20),
-            p("inference-monitor",       0, 38, 56, 24),
+            p("model-lifecycle", 0, 0, 56, 36),
+            p("llm-harness", 58, 0, 36, 20),
+            p("lora-manager", 58, 22, 36, 20),
+            p("inference-monitor", 0, 38, 56, 24),
         ],
         "ontology-builder" => vec![
-            p("contextual-workspace",    0,  0, 56, 62),
-            p("n3-logic-studio",        58,  0, 36, 30),
-            p("sparql-explorer",        58, 32, 36, 30),
+            p("contextual-workspace", 0, 0, 56, 62),
+            p("n3-logic-studio", 58, 0, 36, 30),
+            p("sparql-explorer", 58, 32, 36, 30),
         ],
         "sparql-explorer" => vec![
-            p("sparql-explorer",         0,  0, 62, 62),
-            p("provenance-graph",       64,  0, 30, 30),
-            p("n3-logic-studio",        64, 32, 30, 30),
+            p("sparql-explorer", 0, 0, 62, 62),
+            p("provenance-graph", 64, 0, 30, 30),
+            p("n3-logic-studio", 64, 32, 30, 30),
         ],
         "n3-logic-studio" => vec![
-            p("n3-logic-studio",         0,  0, 62, 62),
-            p("shacl-validator",        64,  0, 30, 30),
-            p("deontic-logic-editor",   64, 32, 30, 30),
+            p("n3-logic-studio", 0, 0, 62, 62),
+            p("shacl-validator", 64, 0, 30, 30),
+            p("deontic-logic-editor", 64, 32, 30, 30),
         ],
         "rdf-star-editor" => vec![
-            p("rdf-star-editor",         0,  0, 62, 62),
-            p("provenance-graph",       64,  0, 30, 30),
-            p("sparql-explorer",        64, 32, 30, 30),
+            p("rdf-star-editor", 0, 0, 62, 62),
+            p("provenance-graph", 64, 0, 30, 30),
+            p("sparql-explorer", 64, 32, 30, 30),
         ],
         "solid-browser" => vec![
-            p("solid-ldp-browser",       0,  0, 62, 62),
-            p("sparql-explorer",        64,  0, 30, 30),
-            p("key-vault-manager",      64, 32, 30, 30),
+            p("solid-ldp-browser", 0, 0, 62, 62),
+            p("sparql-explorer", 64, 0, 30, 30),
+            p("key-vault-manager", 64, 32, 30, 30),
         ],
         "physics-sim" => vec![
-            p("physics-simulator",       0,  0, 62, 62),
-            p("statistical-analysis",   64,  0, 30, 30),
-            p("ode-solver",             64, 32, 30, 30),
+            p("physics-simulator", 0, 0, 62, 62),
+            p("statistical-analysis", 64, 0, 30, 30),
+            p("ode-solver", 64, 32, 30, 30),
         ],
         "chemistry-modeler" => vec![
-            p("chemistry-modeler",       0,  0, 62, 62),
-            p("bioinformatics-lab",     64,  0, 30, 30),
-            p("statistical-analysis",   64, 32, 30, 30),
+            p("chemistry-modeler", 0, 0, 62, 62),
+            p("bioinformatics-lab", 64, 0, 30, 30),
+            p("statistical-analysis", 64, 32, 30, 30),
         ],
         "ode-lab" => vec![
-            p("ode-solver",              0,  0, 62, 62),
-            p("matrix-lab",             64,  0, 30, 30),
-            p("statistical-analysis",   64, 32, 30, 30),
+            p("ode-solver", 0, 0, 62, 62),
+            p("matrix-lab", 64, 0, 30, 30),
+            p("statistical-analysis", 64, 32, 30, 30),
         ],
         "matrix-lab" => vec![
-            p("matrix-lab",              0,  0, 62, 62),
-            p("ode-solver",             64,  0, 30, 30),
-            p("statistical-analysis",   64, 32, 30, 30),
+            p("matrix-lab", 0, 0, 62, 62),
+            p("ode-solver", 64, 0, 30, 30),
+            p("statistical-analysis", 64, 32, 30, 30),
         ],
         "stats-lab" => vec![
-            p("statistical-analysis",    0,  0, 62, 62),
-            p("matrix-lab",             64,  0, 30, 30),
-            p("provenance-graph",       64, 32, 30, 30),
+            p("statistical-analysis", 0, 0, 62, 62),
+            p("matrix-lab", 64, 0, 30, 30),
+            p("provenance-graph", 64, 32, 30, 30),
         ],
         "bioinformatics-lab" => vec![
-            p("bioinformatics-lab",      0,  0, 62, 62),
-            p("chemistry-modeler",      64,  0, 30, 30),
-            p("statistical-analysis",   64, 32, 30, 30),
+            p("bioinformatics-lab", 0, 0, 62, 62),
+            p("chemistry-modeler", 64, 0, 30, 30),
+            p("statistical-analysis", 64, 32, 30, 30),
         ],
         "qpu-optimizer" => vec![
-            p("qpu-optimizer",           0,  0, 56, 36),
-            p("qaoa-explorer",           0, 38, 56, 24),
-            p("qpu-providers",          58,  0, 36, 30),
-            p("statistical-analysis",   58, 32, 36, 30),
+            p("qpu-optimizer", 0, 0, 56, 36),
+            p("qaoa-explorer", 0, 38, 56, 24),
+            p("qpu-providers", 58, 0, 36, 30),
+            p("statistical-analysis", 58, 32, 36, 30),
         ],
         "quantum-dft" => vec![
-            p("quantum-dft",             0,  0, 62, 62),
-            p("qpu-optimizer",          64,  0, 30, 30),
-            p("qpu-providers",          64, 32, 30, 30),
+            p("quantum-dft", 0, 0, 62, 62),
+            p("qpu-optimizer", 64, 0, 30, 30),
+            p("qpu-providers", 64, 32, 30, 30),
         ],
         "qaoa-explorer" => vec![
-            p("qaoa-explorer",           0,  0, 62, 62),
-            p("qpu-optimizer",          64,  0, 30, 30),
-            p("statistical-analysis",   64, 32, 30, 30),
+            p("qaoa-explorer", 0, 0, 62, 62),
+            p("qpu-optimizer", 64, 0, 30, 30),
+            p("statistical-analysis", 64, 32, 30, 30),
         ],
         "qpu-providers" => vec![
-            p("qpu-providers",           0,  0, 56, 40),
-            p("qpu-optimizer",          58,  0, 36, 30),
-            p("qaoa-explorer",          58, 32, 36, 30),
+            p("qpu-providers", 0, 0, 56, 40),
+            p("qpu-optimizer", 58, 0, 36, 30),
+            p("qaoa-explorer", 58, 32, 36, 30),
         ],
         "health-vitals" => vec![
-            p("health-vital-monitor",    0,  0, 46, 30),
-            p("clinical-risk-scorer",    0, 32, 46, 30),
-            p("dicom-viewer",           48,  0, 46, 30),
-            p("comorbidity-analyzer",   48, 32, 46, 30),
+            p("health-vital-monitor", 0, 0, 46, 30),
+            p("clinical-risk-scorer", 0, 32, 46, 30),
+            p("dicom-viewer", 48, 0, 46, 30),
+            p("comorbidity-analyzer", 48, 32, 46, 30),
         ],
         "clinical-risk" => vec![
-            p("clinical-risk-scorer",    0,  0, 62, 62),
-            p("health-vital-monitor",   64,  0, 30, 30),
-            p("comorbidity-analyzer",   64, 32, 30, 30),
+            p("clinical-risk-scorer", 0, 0, 62, 62),
+            p("health-vital-monitor", 64, 0, 30, 30),
+            p("comorbidity-analyzer", 64, 32, 30, 30),
         ],
         "dicom-viewer" => vec![
-            p("dicom-viewer",            0,  0, 62, 62),
-            p("health-vital-monitor",   64,  0, 30, 30),
-            p("clinical-risk-scorer",   64, 32, 30, 30),
+            p("dicom-viewer", 0, 0, 62, 62),
+            p("health-vital-monitor", 64, 0, 30, 30),
+            p("clinical-risk-scorer", 64, 32, 30, 30),
         ],
         "anatomy-browser" => vec![
-            p("health-vital-monitor",    0,  0, 46, 30),
-            p("dicom-viewer",           48,  0, 46, 30),
-            p("clinical-risk-scorer",    0, 32, 46, 30),
-            p("comorbidity-analyzer",   48, 32, 46, 30),
+            p("health-vital-monitor", 0, 0, 46, 30),
+            p("dicom-viewer", 48, 0, 46, 30),
+            p("clinical-risk-scorer", 0, 32, 46, 30),
+            p("comorbidity-analyzer", 48, 32, 46, 30),
         ],
         "comorbidity" => vec![
-            p("comorbidity-analyzer",    0,  0, 62, 62),
-            p("clinical-risk-scorer",   64,  0, 30, 30),
-            p("health-vital-monitor",   64, 32, 30, 30),
+            p("comorbidity-analyzer", 0, 0, 62, 62),
+            p("clinical-risk-scorer", 64, 0, 30, 30),
+            p("health-vital-monitor", 64, 32, 30, 30),
         ],
         "portfolio" => vec![
-            p("portfolio-analyzer",      0,  0, 62, 36),
-            p("risk-engine",             0, 38, 62, 24),
-            p("gbm-simulator",          64,  0, 30, 30),
-            p("statistical-analysis",   64, 32, 30, 30),
+            p("portfolio-analyzer", 0, 0, 62, 36),
+            p("risk-engine", 0, 38, 62, 24),
+            p("gbm-simulator", 64, 0, 30, 30),
+            p("statistical-analysis", 64, 32, 30, 30),
         ],
         "risk-engine" => vec![
-            p("risk-engine",             0,  0, 62, 62),
-            p("portfolio-analyzer",     64,  0, 30, 30),
-            p("gbm-simulator",          64, 32, 30, 30),
+            p("risk-engine", 0, 0, 62, 62),
+            p("portfolio-analyzer", 64, 0, 30, 30),
+            p("gbm-simulator", 64, 32, 30, 30),
         ],
         "gbm-sim" => vec![
-            p("gbm-simulator",           0,  0, 62, 62),
-            p("risk-engine",            64,  0, 30, 30),
-            p("statistical-analysis",   64, 32, 30, 30),
+            p("gbm-simulator", 0, 0, 62, 62),
+            p("risk-engine", 64, 0, 30, 30),
+            p("statistical-analysis", 64, 32, 30, 30),
         ],
         "tax-schema" => vec![
-            p("shacl-validator",         0,  0, 56, 40),
-            p("deontic-logic-editor",   58,  0, 36, 30),
-            p("agreements-rights",      58, 32, 36, 30),
+            p("shacl-validator", 0, 0, 56, 40),
+            p("deontic-logic-editor", 58, 0, 36, 30),
+            p("agreements-rights", 58, 32, 36, 30),
         ],
         "agreements" => vec![
-            p("agreements-rights",       0,  0, 62, 62),
-            p("deontic-logic-editor",   64,  0, 30, 30),
-            p("shacl-validator",        64, 32, 30, 30),
+            p("agreements-rights", 0, 0, 62, 62),
+            p("deontic-logic-editor", 64, 0, 30, 30),
+            p("shacl-validator", 64, 32, 30, 30),
         ],
         "key-vault" => vec![
-            p("key-vault-manager",       0,  0, 62, 62),
-            p("zk-proof-studio",        64,  0, 30, 30),
-            p("agreements-rights",      64, 32, 30, 30),
+            p("key-vault-manager", 0, 0, 62, 62),
+            p("zk-proof-studio", 64, 0, 30, 30),
+            p("agreements-rights", 64, 32, 30, 30),
         ],
         "zk-studio" => vec![
-            p("zk-proof-studio",         0,  0, 62, 62),
-            p("key-vault-manager",      64,  0, 30, 30),
-            p("deontic-logic-editor",   64, 32, 30, 30),
+            p("zk-proof-studio", 0, 0, 62, 62),
+            p("key-vault-manager", 64, 0, 30, 30),
+            p("deontic-logic-editor", 64, 32, 30, 30),
         ],
         "deontic-editor" => vec![
-            p("deontic-logic-editor",    0,  0, 62, 62),
-            p("shacl-validator",        64,  0, 30, 30),
-            p("agreements-rights",      64, 32, 30, 30),
+            p("deontic-logic-editor", 0, 0, 62, 62),
+            p("shacl-validator", 64, 0, 30, 30),
+            p("agreements-rights", 64, 32, 30, 30),
         ],
         "shacl-validator" => vec![
-            p("shacl-validator",         0,  0, 62, 62),
-            p("n3-logic-studio",        64,  0, 30, 30),
-            p("deontic-logic-editor",   64, 32, 30, 30),
+            p("shacl-validator", 0, 0, 62, 62),
+            p("n3-logic-studio", 64, 0, 30, 30),
+            p("deontic-logic-editor", 64, 32, 30, 30),
         ],
         "wal-inspector" => vec![
-            p("wal-inspector",           0,  0, 62, 36),
-            p("provenance-graph",       64,  0, 30, 62),
-            p("q42-volume-manager",      0, 38, 62, 24),
+            p("wal-inspector", 0, 0, 62, 36),
+            p("provenance-graph", 64, 0, 30, 62),
+            p("q42-volume-manager", 0, 38, 62, 24),
         ],
         "q42-volume" => vec![
-            p("q42-volume-manager",      0,  0, 62, 36),
-            p("wal-inspector",          64,  0, 30, 30),
-            p("storage-driver-config",  64, 32, 30, 30),
-            p("provenance-graph",        0, 38, 62, 24),
+            p("q42-volume-manager", 0, 0, 62, 36),
+            p("wal-inspector", 64, 0, 30, 30),
+            p("storage-driver-config", 64, 32, 30, 30),
+            p("provenance-graph", 0, 38, 62, 24),
         ],
         "provenance-graph" => vec![
-            p("provenance-graph",        0,  0, 62, 62),
-            p("wal-inspector",          64,  0, 30, 30),
-            p("sparql-explorer",        64, 32, 30, 30),
+            p("provenance-graph", 0, 0, 62, 62),
+            p("wal-inspector", 64, 0, 30, 30),
+            p("sparql-explorer", 64, 32, 30, 30),
         ],
         "storage-config" => vec![
-            p("storage-driver-config",   0,  0, 56, 40),
-            p("system-diagnostics",     58,  0, 36, 40),
-            p("wal-inspector",           0, 42, 56, 20),
+            p("storage-driver-config", 0, 0, 56, 40),
+            p("system-diagnostics", 58, 0, 36, 40),
+            p("wal-inspector", 0, 42, 56, 20),
         ],
         "webtorrent" => vec![
-            p("webtorrent-seeder",       0,  0, 62, 36),
-            p("p2p-dashboard",          64,  0, 30, 30),
-            p("ebpf-filter-manager",    64, 32, 30, 30),
-            p("provenance-graph",        0, 38, 62, 24),
+            p("webtorrent-seeder", 0, 0, 62, 36),
+            p("p2p-dashboard", 64, 0, 30, 30),
+            p("ebpf-filter-manager", 64, 32, 30, 30),
+            p("provenance-graph", 0, 38, 62, 24),
         ],
         "p2p-dashboard" => vec![
-            p("p2p-dashboard",           0,  0, 62, 62),
-            p("webtorrent-seeder",      64,  0, 30, 30),
-            p("ebpf-filter-manager",    64, 32, 30, 30),
+            p("p2p-dashboard", 0, 0, 62, 62),
+            p("webtorrent-seeder", 64, 0, 30, 30),
+            p("ebpf-filter-manager", 64, 32, 30, 30),
         ],
         "ebpf-filter" => vec![
-            p("ebpf-filter-manager",     0,  0, 62, 62),
-            p("p2p-dashboard",          64,  0, 30, 30),
-            p("system-diagnostics",     64, 32, 30, 30),
+            p("ebpf-filter-manager", 0, 0, 62, 62),
+            p("p2p-dashboard", 64, 0, 30, 30),
+            p("system-diagnostics", 64, 32, 30, 30),
         ],
         "acoustic-ble" => vec![
-            p("acoustic-ble-mesh",       0,  0, 62, 62),
-            p("p2p-dashboard",          64,  0, 30, 30),
-            p("ebpf-filter-manager",    64, 32, 30, 30),
+            p("acoustic-ble-mesh", 0, 0, 62, 62),
+            p("p2p-dashboard", 64, 0, 30, 30),
+            p("ebpf-filter-manager", 64, 32, 30, 30),
         ],
         "mcp-inspector" => vec![
-            p("mcp-inspector",           0,  0, 62, 62),
-            p("system-diagnostics",     64,  0, 30, 30),
-            p("benchmark-harness",      64, 32, 30, 30),
+            p("mcp-inspector", 0, 0, 62, 62),
+            p("system-diagnostics", 64, 0, 30, 30),
+            p("benchmark-harness", 64, 32, 30, 30),
         ],
         "benchmark" => vec![
-            p("benchmark-harness",       0,  0, 62, 62),
-            p("inference-monitor",      64,  0, 30, 30),
-            p("system-diagnostics",     64, 32, 30, 30),
+            p("benchmark-harness", 0, 0, 62, 62),
+            p("inference-monitor", 64, 0, 30, 30),
+            p("system-diagnostics", 64, 32, 30, 30),
         ],
         "cli-bridge" => vec![
-            p("cli-bridge",              0,  0, 62, 62),
-            p("mcp-inspector",          64,  0, 30, 30),
-            p("system-diagnostics",     64, 32, 30, 30),
+            p("cli-bridge", 0, 0, 62, 62),
+            p("mcp-inspector", 64, 0, 30, 30),
+            p("system-diagnostics", 64, 32, 30, 30),
         ],
         "nexus" => vec![
-            p("nexus-canvas",            0,  0, 62, 62),
-            p("sparql-explorer",        64,  0, 30, 30),
-            p("provenance-graph",       64, 32, 30, 30),
+            p("nexus-canvas", 0, 0, 62, 62),
+            p("sparql-explorer", 64, 0, 30, 30),
+            p("provenance-graph", 64, 32, 30, 30),
         ],
         "extension-bus" => vec![
-            p("extension-bus",           0,  0, 56, 40),
-            p("system-diagnostics",     58,  0, 36, 30),
-            p("mcp-inspector",          58, 32, 36, 30),
+            p("extension-bus", 0, 0, 56, 40),
+            p("system-diagnostics", 58, 0, 36, 30),
+            p("mcp-inspector", 58, 32, 36, 30),
         ],
         "profile-identity" => vec![
-            p("contextual-workspace",    0,  0, 62, 62),
-            p("key-vault-manager",      64,  0, 30, 30),
-            p("agreements-rights",      64, 32, 30, 30),
+            p("contextual-workspace", 0, 0, 62, 62),
+            p("key-vault-manager", 64, 0, 30, 30),
+            p("agreements-rights", 64, 32, 30, 30),
         ],
         "hardware-config" => vec![
-            p("system-diagnostics",      0,  0, 56, 40),
-            p("storage-driver-config",  58,  0, 36, 30),
-            p("agent-config",           58, 32, 36, 30),
-            p("benchmark-harness",       0, 42, 56, 20),
+            p("system-diagnostics", 0, 0, 56, 40),
+            p("storage-driver-config", 58, 0, 36, 30),
+            p("agent-config", 58, 32, 36, 30),
+            p("benchmark-harness", 0, 42, 56, 20),
         ],
         _ => vec![p(app_id, 0, 0, 94, 62)],
     }
@@ -552,9 +566,14 @@ pub fn DynamicPage(path: Vec<String>, #[props(default)] app_id: Option<String>) 
     let pane_palette = use_signal(builtin_pane_definitions);
 
     // ── Boot Rehydration ───────────────────────────────────
+    // Only talk to the local daemon when one can exist (native / Tauri webview).
+    // In the plain-browser demo this would just spam connection-refused errors.
     use_effect(move || {
+        if !crate::endpoints::is_native_host() {
+            return;
+        }
         spawn(async move {
-            if let Ok(res) = reqwest::get("http://127.0.0.1:8080/manifest").await {
+            if let Ok(res) = reqwest::get(crate::endpoints::manifest_url()).await {
                 if let Ok(data) = res.json::<WebizenWorkspace>().await {
                     if !data.pages.is_empty() {
                         workspace.set(data);
@@ -569,7 +588,11 @@ pub fn DynamicPage(path: Vec<String>, #[props(default)] app_id: Option<String>) 
 
     #[cfg(target_arch = "wasm32")]
     use_effect(move || {
-        if let Ok(ws) = web_sys::WebSocket::new("ws://127.0.0.1:4242") {
+        // Skip the native-LLM probe entirely outside a daemon-capable host.
+        if !crate::endpoints::is_native_host() {
+            return;
+        }
+        if let Ok(ws) = web_sys::WebSocket::new(crate::endpoints::NATIVE_WS) {
             let onopen = Closure::wrap(Box::new(move |_e: web_sys::Event| {
                 is_native_llm_active.set(true);
             }) as Box<dyn FnMut(web_sys::Event)>);
@@ -588,7 +611,10 @@ pub fn DynamicPage(path: Vec<String>, #[props(default)] app_id: Option<String>) 
 
     #[cfg(target_arch = "wasm32")]
     use_effect(move || {
-        if let Ok(es) = EventSource::new("http://127.0.0.1:8080/telemetry") {
+        if !crate::endpoints::is_native_host() {
+            return;
+        }
+        if let Ok(es) = EventSource::new(&crate::endpoints::telemetry_url()) {
             let callback = Closure::wrap(Box::new(move |e: MessageEvent| {
                 if let Some(txt) = e.data().as_string() {
                     telemetry_logs.write().push(txt.clone());
@@ -625,14 +651,32 @@ pub fn DynamicPage(path: Vec<String>, #[props(default)] app_id: Option<String>) 
                     let new_pane = PanePlacement {
                         component_id: component_id.clone(),
                         x: 4,
-                        y: 4 + (workspace.read().pages.first().map(|p| p.panes.len()).unwrap_or(0) as u16 * 6),
+                        y: 4 + (workspace
+                            .read()
+                            .pages
+                            .first()
+                            .map(|p| p.panes.len())
+                            .unwrap_or(0) as u16
+                            * 6),
                         w: (default_w as u16).saturating_mul(6),
                         h: (default_h as u16).saturating_mul(6),
                         data_bindings: vec![],
-                        binds_rpc: if component_id == "custom-web-module" { Some("ws://127.0.0.1:9001".into()) } else { None },
+                        binds_rpc: if component_id == "custom-web-module" {
+                            Some(crate::endpoints::MODULE_RPC_WS.into())
+                        } else {
+                            None
+                        },
                         requires_capability: vec![],
-                        ui_mode: if component_id == "custom-web-module" { Some(UiMode::IFrameSandbox) } else { None },
-                        layer: if component_id == "custom-web-module" { LayerBehavior::FloatingOverlay } else { LayerBehavior::Docked },
+                        ui_mode: if component_id == "custom-web-module" {
+                            Some(UiMode::IFrameSandbox)
+                        } else {
+                            None
+                        },
+                        layer: if component_id == "custom-web-module" {
+                            LayerBehavior::FloatingOverlay
+                        } else {
+                            LayerBehavior::Docked
+                        },
                         anchor: None,
                         min_w_points: (default_w as u16).saturating_mul(4),
                         min_h_points: (default_h as u16).saturating_mul(4),
@@ -663,7 +707,7 @@ pub fn DynamicPage(path: Vec<String>, #[props(default)] app_id: Option<String>) 
 
                 let client = reqwest::Client::new();
                 let _ = client
-                    .post("http://127.0.0.1:8080/manifest")
+                    .post(crate::endpoints::manifest_url())
                     .header("Content-Type", "application/yaml-ld-q42")
                     .body(payload)
                     .send()
@@ -693,7 +737,11 @@ pub fn DynamicPage(path: Vec<String>, #[props(default)] app_id: Option<String>) 
     // ── Routing ────────────────────────────────────────────
     let current_path = format!("/{}", path.join("/"));
     let ws = workspace.read();
-    let current_page = ws.pages.iter().find(|p| p.url_path == current_path).cloned();
+    let current_page = ws
+        .pages
+        .iter()
+        .find(|p| p.url_path == current_path)
+        .cloned();
     let theme_catalog = if ws.themes.is_empty() {
         builtin_theme_catalog()
     } else {
@@ -1264,15 +1312,39 @@ fn pane_style_for_layout(page: &Page, pane: &PanePlacement, is_selected: bool) -
             match pane.layer {
                 LayerBehavior::Docked => format!(
                     "position: absolute; left: {:.3}%; top: {:.3}%; width: calc({:.3}% - {}px); height: calc({:.3}% - {}px); min-width: {}px; min-height: {}px; background: {}; border: 1px solid {}; border-radius: 12px; padding: 0.75rem; cursor: pointer; transition: border-color 0.2s, background 0.2s, transform 0.2s; display: flex; flex-direction: column; justify-content: space-between; box-shadow: {}; overflow: hidden;",
-                    left, top, width, gutter, height, gutter, min_width_px, min_height_px, bg, border_color, shadow,
+                    left,
+                    top,
+                    width,
+                    gutter,
+                    height,
+                    gutter,
+                    min_width_px,
+                    min_height_px,
+                    bg,
+                    border_color,
+                    shadow,
                 ),
                 LayerBehavior::FloatingOverlay => format!(
                     "position: absolute; pointer-events: auto; left: {:.3}%; top: {:.3}%; width: calc({:.3}% - {}px); height: calc({:.3}% - {}px); min-width: {}px; min-height: {}px; background: color-mix(in srgb, {} 92%, black 8%); border: 1px solid {}; border-radius: 14px; padding: 0.75rem; cursor: pointer; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 22px 50px rgba(0, 0, 0, 0.35); backdrop-filter: blur(14px); z-index: 30; overflow: hidden;",
-                    left, top, width, gutter, height, gutter, min_width_px, min_height_px, bg, border_color,
+                    left,
+                    top,
+                    width,
+                    gutter,
+                    height,
+                    gutter,
+                    min_width_px,
+                    min_height_px,
+                    bg,
+                    border_color,
                 ),
                 LayerBehavior::ModalOverlay => format!(
                     "position: absolute; pointer-events: auto; left: 50%; top: 50%; width: min({:.3}%, 760px); height: min({:.3}%, 560px); min-width: {}px; min-height: {}px; transform: translate(-50%, -50%); background: color-mix(in srgb, {} 94%, black 6%); border: 1px solid {}; border-radius: 16px; padding: 0.9rem; cursor: pointer; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 28px 80px rgba(0, 0, 0, 0.45); backdrop-filter: blur(16px); z-index: 45; overflow: hidden;",
-                    width.max(28.0), height.max(24.0), min_width_px.max(280), min_height_px.max(220), bg, border_color,
+                    width.max(28.0),
+                    height.max(24.0),
+                    min_width_px.max(280),
+                    min_height_px.max(220),
+                    bg,
+                    border_color,
                 ),
                 LayerBehavior::FullCanvas => format!(
                     "position: absolute; pointer-events: auto; inset: 0; background: {}; border: 1px solid {}; border-radius: 14px; padding: 0.9rem; cursor: pointer; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 22px 50px rgba(0, 0, 0, 0.32); z-index: 55; overflow: hidden;",
@@ -1321,4 +1393,3 @@ fn render_placed_pane(
         }
     }
 }
-

@@ -11,66 +11,83 @@ pub fn ArchitecturalStudiesQapp() -> Element {
     let mut notes = use_signal(|| String::new());
 
     let design_approaches = [
-        "Parametric", "Sustainable", "Universal Design",
-        "Contextual", "Typological", "Phenomenological",
+        "Parametric",
+        "Sustainable",
+        "Universal Design",
+        "Contextual",
+        "Typological",
+        "Phenomenological",
     ];
-    let scales = ["Interior", "Building", "Campus", "Urban Block", "City", "Regional"];
+    let scales = [
+        "Interior",
+        "Building",
+        "Campus",
+        "Urban Block",
+        "City",
+        "Regional",
+    ];
     let programs = [
-        "Residential", "Commercial", "Cultural", "Civic", "Industrial", "Mixed-Use", "Landscape",
+        "Residential",
+        "Commercial",
+        "Cultural",
+        "Civic",
+        "Industrial",
+        "Mixed-Use",
+        "Landscape",
     ];
     let structural_systems = ["Bearing Wall", "Frame", "Shell", "Tensile", "Hybrid"];
 
     rsx! {
         div {
-            style: "padding: 20px; background: #1e1e2e; color: #cdd6f4; border-radius: 12px; font-family: monospace; display: flex; flex-direction: column; gap: 16px; height: 100%; box-sizing: border-box;",
+            style: "padding: 20px; background: var(--qualia-surface); color: var(--qualia-text); border-radius: 12px; font-family: monospace; display: flex; flex-direction: column; gap: 16px; height: 100%; box-sizing: border-box;",
 
             h2 {
-                style: "margin: 0; color: #f38ba8; border-bottom: 1px solid #313244; padding-bottom: 8px;",
+                style: "margin: 0; color: var(--qualia-accent); border-bottom: 1px solid var(--qualia-border); padding-bottom: 8px;",
                 "Architectural Studies"
             }
 
             div {
-                label { style: "font-size: 0.8rem; color: #a6adc8;", "Design Approach" }
+                label { style: "font-size: 0.8rem; color: var(--qualia-text-muted);", "Design Approach" }
                 select {
                     value: "{design_approach}",
                     onchange: move |e| design_approach.set(e.value()),
-                    style: "width: 100%; padding: 8px; background: #181825; border: 1px solid #45475a; color: #cdd6f4; border-radius: 4px; margin-top: 4px; box-sizing: border-box;",
+                    style: "width: 100%; padding: 8px; background: var(--qualia-bg); border: 1px solid var(--qualia-border); color: var(--qualia-text); border-radius: 4px; margin-top: 4px; box-sizing: border-box;",
                     for x in design_approaches { option { value: "{x}", "{x}" } }
                 }
             }
 
             div {
-                label { style: "font-size: 0.8rem; color: #a6adc8;", "Scale" }
+                label { style: "font-size: 0.8rem; color: var(--qualia-text-muted);", "Scale" }
                 select {
                     value: "{scale}",
                     onchange: move |e| scale.set(e.value()),
-                    style: "width: 100%; padding: 8px; background: #181825; border: 1px solid #45475a; color: #cdd6f4; border-radius: 4px; margin-top: 4px; box-sizing: border-box;",
+                    style: "width: 100%; padding: 8px; background: var(--qualia-bg); border: 1px solid var(--qualia-border); color: var(--qualia-text); border-radius: 4px; margin-top: 4px; box-sizing: border-box;",
                     for x in scales { option { value: "{x}", "{x}" } }
                 }
             }
 
             div {
-                label { style: "font-size: 0.8rem; color: #a6adc8;", "Program" }
+                label { style: "font-size: 0.8rem; color: var(--qualia-text-muted);", "Program" }
                 select {
                     value: "{program}",
                     onchange: move |e| program.set(e.value()),
-                    style: "width: 100%; padding: 8px; background: #181825; border: 1px solid #45475a; color: #cdd6f4; border-radius: 4px; margin-top: 4px; box-sizing: border-box;",
+                    style: "width: 100%; padding: 8px; background: var(--qualia-bg); border: 1px solid var(--qualia-border); color: var(--qualia-text); border-radius: 4px; margin-top: 4px; box-sizing: border-box;",
                     for x in programs { option { value: "{x}", "{x}" } }
                 }
             }
 
             div {
-                label { style: "font-size: 0.8rem; color: #a6adc8;", "Structural System" }
+                label { style: "font-size: 0.8rem; color: var(--qualia-text-muted);", "Structural System" }
                 select {
                     value: "{structural_system}",
                     onchange: move |e| structural_system.set(e.value()),
-                    style: "width: 100%; padding: 8px; background: #181825; border: 1px solid #45475a; color: #cdd6f4; border-radius: 4px; margin-top: 4px; box-sizing: border-box;",
+                    style: "width: 100%; padding: 8px; background: var(--qualia-bg); border: 1px solid var(--qualia-border); color: var(--qualia-text); border-radius: 4px; margin-top: 4px; box-sizing: border-box;",
                     for x in structural_systems { option { value: "{x}", "{x}" } }
                 }
             }
 
             div {
-                label { style: "font-size: 0.8rem; color: #a6adc8;", "Floor Area (m²): {floor_area}" }
+                label { style: "font-size: 0.8rem; color: var(--qualia-text-muted);", "Floor Area (m²): {floor_area}" }
                 input {
                     r#type: "range", min: "0", max: "500000",
                     value: "{floor_area}",
@@ -80,7 +97,7 @@ pub fn ArchitecturalStudiesQapp() -> Element {
             }
 
             div {
-                label { style: "font-size: 0.8rem; color: #a6adc8;", "Sustainability Rating: {sustainability_rating}%" }
+                label { style: "font-size: 0.8rem; color: var(--qualia-text-muted);", "Sustainability Rating: {sustainability_rating}%" }
                 input {
                     r#type: "range", min: "0", max: "100",
                     value: "{sustainability_rating}",
@@ -91,18 +108,18 @@ pub fn ArchitecturalStudiesQapp() -> Element {
 
             div {
                 style: "flex: 1; display: flex; flex-direction: column;",
-                label { style: "font-size: 0.8rem; color: #a6adc8;", "Notes" }
+                label { style: "font-size: 0.8rem; color: var(--qualia-text-muted);", "Notes" }
                 textarea {
                     value: "{notes}",
                     oninput: move |e| notes.set(e.value()),
-                    style: "flex: 1; width: 100%; padding: 8px; background: #181825; border: 1px solid #45475a; color: #cdd6f4; border-radius: 4px; margin-top: 4px; resize: none; box-sizing: border-box; min-height: 60px;"
+                    style: "flex: 1; width: 100%; padding: 8px; background: var(--qualia-bg); border: 1px solid var(--qualia-border); color: var(--qualia-text); border-radius: 4px; margin-top: 4px; resize: none; box-sizing: border-box; min-height: 60px;"
                 }
             }
 
             div {
-                style: "background: #11111b; padding: 12px 16px; border-radius: 8px; border-left: 4px solid #f38ba8;",
-                span { style: "font-size: 0.8rem; color: #a6adc8;", "{design_approach} | {scale} | {program} | {structural_system} | {floor_area} m²" }
-                div { style: "font-size: 0.75rem; color: #585b70; margin-top: 6px;", "QualiaDB → knowledge engine | sieve | anchor" }
+                style: "background: var(--qualia-bg); padding: 12px 16px; border-radius: 8px; border-left: 4px solid var(--qualia-accent);",
+                span { style: "font-size: 0.8rem; color: var(--qualia-text-muted);", "{design_approach} | {scale} | {program} | {structural_system} | {floor_area} m²" }
+                div { style: "font-size: 0.75rem; color: var(--qualia-text-muted); margin-top: 6px;", "QualiaDB → knowledge engine | sieve | anchor" }
             }
         }
     }

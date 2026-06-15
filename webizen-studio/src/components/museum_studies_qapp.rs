@@ -13,13 +13,13 @@ pub fn MuseumStudiesQapp() -> Element {
 
     rsx! {
         div {
-            style: "padding: 20px; background: #1e1e2e; color: #cdd6f4; border-radius: 12px; font-family: monospace; display: flex; flex-direction: column; gap: 16px; height: 100%; box-sizing: border-box; overflow-y: auto;",
-            h2 { style: "margin: 0; color: #b4befe; border-bottom: 1px solid #313244; padding-bottom: 8px;", "Museum Studies QApp" }
+            style: "padding: 20px; background: var(--qualia-surface); color: var(--qualia-text); border-radius: 12px; font-family: monospace; display: flex; flex-direction: column; gap: 16px; height: 100%; box-sizing: border-box; overflow-y: auto;",
+            h2 { style: "margin: 0; color: var(--qualia-accent); border-bottom: 1px solid var(--qualia-border); padding-bottom: 8px;", "Museum Studies QApp" }
 
             div { style: "display: flex; flex-direction: column; gap: 8px;",
-                label { style: "font-size: 0.85rem; color: #a6adc8;", "Museum Type" }
+                label { style: "font-size: 0.85rem; color: var(--qualia-text-muted);", "Museum Type" }
                 select {
-                    style: "background: #313244; color: #cdd6f4; border: 1px solid #45475a; border-radius: 6px; padding: 6px 8px; font-family: monospace; width: 100%; box-sizing: border-box;",
+                    style: "background: var(--qualia-border); color: var(--qualia-text); border: 1px solid var(--qualia-border); border-radius: 6px; padding: 6px 8px; font-family: monospace; width: 100%; box-sizing: border-box;",
                     onchange: move |e| museum_type.set(e.value()),
                     option { selected: true, "Art" }
                     option { "Natural History" }
@@ -33,9 +33,9 @@ pub fn MuseumStudiesQapp() -> Element {
             }
 
             div { style: "display: flex; flex-direction: column; gap: 8px;",
-                label { style: "font-size: 0.85rem; color: #a6adc8;", "Collection Type" }
+                label { style: "font-size: 0.85rem; color: var(--qualia-text-muted);", "Collection Type" }
                 select {
-                    style: "background: #313244; color: #cdd6f4; border: 1px solid #45475a; border-radius: 6px; padding: 6px 8px; font-family: monospace; width: 100%; box-sizing: border-box;",
+                    style: "background: var(--qualia-border); color: var(--qualia-text); border: 1px solid var(--qualia-border); border-radius: 6px; padding: 6px 8px; font-family: monospace; width: 100%; box-sizing: border-box;",
                     onchange: move |e| collection_type.set(e.value()),
                     option { selected: true, "Artefact" }
                     option { "Specimen" }
@@ -47,9 +47,9 @@ pub fn MuseumStudiesQapp() -> Element {
             }
 
             div { style: "display: flex; flex-direction: column; gap: 8px;",
-                label { style: "font-size: 0.85rem; color: #a6adc8;", "Curation Approach" }
+                label { style: "font-size: 0.85rem; color: var(--qualia-text-muted);", "Curation Approach" }
                 select {
-                    style: "background: #313244; color: #cdd6f4; border: 1px solid #45475a; border-radius: 6px; padding: 6px 8px; font-family: monospace; width: 100%; box-sizing: border-box;",
+                    style: "background: var(--qualia-border); color: var(--qualia-text); border: 1px solid var(--qualia-border); border-radius: 6px; padding: 6px 8px; font-family: monospace; width: 100%; box-sizing: border-box;",
                     onchange: move |e| curation_approach.set(e.value()),
                     option { "Encyclopaedic" }
                     option { selected: true, "Thematic" }
@@ -61,9 +61,9 @@ pub fn MuseumStudiesQapp() -> Element {
             }
 
             div { style: "display: flex; flex-direction: column; gap: 8px;",
-                label { style: "font-size: 0.85rem; color: #a6adc8;", "Interpretation Method" }
+                label { style: "font-size: 0.85rem; color: var(--qualia-text-muted);", "Interpretation Method" }
                 select {
-                    style: "background: #313244; color: #cdd6f4; border: 1px solid #45475a; border-radius: 6px; padding: 6px 8px; font-family: monospace; width: 100%; box-sizing: border-box;",
+                    style: "background: var(--qualia-border); color: var(--qualia-text); border: 1px solid var(--qualia-border); border-radius: 6px; padding: 6px 8px; font-family: monospace; width: 100%; box-sizing: border-box;",
                     onchange: move |e| interpretation_method.set(e.value()),
                     option { "Label" }
                     option { "Audio Guide" }
@@ -76,22 +76,22 @@ pub fn MuseumStudiesQapp() -> Element {
             }
 
             div { style: "display: flex; flex-direction: column; gap: 8px;",
-                label { style: "font-size: 0.85rem; color: #a6adc8;", "Provenance Certainty (0–100): {provenance_certainty()}%" }
+                label { style: "font-size: 0.85rem; color: var(--qualia-text-muted);", "Provenance Certainty (0–100): {provenance_certainty()}%" }
                 input {
                     r#type: "range",
                     min: "0",
                     max: "100",
                     step: "1",
                     value: "{provenance_certainty()}",
-                    style: "width: 100%; box-sizing: border-box; accent-color: if provenance_certainty() >= 70 { \"#a6e3a1\" } else { \"#f38ba8\" };",
+                    style: "width: 100%; box-sizing: border-box; accent-color: if provenance_certainty() >= 70 { \"var(--qualia-accent)\" } else { \"var(--qualia-accent)\" };",
                     oninput: move |e| provenance_certainty.set(e.value().parse().unwrap_or(75)),
                 }
             }
 
             div { style: "display: flex; flex-direction: column; gap: 8px;",
-                label { style: "font-size: 0.85rem; color: #a6adc8;", "Access Model" }
+                label { style: "font-size: 0.85rem; color: var(--qualia-text-muted);", "Access Model" }
                 select {
-                    style: "background: #313244; color: #cdd6f4; border: 1px solid #45475a; border-radius: 6px; padding: 6px 8px; font-family: monospace; width: 100%; box-sizing: border-box;",
+                    style: "background: var(--qualia-border); color: var(--qualia-text); border: 1px solid var(--qualia-border); border-radius: 6px; padding: 6px 8px; font-family: monospace; width: 100%; box-sizing: border-box;",
                     onchange: move |e| access_model.set(e.value()),
                     option { "Free" }
                     option { "Ticketed" }
@@ -101,33 +101,33 @@ pub fn MuseumStudiesQapp() -> Element {
             }
 
             div { style: "display: flex; flex-direction: column; gap: 8px;",
-                label { style: "font-size: 0.85rem; color: #a6adc8;", "Conservation Priority" }
+                label { style: "font-size: 0.85rem; color: var(--qualia-text-muted);", "Conservation Priority" }
                 input {
-                    style: "background: #313244; color: #cdd6f4; border: 1px solid #45475a; border-radius: 6px; padding: 6px 8px; font-family: monospace; width: 100%; box-sizing: border-box;",
+                    style: "background: var(--qualia-border); color: var(--qualia-text); border: 1px solid var(--qualia-border); border-radius: 6px; padding: 6px 8px; font-family: monospace; width: 100%; box-sizing: border-box;",
                     placeholder: "e.g. climate control, digitisation, repatriation...",
                     oninput: move |e| conservation_priority.set(e.value()),
                 }
             }
 
             div { style: "display: flex; flex-direction: column; gap: 8px;",
-                label { style: "font-size: 0.85rem; color: #a6adc8;", "Notes" }
+                label { style: "font-size: 0.85rem; color: var(--qualia-text-muted);", "Notes" }
                 textarea {
-                    style: "background: #313244; color: #cdd6f4; border: 1px solid #45475a; border-radius: 6px; padding: 6px 8px; font-family: monospace; width: 100%; box-sizing: border-box; min-height: 60px; resize: vertical;",
+                    style: "background: var(--qualia-border); color: var(--qualia-text); border: 1px solid var(--qualia-border); border-radius: 6px; padding: 6px 8px; font-family: monospace; width: 100%; box-sizing: border-box; min-height: 60px; resize: vertical;",
                     placeholder: "Additional notes...",
                     oninput: move |e| notes.set(e.value()),
                 }
             }
 
             div {
-                style: "background: #11111b; padding: 16px; border-radius: 8px; border-left: 4px solid #b4befe; flex: 1;",
-                h3 { style: "margin-top: 0; color: #b4befe; font-size: 0.9rem;", "QualiaDB Output" }
-                div { style: "font-size: 0.8rem; color: #a6adc8; display: flex; flex-direction: column; gap: 4px;",
+                style: "background: var(--qualia-bg); padding: 16px; border-radius: 8px; border-left: 4px solid var(--qualia-accent); flex: 1;",
+                h3 { style: "margin-top: 0; color: var(--qualia-accent); font-size: 0.9rem;", "QualiaDB Output" }
+                div { style: "font-size: 0.8rem; color: var(--qualia-text-muted); display: flex; flex-direction: column; gap: 4px;",
                     div { "Type: {museum_type()}" }
                     div { "Curation: {curation_approach()}" }
                     div { "Interpretation: {interpretation_method()}" }
-                    div { style: "color: if provenance_certainty() >= 70 { \"#a6e3a1\" } else { \"#f38ba8\" };", "Provenance: {provenance_certainty()}%" }
+                    div { style: "color: if provenance_certainty() >= 70 { \"var(--qualia-accent)\" } else { \"var(--qualia-accent)\" };", "Provenance: {provenance_certainty()}%" }
                 }
-                div { style: "font-size: 0.75rem; color: #585b70; margin-top: 8px;", "QualiaDB → provenance graph | knowledge graph | SPARQL" }
+                div { style: "font-size: 0.75rem; color: var(--qualia-text-muted); margin-top: 8px;", "QualiaDB → provenance graph | knowledge graph | SPARQL" }
             }
         }
     }

@@ -5,7 +5,7 @@ pub fn Q42VolumeManager() -> Element {
     rsx! {
         div { style: "padding: 20px; background: #e0e5ec; min-height: 100vh; font-family: sans-serif;",
             h2 { style: "color: #2d3748; margin-top: 0;", "Q42 Native Volume Orchestrator" }
-            
+
             div { style: "display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;",
                 // Volume Card
                 div { style: "background: #e0e5ec; padding: 20px; border-radius: 16px; box-shadow: 9px 9px 16px rgb(163,177,198,0.6), -9px -9px 16px rgba(255,255,255, 0.5);",

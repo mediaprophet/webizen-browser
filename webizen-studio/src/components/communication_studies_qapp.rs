@@ -11,13 +11,13 @@ pub fn CommunicationStudiesQapp() -> Element {
 
     rsx! {
         div {
-            style: "padding: 20px; background: #1e1e2e; color: #cdd6f4; border-radius: 12px; font-family: monospace; display: flex; flex-direction: column; gap: 16px; height: 100%; box-sizing: border-box; overflow-y: auto;",
-            h2 { style: "margin: 0; color: #cba6f7; border-bottom: 1px solid #313244; padding-bottom: 8px;", "Communication Studies QApp" }
+            style: "padding: 20px; background: var(--qualia-surface); color: var(--qualia-text); border-radius: 12px; font-family: monospace; display: flex; flex-direction: column; gap: 16px; height: 100%; box-sizing: border-box; overflow-y: auto;",
+            h2 { style: "margin: 0; color: var(--qualia-accent); border-bottom: 1px solid var(--qualia-border); padding-bottom: 8px;", "Communication Studies QApp" }
 
             div { style: "display: flex; flex-direction: column; gap: 8px;",
-                label { style: "font-size: 0.85rem; color: #a6adc8;", "Subfield" }
+                label { style: "font-size: 0.85rem; color: var(--qualia-text-muted);", "Subfield" }
                 select {
-                    style: "background: #313244; color: #cdd6f4; border: 1px solid #45475a; border-radius: 6px; padding: 6px 8px; font-family: monospace; width: 100%; box-sizing: border-box;",
+                    style: "background: var(--qualia-border); color: var(--qualia-text); border: 1px solid var(--qualia-border); border-radius: 6px; padding: 6px 8px; font-family: monospace; width: 100%; box-sizing: border-box;",
                     onchange: move |e| subfield.set(e.value()),
                     option { "Interpersonal" }
                     option { "Group" }
@@ -32,9 +32,9 @@ pub fn CommunicationStudiesQapp() -> Element {
             }
 
             div { style: "display: flex; flex-direction: column; gap: 8px;",
-                label { style: "font-size: 0.85rem; color: #a6adc8;", "Theoretical Framework" }
+                label { style: "font-size: 0.85rem; color: var(--qualia-text-muted);", "Theoretical Framework" }
                 select {
-                    style: "background: #313244; color: #cdd6f4; border: 1px solid #45475a; border-radius: 6px; padding: 6px 8px; font-family: monospace; width: 100%; box-sizing: border-box;",
+                    style: "background: var(--qualia-border); color: var(--qualia-text); border: 1px solid var(--qualia-border); border-radius: 6px; padding: 6px 8px; font-family: monospace; width: 100%; box-sizing: border-box;",
                     onchange: move |e| theoretical_framework.set(e.value()),
                     option { "Agenda-Setting" }
                     option { selected: true, "Framing" }
@@ -48,9 +48,9 @@ pub fn CommunicationStudiesQapp() -> Element {
             }
 
             div { style: "display: flex; flex-direction: column; gap: 8px;",
-                label { style: "font-size: 0.85rem; color: #a6adc8;", "Medium" }
+                label { style: "font-size: 0.85rem; color: var(--qualia-text-muted);", "Medium" }
                 select {
-                    style: "background: #313244; color: #cdd6f4; border: 1px solid #45475a; border-radius: 6px; padding: 6px 8px; font-family: monospace; width: 100%; box-sizing: border-box;",
+                    style: "background: var(--qualia-border); color: var(--qualia-text); border: 1px solid var(--qualia-border); border-radius: 6px; padding: 6px 8px; font-family: monospace; width: 100%; box-sizing: border-box;",
                     onchange: move |e| medium.set(e.value()),
                     option { "Print" }
                     option { "Radio" }
@@ -64,41 +64,41 @@ pub fn CommunicationStudiesQapp() -> Element {
             }
 
             div { style: "display: flex; flex-direction: column; gap: 8px;",
-                label { style: "font-size: 0.85rem; color: #a6adc8;", "Message Type" }
+                label { style: "font-size: 0.85rem; color: var(--qualia-text-muted);", "Message Type" }
                 input {
-                    style: "background: #313244; color: #cdd6f4; border: 1px solid #45475a; border-radius: 6px; padding: 6px 8px; font-family: monospace; width: 100%; box-sizing: border-box;",
+                    style: "background: var(--qualia-border); color: var(--qualia-text); border: 1px solid var(--qualia-border); border-radius: 6px; padding: 6px 8px; font-family: monospace; width: 100%; box-sizing: border-box;",
                     placeholder: "e.g. persuasive, informational, narrative...",
                     oninput: move |e| message_type.set(e.value()),
                 }
             }
 
             div { style: "display: flex; flex-direction: column; gap: 8px;",
-                label { style: "font-size: 0.85rem; color: #a6adc8;", "Audience Type" }
+                label { style: "font-size: 0.85rem; color: var(--qualia-text-muted);", "Audience Type" }
                 input {
-                    style: "background: #313244; color: #cdd6f4; border: 1px solid #45475a; border-radius: 6px; padding: 6px 8px; font-family: monospace; width: 100%; box-sizing: border-box;",
+                    style: "background: var(--qualia-border); color: var(--qualia-text); border: 1px solid var(--qualia-border); border-radius: 6px; padding: 6px 8px; font-family: monospace; width: 100%; box-sizing: border-box;",
                     placeholder: "e.g. general public, niche community...",
                     oninput: move |e| audience_type.set(e.value()),
                 }
             }
 
             div { style: "display: flex; flex-direction: column; gap: 8px;",
-                label { style: "font-size: 0.85rem; color: #a6adc8;", "Research Notes" }
+                label { style: "font-size: 0.85rem; color: var(--qualia-text-muted);", "Research Notes" }
                 textarea {
-                    style: "background: #313244; color: #cdd6f4; border: 1px solid #45475a; border-radius: 6px; padding: 6px 8px; font-family: monospace; width: 100%; box-sizing: border-box; min-height: 60px; resize: vertical;",
+                    style: "background: var(--qualia-border); color: var(--qualia-text); border: 1px solid var(--qualia-border); border-radius: 6px; padding: 6px 8px; font-family: monospace; width: 100%; box-sizing: border-box; min-height: 60px; resize: vertical;",
                     placeholder: "Additional research notes...",
                     oninput: move |e| research_notes.set(e.value()),
                 }
             }
 
             div {
-                style: "background: #11111b; padding: 16px; border-radius: 8px; border-left: 4px solid #cba6f7; flex: 1;",
-                h3 { style: "margin-top: 0; color: #cba6f7; font-size: 0.9rem;", "QualiaDB Output" }
-                div { style: "font-size: 0.8rem; color: #a6adc8; display: flex; flex-direction: column; gap: 4px;",
+                style: "background: var(--qualia-bg); padding: 16px; border-radius: 8px; border-left: 4px solid var(--qualia-accent); flex: 1;",
+                h3 { style: "margin-top: 0; color: var(--qualia-accent); font-size: 0.9rem;", "QualiaDB Output" }
+                div { style: "font-size: 0.8rem; color: var(--qualia-text-muted); display: flex; flex-direction: column; gap: 4px;",
                     div { "Subfield: {subfield()}" }
                     div { "Framework: {theoretical_framework()}" }
                     div { "Medium: {medium()}" }
                 }
-                div { style: "font-size: 0.75rem; color: #585b70; margin-top: 8px;", "QualiaDB → discourse sieve | graph network | Allen Interval" }
+                div { style: "font-size: 0.75rem; color: var(--qualia-text-muted); margin-top: 8px;", "QualiaDB → discourse sieve | graph network | Allen Interval" }
             }
         }
     }

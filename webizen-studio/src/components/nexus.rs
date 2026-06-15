@@ -3,73 +3,205 @@ use dioxus::prelude::*;
 // ── Enums ─────────────────────────────────────────────────────────────────────
 
 #[derive(Clone, Copy, PartialEq, Debug)]
-pub enum Lens { Causal, Mathematical, Visual, Epistemic }
+pub enum Lens {
+    Causal,
+    Mathematical,
+    Visual,
+    Epistemic,
+}
 
 #[derive(Clone, Copy, PartialEq)]
-enum NType { Paper, Claim, Dataset, Hypothesis, Simulation }
+enum NType {
+    Paper,
+    Claim,
+    Dataset,
+    Hypothesis,
+    Simulation,
+}
 
 #[derive(Clone, Copy, PartialEq)]
-enum EType { Supports, Contradicts, DerivedFrom }
+enum EType {
+    Supports,
+    Contradicts,
+    DerivedFrom,
+}
 
 #[derive(Clone, Copy, PartialEq)]
-enum ModalOp { Knows, Believes, Common, Doubts }
+enum ModalOp {
+    Knows,
+    Believes,
+    Common,
+    Doubts,
+}
 
 // ── Domain structs ────────────────────────────────────────────────────────────
 
 struct RNode {
-    id:    &'static str,
+    id: &'static str,
     label: &'static str,
-    year:  u32,
+    year: u32,
     ntype: NType,
-    x:     f64,
-    y:     f64,
+    x: f64,
+    y: f64,
 }
 
 struct REdge {
-    from:  &'static str,
-    to:    &'static str,
+    from: &'static str,
+    to: &'static str,
     etype: EType,
 }
 
 #[derive(Clone)]
 struct EClaim {
-    author:  String,
-    op:      ModalOp,
+    author: String,
+    op: ModalOp,
     content: String,
-    year:    u32,
+    year: u32,
 }
 
 // ── Pre-render data ───────────────────────────────────────────────────────────
 
-struct ND { id: &'static str, label: &'static str, x: f64, y: f64, color: &'static str, ring: f64 }
-struct ED { x1: f64, y1: f64, x2: f64, y2: f64, color: &'static str, dash: &'static str }
-struct CD { key: String, op_label: &'static str, op_color: &'static str, author: String, year: u32, content: String }
+struct ND {
+    id: &'static str,
+    label: &'static str,
+    x: f64,
+    y: f64,
+    color: &'static str,
+    ring: f64,
+}
+struct ED {
+    x1: f64,
+    y1: f64,
+    x2: f64,
+    y2: f64,
+    color: &'static str,
+    dash: &'static str,
+}
+struct CD {
+    key: String,
+    op_label: &'static str,
+    op_color: &'static str,
+    author: String,
+    year: u32,
+    content: String,
+}
 
 // ── Static data ───────────────────────────────────────────────────────────────
 
 fn research_nodes() -> Vec<RNode> {
     vec![
-        RNode { id: "p-engel",  label: "FMO Coherence",       year: 2018, ntype: NType::Paper,      x: 130.0, y: 140.0 },
-        RNode { id: "c-walk",   label: "Quantum Walk Claim",   year: 2018, ntype: NType::Claim,      x: 295.0, y: 80.0  },
-        RNode { id: "p-smith",  label: "Decoherence Critique", year: 2022, ntype: NType::Paper,      x: 340.0, y: 295.0 },
-        RNode { id: "c-deco",   label: "300K Eliminates Coh.", year: 2022, ntype: NType::Claim,      x: 515.0, y: 240.0 },
-        RNode { id: "ds-sm",    label: "SM Spectroscopy HDF5", year: 2024, ntype: NType::Dataset,    x: 565.0, y: 70.0  },
-        RNode { id: "h-vet",    label: "Vibration-Assist. ET", year: 2025, ntype: NType::Hypothesis, x: 655.0, y: 178.0 },
-        RNode { id: "s-dft",    label: "DFT FMO Trimer",       year: 2025, ntype: NType::Simulation, x: 705.0, y: 325.0 },
-        RNode { id: "p-pinn",   label: "PINN Binding Model",   year: 2020, ntype: NType::Paper,      x: 195.0, y: 395.0 },
-        RNode { id: "c-dlvdft", label: "DL Surpasses DFT",     year: 2020, ntype: NType::Claim,      x: 395.0, y: 420.0 },
+        RNode {
+            id: "p-engel",
+            label: "FMO Coherence",
+            year: 2018,
+            ntype: NType::Paper,
+            x: 130.0,
+            y: 140.0,
+        },
+        RNode {
+            id: "c-walk",
+            label: "Quantum Walk Claim",
+            year: 2018,
+            ntype: NType::Claim,
+            x: 295.0,
+            y: 80.0,
+        },
+        RNode {
+            id: "p-smith",
+            label: "Decoherence Critique",
+            year: 2022,
+            ntype: NType::Paper,
+            x: 340.0,
+            y: 295.0,
+        },
+        RNode {
+            id: "c-deco",
+            label: "300K Eliminates Coh.",
+            year: 2022,
+            ntype: NType::Claim,
+            x: 515.0,
+            y: 240.0,
+        },
+        RNode {
+            id: "ds-sm",
+            label: "SM Spectroscopy HDF5",
+            year: 2024,
+            ntype: NType::Dataset,
+            x: 565.0,
+            y: 70.0,
+        },
+        RNode {
+            id: "h-vet",
+            label: "Vibration-Assist. ET",
+            year: 2025,
+            ntype: NType::Hypothesis,
+            x: 655.0,
+            y: 178.0,
+        },
+        RNode {
+            id: "s-dft",
+            label: "DFT FMO Trimer",
+            year: 2025,
+            ntype: NType::Simulation,
+            x: 705.0,
+            y: 325.0,
+        },
+        RNode {
+            id: "p-pinn",
+            label: "PINN Binding Model",
+            year: 2020,
+            ntype: NType::Paper,
+            x: 195.0,
+            y: 395.0,
+        },
+        RNode {
+            id: "c-dlvdft",
+            label: "DL Surpasses DFT",
+            year: 2020,
+            ntype: NType::Claim,
+            x: 395.0,
+            y: 420.0,
+        },
     ]
 }
 
 fn research_edges() -> Vec<REdge> {
     vec![
-        REdge { from: "p-engel",  to: "c-walk",   etype: EType::DerivedFrom  },
-        REdge { from: "p-smith",  to: "c-deco",   etype: EType::DerivedFrom  },
-        REdge { from: "c-deco",   to: "c-walk",   etype: EType::Contradicts  },
-        REdge { from: "ds-sm",    to: "h-vet",    etype: EType::Supports     },
-        REdge { from: "h-vet",    to: "s-dft",    etype: EType::DerivedFrom  },
-        REdge { from: "s-dft",    to: "c-walk",   etype: EType::Supports     },
-        REdge { from: "p-pinn",   to: "c-dlvdft", etype: EType::DerivedFrom  },
+        REdge {
+            from: "p-engel",
+            to: "c-walk",
+            etype: EType::DerivedFrom,
+        },
+        REdge {
+            from: "p-smith",
+            to: "c-deco",
+            etype: EType::DerivedFrom,
+        },
+        REdge {
+            from: "c-deco",
+            to: "c-walk",
+            etype: EType::Contradicts,
+        },
+        REdge {
+            from: "ds-sm",
+            to: "h-vet",
+            etype: EType::Supports,
+        },
+        REdge {
+            from: "h-vet",
+            to: "s-dft",
+            etype: EType::DerivedFrom,
+        },
+        REdge {
+            from: "s-dft",
+            to: "c-walk",
+            etype: EType::Supports,
+        },
+        REdge {
+            from: "p-pinn",
+            to: "c-dlvdft",
+            etype: EType::DerivedFrom,
+        },
     ]
 }
 
@@ -107,90 +239,120 @@ fn initial_claims() -> Vec<EClaim> {
 #[component]
 pub fn Nexus() -> Element {
     // Signals
-    let mut lens       = use_signal(|| Lens::Causal);
-    let mut tl_year    = use_signal(|| 2025_u32);
-    let mut pan_x      = use_signal(|| -20.0_f64);
-    let mut pan_y      = use_signal(|| -5.0_f64);
-    let mut zoom       = use_signal(|| 1.0_f64);
-    let mut dragging   = use_signal(|| false);
-    let mut drag_sx    = use_signal(|| 0.0_f64);
-    let mut drag_sy    = use_signal(|| 0.0_f64);
-    let mut pan_ax     = use_signal(|| -20.0_f64);
-    let mut pan_ay     = use_signal(|| -5.0_f64);
-    let mut sel        = use_signal(|| Option::<&'static str>::None);
-    let mut dispatch   = use_signal(|| Option::<&'static str>::None);
-    let mut url_input  = use_signal(|| String::new());
+    let mut lens = use_signal(|| Lens::Causal);
+    let mut tl_year = use_signal(|| 2025_u32);
+    let mut pan_x = use_signal(|| -20.0_f64);
+    let mut pan_y = use_signal(|| -5.0_f64);
+    let mut zoom = use_signal(|| 1.0_f64);
+    let mut dragging = use_signal(|| false);
+    let mut drag_sx = use_signal(|| 0.0_f64);
+    let mut drag_sy = use_signal(|| 0.0_f64);
+    let mut pan_ax = use_signal(|| -20.0_f64);
+    let mut pan_ay = use_signal(|| -5.0_f64);
+    let mut sel = use_signal(|| Option::<&'static str>::None);
+    let mut dispatch = use_signal(|| Option::<&'static str>::None);
+    let mut url_input = use_signal(|| String::new());
     let mut claim_text = use_signal(|| String::new());
-    let mut claim_op   = use_signal(|| ModalOp::Believes);
-    let mut claims     = use_signal(|| initial_claims());
+    let mut claim_op = use_signal(|| ModalOp::Believes);
+    let mut claims = use_signal(|| initial_claims());
 
     // Snapshot signals
     let lns = lens();
-    let yr  = tl_year();
-    let z   = zoom();
-    let px  = pan_x();
-    let py  = pan_y();
-    let s   = sel();
-    let ds  = dispatch();
-    let cs  = claims();
+    let yr = tl_year();
+    let z = zoom();
+    let px = pan_x();
+    let py = pan_y();
+    let s = sel();
+    let ds = dispatch();
+    let cs = claims();
 
     // Static graph data
     let static_nodes = research_nodes();
     let static_edges = research_edges();
 
     // Helpers
-    let get_xy   = |id: &str| static_nodes.iter().find(|n| n.id == id).map(|n| (n.x, n.y));
-    let get_year = |id: &str| static_nodes.iter().find(|n| n.id == id).map_or(9999, |n| n.year);
+    let get_xy = |id: &str| static_nodes.iter().find(|n| n.id == id).map(|n| (n.x, n.y));
+    let get_year = |id: &str| {
+        static_nodes
+            .iter()
+            .find(|n| n.id == id)
+            .map_or(9999, |n| n.year)
+    };
 
     // Pre-compute edge display data
-    let edge_data: Vec<ED> = static_edges.iter().filter_map(|e| {
-        if get_year(e.from) > yr || get_year(e.to) > yr { return None; }
-        let (x1, y1) = get_xy(e.from)?;
-        let (x2, y2) = get_xy(e.to)?;
-        let (color, dash) = match e.etype {
-            EType::Supports    => ("#10b981", "none"),
-            EType::Contradicts => ("#ef4444", "none"),
-            EType::DerivedFrom => ("#64748b", "6 3"),
-        };
-        Some(ED { x1, y1, x2, y2, color, dash })
-    }).collect();
+    let edge_data: Vec<ED> = static_edges
+        .iter()
+        .filter_map(|e| {
+            if get_year(e.from) > yr || get_year(e.to) > yr {
+                return None;
+            }
+            let (x1, y1) = get_xy(e.from)?;
+            let (x2, y2) = get_xy(e.to)?;
+            let (color, dash) = match e.etype {
+                EType::Supports => ("#10b981", "none"),
+                EType::Contradicts => ("#ef4444", "none"),
+                EType::DerivedFrom => ("#64748b", "6 3"),
+            };
+            Some(ED {
+                x1,
+                y1,
+                x2,
+                y2,
+                color,
+                dash,
+            })
+        })
+        .collect();
 
     // Pre-compute node display data
-    let node_data: Vec<ND> = static_nodes.iter()
+    let node_data: Vec<ND> = static_nodes
+        .iter()
         .filter(|n| n.year <= yr)
         .map(|n| {
             let label = match lns {
                 Lens::Mathematical => "∀x:P",
-                Lens::Visual       => "⬡",
-                Lens::Epistemic    => "K(φ)",
-                Lens::Causal       => n.label,
+                Lens::Visual => "⬡",
+                Lens::Epistemic => "K(φ)",
+                Lens::Causal => n.label,
             };
             let color = match n.ntype {
-                NType::Paper       => "#3b82f6",
-                NType::Claim       => "#f59e0b",
-                NType::Dataset     => "#10b981",
-                NType::Hypothesis  => "#8b5cf6",
-                NType::Simulation  => "#06b6d4",
+                NType::Paper => "#3b82f6",
+                NType::Claim => "#f59e0b",
+                NType::Dataset => "#10b981",
+                NType::Hypothesis => "#8b5cf6",
+                NType::Simulation => "#06b6d4",
             };
-            ND { id: n.id, label, x: n.x, y: n.y, color, ring: if s == Some(n.id) { 3.5 } else { 1.5 } }
-        }).collect();
+            ND {
+                id: n.id,
+                label,
+                x: n.x,
+                y: n.y,
+                color,
+                ring: if s == Some(n.id) { 3.5 } else { 1.5 },
+            }
+        })
+        .collect();
 
     // Pre-compute claim display data
-    let claim_data: Vec<CD> = cs.iter().map(|c| {
-        let (op_label, op_color) = match c.op {
-            ModalOp::Knows    => ("KNOWS",    "#10b981"),
-            ModalOp::Believes => ("BELIEVES", "#3b82f6"),
-            ModalOp::Common   => ("COMMON K.","#8b5cf6"),
-            ModalOp::Doubts   => ("DOUBTS",   "#f59e0b"),
-        };
-        CD {
-            key: format!("{}-{}", c.author, c.year),
-            op_label, op_color,
-            author:  c.author.clone(),
-            year:    c.year,
-            content: c.content.clone(),
-        }
-    }).collect();
+    let claim_data: Vec<CD> = cs
+        .iter()
+        .map(|c| {
+            let (op_label, op_color) = match c.op {
+                ModalOp::Knows => ("KNOWS", "#10b981"),
+                ModalOp::Believes => ("BELIEVES", "#3b82f6"),
+                ModalOp::Common => ("COMMON K.", "#8b5cf6"),
+                ModalOp::Doubts => ("DOUBTS", "#f59e0b"),
+            };
+            CD {
+                key: format!("{}-{}", c.author, c.year),
+                op_label,
+                op_color,
+                author: c.author.clone(),
+                year: c.year,
+                content: c.content.clone(),
+            }
+        })
+        .collect();
 
     // SVG viewport dimensions
     let vw = 820.0 / z;
@@ -199,13 +361,18 @@ pub fn Nexus() -> Element {
     // Selected node info for left panel
     let sel_info: Option<String> = s.and_then(|sid| {
         static_nodes.iter().find(|n| n.id == sid).map(|n| {
-            format!("{} · {} · {}", n.label, n.year, match n.ntype {
-                NType::Paper       => "Paper",
-                NType::Claim       => "Claim",
-                NType::Dataset     => "Dataset",
-                NType::Hypothesis  => "Hypothesis",
-                NType::Simulation  => "Simulation",
-            })
+            format!(
+                "{} · {} · {}",
+                n.label,
+                n.year,
+                match n.ntype {
+                    NType::Paper => "Paper",
+                    NType::Claim => "Claim",
+                    NType::Dataset => "Dataset",
+                    NType::Hypothesis => "Hypothesis",
+                    NType::Simulation => "Simulation",
+                }
+            )
         })
     });
 

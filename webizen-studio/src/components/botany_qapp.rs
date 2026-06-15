@@ -11,14 +11,14 @@ pub fn BotanyQapp() -> Element {
 
     rsx! {
         div {
-            style: "padding: 20px; background: #1e1e2e; color: #cdd6f4; border-radius: 12px; font-family: monospace; display: flex; flex-direction: column; gap: 16px; height: 100%; box-sizing: border-box;",
-            h2 { style: "margin: 0; color: #a6e3a1; border-bottom: 1px solid #313244; padding-bottom: 8px;", "Botany QApp" }
+            style: "padding: 20px; background: var(--qualia-surface); color: var(--qualia-text); border-radius: 12px; font-family: monospace; display: flex; flex-direction: column; gap: 16px; height: 100%; box-sizing: border-box;",
+            h2 { style: "margin: 0; color: var(--qualia-accent); border-bottom: 1px solid var(--qualia-border); padding-bottom: 8px;", "Botany QApp" }
 
             div { style: "display: grid; grid-template-columns: 1fr 1fr; gap: 12px;",
                 div {
-                    label { style: "font-size: 0.8rem; color: #a6adc8;", "Plant Division" }
+                    label { style: "font-size: 0.8rem; color: var(--qualia-text-muted);", "Plant Division" }
                     select {
-                        style: "width: 100%; padding: 6px; background: #181825; border: 1px solid #45475a; color: #cdd6f4; border-radius: 4px; margin-top: 4px; box-sizing: border-box;",
+                        style: "width: 100%; padding: 6px; background: var(--qualia-bg); border: 1px solid var(--qualia-border); color: var(--qualia-text); border-radius: 4px; margin-top: 4px; box-sizing: border-box;",
                         onchange: move |e| plant_division.set(e.value()),
                         option { "Angiosperms" }
                         option { "Gymnosperms" }
@@ -31,9 +31,9 @@ pub fn BotanyQapp() -> Element {
                     }
                 }
                 div {
-                    label { style: "font-size: 0.8rem; color: #a6adc8;", "Growth Form" }
+                    label { style: "font-size: 0.8rem; color: var(--qualia-text-muted);", "Growth Form" }
                     select {
-                        style: "width: 100%; padding: 6px; background: #181825; border: 1px solid #45475a; color: #cdd6f4; border-radius: 4px; margin-top: 4px; box-sizing: border-box;",
+                        style: "width: 100%; padding: 6px; background: var(--qualia-bg); border: 1px solid var(--qualia-border); color: var(--qualia-text); border-radius: 4px; margin-top: 4px; box-sizing: border-box;",
                         onchange: move |e| growth_form.set(e.value()),
                         option { "Tree" }
                         option { "Shrub" }
@@ -46,9 +46,9 @@ pub fn BotanyQapp() -> Element {
                     }
                 }
                 div {
-                    label { style: "font-size: 0.8rem; color: #a6adc8;", "Habitat" }
+                    label { style: "font-size: 0.8rem; color: var(--qualia-text-muted);", "Habitat" }
                     select {
-                        style: "width: 100%; padding: 6px; background: #181825; border: 1px solid #45475a; color: #cdd6f4; border-radius: 4px; margin-top: 4px; box-sizing: border-box;",
+                        style: "width: 100%; padding: 6px; background: var(--qualia-bg); border: 1px solid var(--qualia-border); color: var(--qualia-text); border-radius: 4px; margin-top: 4px; box-sizing: border-box;",
                         onchange: move |e| habitat.set(e.value()),
                         option { "Tropical Rainforest" }
                         option { "Temperate Forest" }
@@ -62,9 +62,9 @@ pub fn BotanyQapp() -> Element {
                     }
                 }
                 div {
-                    label { style: "font-size: 0.8rem; color: #a6adc8;", "Phenological Stage" }
+                    label { style: "font-size: 0.8rem; color: var(--qualia-text-muted);", "Phenological Stage" }
                     select {
-                        style: "width: 100%; padding: 6px; background: #181825; border: 1px solid #45475a; color: #cdd6f4; border-radius: 4px; margin-top: 4px; box-sizing: border-box;",
+                        style: "width: 100%; padding: 6px; background: var(--qualia-bg); border: 1px solid var(--qualia-border); color: var(--qualia-text); border-radius: 4px; margin-top: 4px; box-sizing: border-box;",
                         onchange: move |e| phenological_stage.set(e.value()),
                         option { "Germination" }
                         option { "Vegetative" }
@@ -76,9 +76,9 @@ pub fn BotanyQapp() -> Element {
                     }
                 }
                 div {
-                    label { style: "font-size: 0.8rem; color: #a6adc8;", "Pollination Mechanism" }
+                    label { style: "font-size: 0.8rem; color: var(--qualia-text-muted);", "Pollination Mechanism" }
                     select {
-                        style: "width: 100%; padding: 6px; background: #181825; border: 1px solid #45475a; color: #cdd6f4; border-radius: 4px; margin-top: 4px; box-sizing: border-box;",
+                        style: "width: 100%; padding: 6px; background: var(--qualia-bg); border: 1px solid var(--qualia-border); color: var(--qualia-text); border-radius: 4px; margin-top: 4px; box-sizing: border-box;",
                         onchange: move |e| pollination_mechanism.set(e.value()),
                         option { "Entomophily (insect)" }
                         option { "Anemophily (wind)" }
@@ -92,9 +92,9 @@ pub fn BotanyQapp() -> Element {
             }
 
             div {
-                label { style: "font-size: 0.8rem; color: #a6adc8;", "Specimen Notes" }
+                label { style: "font-size: 0.8rem; color: var(--qualia-text-muted);", "Specimen Notes" }
                 textarea {
-                    style: "width: 100%; padding: 8px; background: #181825; border: 1px solid #45475a; color: #cdd6f4; border-radius: 4px; margin-top: 4px; min-height: 70px; box-sizing: border-box; resize: vertical;",
+                    style: "width: 100%; padding: 8px; background: var(--qualia-bg); border: 1px solid var(--qualia-border); color: var(--qualia-text); border-radius: 4px; margin-top: 4px; min-height: 70px; box-sizing: border-box; resize: vertical;",
                     placeholder: "Taxonomic identification, GPS coordinates, voucher number, morphological description...",
                     oninput: move |e| specimen_notes.set(e.value()),
                     "{specimen_notes}"
@@ -102,21 +102,21 @@ pub fn BotanyQapp() -> Element {
             }
 
             div {
-                style: "background: #11111b; padding: 16px; border-radius: 8px; border-left: 4px solid #a6e3a1; flex: 1;",
-                h3 { style: "margin-top: 0; color: #a6e3a1; font-size: 0.9rem;", "Output / Analysis" }
+                style: "background: var(--qualia-bg); padding: 16px; border-radius: 8px; border-left: 4px solid var(--qualia-accent); flex: 1;",
+                h3 { style: "margin-top: 0; color: var(--qualia-accent); font-size: 0.9rem;", "Output / Analysis" }
                 div { style: "display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 0.8rem;",
-                    div { style: "color: #a6adc8;", "Division:" }
-                    div { style: "color: #cdd6f4;", "{plant_division}" }
-                    div { style: "color: #a6adc8;", "Growth Form:" }
-                    div { style: "color: #cdd6f4;", "{growth_form}" }
-                    div { style: "color: #a6adc8;", "Habitat:" }
-                    div { style: "color: #cdd6f4;", "{habitat}" }
-                    div { style: "color: #a6adc8;", "Phenophase:" }
-                    div { style: "color: #cdd6f4;", "{phenological_stage}" }
-                    div { style: "color: #a6adc8;", "Pollination:" }
-                    div { style: "color: #cdd6f4;", "{pollination_mechanism}" }
+                    div { style: "color: var(--qualia-text-muted);", "Division:" }
+                    div { style: "color: var(--qualia-text);", "{plant_division}" }
+                    div { style: "color: var(--qualia-text-muted);", "Growth Form:" }
+                    div { style: "color: var(--qualia-text);", "{growth_form}" }
+                    div { style: "color: var(--qualia-text-muted);", "Habitat:" }
+                    div { style: "color: var(--qualia-text);", "{habitat}" }
+                    div { style: "color: var(--qualia-text-muted);", "Phenophase:" }
+                    div { style: "color: var(--qualia-text);", "{phenological_stage}" }
+                    div { style: "color: var(--qualia-text-muted);", "Pollination:" }
+                    div { style: "color: var(--qualia-text);", "{pollination_mechanism}" }
                 }
-                div { style: "font-size: 0.75rem; color: #585b70; margin-top: 12px; border-top: 1px solid #313244; padding-top: 8px;",
+                div { style: "font-size: 0.75rem; color: var(--qualia-text-muted); margin-top: 12px; border-top: 1px solid var(--qualia-border); padding-top: 8px;",
                     "QualiaDB → Allen Interval phenology engine | taxonomy graph | ecological sieve"
                 }
             }

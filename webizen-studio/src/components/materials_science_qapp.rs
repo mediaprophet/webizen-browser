@@ -10,48 +10,77 @@ pub fn MaterialsScienceQapp() -> Element {
     let mut hardness_vhn = use_signal(|| 100.0f64);
     let mut notes = use_signal(|| String::new());
 
-    let material_classes = ["Metal", "Polymer", "Ceramic", "Composite", "Semiconductor", "Biomaterial", "Nanomaterial", "Metamaterial", "2D Material", "Amorphous"];
-    let property_focuses = ["Mechanical", "Thermal", "Electrical", "Magnetic", "Optical", "Chemical", "Biocompatibility"];
-    let char_methods = ["XRD", "SEM", "TEM", "AFM", "EDS", "Raman", "DSC", "XPS", "Nanoindentation"];
+    let material_classes = [
+        "Metal",
+        "Polymer",
+        "Ceramic",
+        "Composite",
+        "Semiconductor",
+        "Biomaterial",
+        "Nanomaterial",
+        "Metamaterial",
+        "2D Material",
+        "Amorphous",
+    ];
+    let property_focuses = [
+        "Mechanical",
+        "Thermal",
+        "Electrical",
+        "Magnetic",
+        "Optical",
+        "Chemical",
+        "Biocompatibility",
+    ];
+    let char_methods = [
+        "XRD",
+        "SEM",
+        "TEM",
+        "AFM",
+        "EDS",
+        "Raman",
+        "DSC",
+        "XPS",
+        "Nanoindentation",
+    ];
 
     rsx! {
         div {
-            style: "padding: 20px; background: #1e1e2e; color: #cdd6f4; border-radius: 12px; font-family: monospace; display: flex; flex-direction: column; gap: 16px; height: 100%; box-sizing: border-box;",
-            h2 { style: "margin: 0; color: #b4befe; border-bottom: 1px solid #313244; padding-bottom: 8px;", "Materials Science" }
+            style: "padding: 20px; background: var(--qualia-surface); color: var(--qualia-text); border-radius: 12px; font-family: monospace; display: flex; flex-direction: column; gap: 16px; height: 100%; box-sizing: border-box;",
+            h2 { style: "margin: 0; color: var(--qualia-accent); border-bottom: 1px solid var(--qualia-border); padding-bottom: 8px;", "Materials Science" }
 
             div {
                 style: "display: grid; grid-template-columns: 1fr 1fr; gap: 12px;",
                 div {
-                    label { style: "font-size: 0.8rem; color: #a6adc8;", "Material Class" }
+                    label { style: "font-size: 0.8rem; color: var(--qualia-text-muted);", "Material Class" }
                     select {
                         value: "{material_class}",
                         onchange: move |e| material_class.set(e.value()),
-                        style: "width: 100%; padding: 8px; background: #181825; border: 1px solid #45475a; color: #cdd6f4; border-radius: 4px; margin-top: 4px; box-sizing: border-box;",
+                        style: "width: 100%; padding: 8px; background: var(--qualia-bg); border: 1px solid var(--qualia-border); color: var(--qualia-text); border-radius: 4px; margin-top: 4px; box-sizing: border-box;",
                         for x in material_classes { option { value: "{x}", "{x}" } }
                     }
                 }
                 div {
-                    label { style: "font-size: 0.8rem; color: #a6adc8;", "Property Focus" }
+                    label { style: "font-size: 0.8rem; color: var(--qualia-text-muted);", "Property Focus" }
                     select {
                         value: "{property_focus}",
                         onchange: move |e| property_focus.set(e.value()),
-                        style: "width: 100%; padding: 8px; background: #181825; border: 1px solid #45475a; color: #cdd6f4; border-radius: 4px; margin-top: 4px; box-sizing: border-box;",
+                        style: "width: 100%; padding: 8px; background: var(--qualia-bg); border: 1px solid var(--qualia-border); color: var(--qualia-text); border-radius: 4px; margin-top: 4px; box-sizing: border-box;",
                         for x in property_focuses { option { value: "{x}", "{x}" } }
                     }
                 }
                 div {
-                    label { style: "font-size: 0.8rem; color: #a6adc8;", "Characterisation Method" }
+                    label { style: "font-size: 0.8rem; color: var(--qualia-text-muted);", "Characterisation Method" }
                     select {
                         value: "{characterisation_method}",
                         onchange: move |e| characterisation_method.set(e.value()),
-                        style: "width: 100%; padding: 8px; background: #181825; border: 1px solid #45475a; color: #cdd6f4; border-radius: 4px; margin-top: 4px; box-sizing: border-box;",
+                        style: "width: 100%; padding: 8px; background: var(--qualia-bg); border: 1px solid var(--qualia-border); color: var(--qualia-text); border-radius: 4px; margin-top: 4px; box-sizing: border-box;",
                         for x in char_methods { option { value: "{x}", "{x}" } }
                     }
                 }
             }
 
             div {
-                label { style: "font-size: 0.8rem; color: #a6adc8;", "Temperature (°C): {temperature_c:.1}" }
+                label { style: "font-size: 0.8rem; color: var(--qualia-text-muted);", "Temperature (°C): {temperature_c:.1}" }
                 input {
                     r#type: "range",
                     min: "-200",
@@ -64,7 +93,7 @@ pub fn MaterialsScienceQapp() -> Element {
             }
 
             div {
-                label { style: "font-size: 0.8rem; color: #a6adc8;", "Elastic Modulus (GPa): {elastic_modulus_gpa:.1}" }
+                label { style: "font-size: 0.8rem; color: var(--qualia-text-muted);", "Elastic Modulus (GPa): {elastic_modulus_gpa:.1}" }
                 input {
                     r#type: "range",
                     min: "0",
@@ -77,7 +106,7 @@ pub fn MaterialsScienceQapp() -> Element {
             }
 
             div {
-                label { style: "font-size: 0.8rem; color: #a6adc8;", "Hardness (VHN): {hardness_vhn:.0}" }
+                label { style: "font-size: 0.8rem; color: var(--qualia-text-muted);", "Hardness (VHN): {hardness_vhn:.0}" }
                 input {
                     r#type: "range",
                     min: "1",
@@ -91,18 +120,18 @@ pub fn MaterialsScienceQapp() -> Element {
 
             div {
                 style: "flex: 1; display: flex; flex-direction: column;",
-                label { style: "font-size: 0.8rem; color: #a6adc8;", "Notes" }
+                label { style: "font-size: 0.8rem; color: var(--qualia-text-muted);", "Notes" }
                 textarea {
                     value: "{notes}",
                     oninput: move |e| notes.set(e.value()),
-                    style: "flex: 1; width: 100%; padding: 8px; background: #181825; border: 1px solid #45475a; color: #cdd6f4; border-radius: 4px; margin-top: 4px; resize: none; box-sizing: border-box; min-height: 60px;"
+                    style: "flex: 1; width: 100%; padding: 8px; background: var(--qualia-bg); border: 1px solid var(--qualia-border); color: var(--qualia-text); border-radius: 4px; margin-top: 4px; resize: none; box-sizing: border-box; min-height: 60px;"
                 }
             }
 
             div {
-                style: "background: #11111b; padding: 12px 16px; border-radius: 8px; border-left: 4px solid #b4befe;",
-                span { style: "font-size: 0.8rem; color: #a6adc8;", "{material_class} | {property_focus} | {characterisation_method} | E:{elastic_modulus_gpa:.0}GPa | H:{hardness_vhn:.0}VHN" }
-                div { style: "font-size: 0.75rem; color: #585b70; margin-top: 6px;", "QualiaDB → materials characterisation engine | property sieve | microstructure anchor" }
+                style: "background: var(--qualia-bg); padding: 12px 16px; border-radius: 8px; border-left: 4px solid var(--qualia-accent);",
+                span { style: "font-size: 0.8rem; color: var(--qualia-text-muted);", "{material_class} | {property_focus} | {characterisation_method} | E:{elastic_modulus_gpa:.0}GPa | H:{hardness_vhn:.0}VHN" }
+                div { style: "font-size: 0.75rem; color: var(--qualia-text-muted); margin-top: 6px;", "QualiaDB → materials characterisation engine | property sieve | microstructure anchor" }
             }
         }
     }

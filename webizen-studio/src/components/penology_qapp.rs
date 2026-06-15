@@ -10,48 +10,70 @@ pub fn PenologyQapp() -> Element {
     let mut overcrowding_pct = use_signal(|| 110u32);
     let mut notes = use_signal(|| String::new());
 
-    let philosophies = ["Deterrence", "Retribution", "Rehabilitation", "Incapacitation", "Restoration"];
-    let incarceration_types = ["Maximum Security", "Medium Security", "Minimum Security", "Open", "Remand", "Juvenile", "Immigration Detention"];
-    let reform_approaches = ["Education Programmes", "Vocational Training", "Therapeutic Communities", "Restorative Justice", "Abolition", "Decarceration", "Electronic Monitoring"];
+    let philosophies = [
+        "Deterrence",
+        "Retribution",
+        "Rehabilitation",
+        "Incapacitation",
+        "Restoration",
+    ];
+    let incarceration_types = [
+        "Maximum Security",
+        "Medium Security",
+        "Minimum Security",
+        "Open",
+        "Remand",
+        "Juvenile",
+        "Immigration Detention",
+    ];
+    let reform_approaches = [
+        "Education Programmes",
+        "Vocational Training",
+        "Therapeutic Communities",
+        "Restorative Justice",
+        "Abolition",
+        "Decarceration",
+        "Electronic Monitoring",
+    ];
 
     rsx! {
         div {
-            style: "padding: 20px; background: #1e1e2e; color: #cdd6f4; border-radius: 12px; font-family: monospace; display: flex; flex-direction: column; gap: 16px; height: 100%; box-sizing: border-box;",
-            h2 { style: "margin: 0; color: #f38ba8; border-bottom: 1px solid #313244; padding-bottom: 8px;", "Penology" }
+            style: "padding: 20px; background: var(--qualia-surface); color: var(--qualia-text); border-radius: 12px; font-family: monospace; display: flex; flex-direction: column; gap: 16px; height: 100%; box-sizing: border-box;",
+            h2 { style: "margin: 0; color: var(--qualia-accent); border-bottom: 1px solid var(--qualia-border); padding-bottom: 8px;", "Penology" }
 
             div {
                 style: "display: grid; grid-template-columns: 1fr 1fr; gap: 12px;",
                 div {
-                    label { style: "font-size: 0.8rem; color: #a6adc8;", "Sentencing Philosophy" }
+                    label { style: "font-size: 0.8rem; color: var(--qualia-text-muted);", "Sentencing Philosophy" }
                     select {
                         value: "{sentencing_philosophy}",
                         onchange: move |e| sentencing_philosophy.set(e.value()),
-                        style: "width: 100%; padding: 8px; background: #181825; border: 1px solid #45475a; color: #cdd6f4; border-radius: 4px; margin-top: 4px; box-sizing: border-box;",
+                        style: "width: 100%; padding: 8px; background: var(--qualia-bg); border: 1px solid var(--qualia-border); color: var(--qualia-text); border-radius: 4px; margin-top: 4px; box-sizing: border-box;",
                         for x in philosophies { option { value: "{x}", "{x}" } }
                     }
                 }
                 div {
-                    label { style: "font-size: 0.8rem; color: #a6adc8;", "Incarceration Type" }
+                    label { style: "font-size: 0.8rem; color: var(--qualia-text-muted);", "Incarceration Type" }
                     select {
                         value: "{incarceration_type}",
                         onchange: move |e| incarceration_type.set(e.value()),
-                        style: "width: 100%; padding: 8px; background: #181825; border: 1px solid #45475a; color: #cdd6f4; border-radius: 4px; margin-top: 4px; box-sizing: border-box;",
+                        style: "width: 100%; padding: 8px; background: var(--qualia-bg); border: 1px solid var(--qualia-border); color: var(--qualia-text); border-radius: 4px; margin-top: 4px; box-sizing: border-box;",
                         for x in incarceration_types { option { value: "{x}", "{x}" } }
                     }
                 }
                 div {
-                    label { style: "font-size: 0.8rem; color: #a6adc8;", "Reform Approach" }
+                    label { style: "font-size: 0.8rem; color: var(--qualia-text-muted);", "Reform Approach" }
                     select {
                         value: "{reform_approach}",
                         onchange: move |e| reform_approach.set(e.value()),
-                        style: "width: 100%; padding: 8px; background: #181825; border: 1px solid #45475a; color: #cdd6f4; border-radius: 4px; margin-top: 4px; box-sizing: border-box;",
+                        style: "width: 100%; padding: 8px; background: var(--qualia-bg); border: 1px solid var(--qualia-border); color: var(--qualia-text); border-radius: 4px; margin-top: 4px; box-sizing: border-box;",
                         for x in reform_approaches { option { value: "{x}", "{x}" } }
                     }
                 }
             }
 
             div {
-                label { style: "font-size: 0.8rem; color: #a6adc8;", "Recidivism Rate: {recidivism_rate:.2}" }
+                label { style: "font-size: 0.8rem; color: var(--qualia-text-muted);", "Recidivism Rate: {recidivism_rate:.2}" }
                 input {
                     r#type: "range",
                     min: "0",
@@ -63,7 +85,7 @@ pub fn PenologyQapp() -> Element {
             }
 
             div {
-                label { style: "font-size: 0.8rem; color: #a6adc8;", "Sentence Length (months): {sentence_length_months}" }
+                label { style: "font-size: 0.8rem; color: var(--qualia-text-muted);", "Sentence Length (months): {sentence_length_months}" }
                 input {
                     r#type: "range",
                     min: "0",
@@ -75,7 +97,7 @@ pub fn PenologyQapp() -> Element {
             }
 
             div {
-                label { style: "font-size: 0.8rem; color: #a6adc8;", "Overcrowding %: {overcrowding_pct}" }
+                label { style: "font-size: 0.8rem; color: var(--qualia-text-muted);", "Overcrowding %: {overcrowding_pct}" }
                 input {
                     r#type: "range",
                     min: "0",
@@ -88,18 +110,18 @@ pub fn PenologyQapp() -> Element {
 
             div {
                 style: "flex: 1; display: flex; flex-direction: column;",
-                label { style: "font-size: 0.8rem; color: #a6adc8;", "Notes" }
+                label { style: "font-size: 0.8rem; color: var(--qualia-text-muted);", "Notes" }
                 textarea {
                     value: "{notes}",
                     oninput: move |e| notes.set(e.value()),
-                    style: "flex: 1; width: 100%; padding: 8px; background: #181825; border: 1px solid #45475a; color: #cdd6f4; border-radius: 4px; margin-top: 4px; resize: none; box-sizing: border-box; min-height: 60px;"
+                    style: "flex: 1; width: 100%; padding: 8px; background: var(--qualia-bg); border: 1px solid var(--qualia-border); color: var(--qualia-text); border-radius: 4px; margin-top: 4px; resize: none; box-sizing: border-box; min-height: 60px;"
                 }
             }
 
             div {
-                style: "background: #11111b; padding: 12px 16px; border-radius: 8px; border-left: 4px solid #f38ba8;",
-                span { style: "font-size: 0.8rem; color: #a6adc8;", "{sentencing_philosophy} | {incarceration_type} | Recidivism:{recidivism_rate:.2} | {sentence_length_months}mo | {overcrowding_pct}% capacity" }
-                div { style: "font-size: 0.75rem; color: #585b70; margin-top: 6px;", "QualiaDB → penological engine | recidivism sieve | reform anchor" }
+                style: "background: var(--qualia-bg); padding: 12px 16px; border-radius: 8px; border-left: 4px solid var(--qualia-accent);",
+                span { style: "font-size: 0.8rem; color: var(--qualia-text-muted);", "{sentencing_philosophy} | {incarceration_type} | Recidivism:{recidivism_rate:.2} | {sentence_length_months}mo | {overcrowding_pct}% capacity" }
+                div { style: "font-size: 0.75rem; color: var(--qualia-text-muted); margin-top: 6px;", "QualiaDB → penological engine | recidivism sieve | reform anchor" }
             }
         }
     }

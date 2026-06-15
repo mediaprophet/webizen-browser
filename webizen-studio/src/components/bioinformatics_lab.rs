@@ -3,7 +3,7 @@ use dioxus::prelude::*;
 #[component]
 pub fn BioinformaticsLab() -> Element {
     let mut sequence = use_signal(|| "ATCGATCGTACG".to_string());
-    
+
     rsx! {
         div {
             style: "padding: 20px; background: #1e1e2e; color: #cdd6f4; border-radius: 12px; font-family: monospace; display: flex; flex-direction: column; gap: 16px; height: 100%;",

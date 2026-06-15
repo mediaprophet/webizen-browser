@@ -7,7 +7,7 @@ pub fn RdfStarEditor() -> Element {
     rsx! {
         div {
             style: "flex: 1; padding: 2rem; background: rgba(15, 20, 25, 0.8); backdrop-filter: blur(20px); border-radius: 16px; border: 1px solid rgba(255, 255, 255, 0.05); color: #E8E8E8;",
-            
+
             h2 {
                 style: "font-family: 'Inter', sans-serif; font-size: 2.2rem; margin-bottom: 0.5rem; background: linear-gradient(to right, #F5A623, #F83600); -webkit-background-clip: text; -webkit-text-fill-color: transparent;",
                 "RDF-Star Editor"
@@ -16,7 +16,7 @@ pub fn RdfStarEditor() -> Element {
 
             div {
                 style: "background: rgba(0,0,0,0.3); border-radius: 12px; padding: 1.5rem; border: 1px solid rgba(245, 166, 35, 0.2);",
-                
+
                 div {
                     style: "display: flex; align-items: center; gap: 1rem; padding-bottom: 1rem; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 1rem;",
                     div { style: "padding: 0.5rem 1rem; background: rgba(245, 166, 35, 0.1); border-radius: 6px; color: #F5A623; font-family: monospace;", "did:q42:alice" }
@@ -39,7 +39,7 @@ pub fn RdfStarEditor() -> Element {
                         }
                     }
                 }
-                
+
                 div {
                     style: "margin-top: 2rem; display: flex; gap: 1rem;",
                     button {

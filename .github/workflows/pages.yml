@@ -15,8 +15,45 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  check:
+    name: Lint & format (wasm)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust (stable + wasm32 + clippy/rustfmt)
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+          components: clippy, rustfmt
+
+      - name: Cache Cargo registry
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+          key: ${{ runner.os }}-cargo-check-${{ hashFiles('webizen-studio/Cargo.lock') }}
+          restore-keys: ${{ runner.os }}-cargo-check-
+
+      - name: QApp catalogue ↔ dispatcher consistency
+        run: python3 tools/check_qapp_consistency.py
+
+      - name: rustfmt --check
+        working-directory: webizen-studio
+        run: cargo fmt --check
+
+      # The wasm build stubs out qualia-core-db, so clippy needs no sibling repo.
+      # Informational for now (the 274 QApps still carry warnings); flip to
+      # `-D warnings` once the warning backlog is cleared so it becomes a hard gate.
+      - name: clippy (wasm32)
+        working-directory: webizen-studio
+        continue-on-error: true
+        run: cargo clippy --target wasm32-unknown-unknown
+
   build:
     runs-on: ubuntu-latest
+    needs: check
     steps:
       - uses: actions/checkout@v4
 

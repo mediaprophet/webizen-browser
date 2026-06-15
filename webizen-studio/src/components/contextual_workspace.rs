@@ -4,66 +4,215 @@ use dioxus::prelude::*;
 // ── Domain types ──────────────────────────────────────────────────────────────
 
 #[derive(Clone, PartialEq, Debug, Copy)]
-enum NodeZone { Selfhood, Personhood, Bridge }
+enum NodeZone {
+    Selfhood,
+    Personhood,
+    Bridge,
+}
 
 #[derive(Clone, PartialEq, Debug, Copy)]
-enum NodeCat { Identity, Keys, Data, Agreement, Media, Commons, Agent, Knowledge }
+enum NodeCat {
+    Identity,
+    Keys,
+    Data,
+    Agreement,
+    Media,
+    Commons,
+    Agent,
+    Knowledge,
+}
 
 #[derive(Clone, PartialEq, Debug)]
 struct GraphNode {
-    id:     &'static str,
-    label:  &'static str,
-    x:      f64,
-    y:      f64,
-    zone:   NodeZone,
-    cat:    NodeCat,
+    id: &'static str,
+    label: &'static str,
+    x: f64,
+    y: f64,
+    zone: NodeZone,
+    cat: NodeCat,
     detail: &'static str,
 }
 
 #[derive(Clone, PartialEq, Debug)]
-struct GraphEdge { from: &'static str, to: &'static str }
+struct GraphEdge {
+    from: &'static str,
+    to: &'static str,
+}
 
 #[derive(Clone, PartialEq, Debug, Copy)]
-enum Lens { All, Identity, Financial, Social, Knowledge }
+enum Lens {
+    All,
+    Identity,
+    Financial,
+    Social,
+    Knowledge,
+}
 
 #[derive(Clone, PartialEq)]
-struct ChatMsg { is_user: bool, text: String }
+struct ChatMsg {
+    is_user: bool,
+    text: String,
+}
 
 // ── Static data ───────────────────────────────────────────────────────────────
 
 fn graph_nodes() -> Vec<GraphNode> {
     vec![
         // Selfhood
-        GraphNode { id:"identity",     label:"Identity",       x:170., y:110., zone:NodeZone::Selfhood,   cat:NodeCat::Identity,  detail:"did:q42:local-admin" },
-        GraphNode { id:"keys",         label:"Private Keys",   x:65.,  y:230., zone:NodeZone::Selfhood,   cat:NodeCat::Keys,      detail:"ed25519 · x25519 ECDH" },
-        GraphNode { id:"did-doc",      label:"DID Document",   x:295., y:195., zone:NodeZone::Selfhood,   cat:NodeCat::Identity,  detail:"W3C DID v1.1" },
-        GraphNode { id:"enc-data",     label:"Encrypted Data", x:145., y:340., zone:NodeZone::Selfhood,   cat:NodeCat::Data,      detail:"AES-256-GCM vault" },
+        GraphNode {
+            id: "identity",
+            label: "Identity",
+            x: 170.,
+            y: 110.,
+            zone: NodeZone::Selfhood,
+            cat: NodeCat::Identity,
+            detail: "did:q42:local-admin",
+        },
+        GraphNode {
+            id: "keys",
+            label: "Private Keys",
+            x: 65.,
+            y: 230.,
+            zone: NodeZone::Selfhood,
+            cat: NodeCat::Keys,
+            detail: "ed25519 · x25519 ECDH",
+        },
+        GraphNode {
+            id: "did-doc",
+            label: "DID Document",
+            x: 295.,
+            y: 195.,
+            zone: NodeZone::Selfhood,
+            cat: NodeCat::Identity,
+            detail: "W3C DID v1.1",
+        },
+        GraphNode {
+            id: "enc-data",
+            label: "Encrypted Data",
+            x: 145.,
+            y: 340.,
+            zone: NodeZone::Selfhood,
+            cat: NodeCat::Data,
+            detail: "AES-256-GCM vault",
+        },
         // Personhood
-        GraphNode { id:"agreements",   label:"Agreements",     x:560., y:105., zone:NodeZone::Personhood, cat:NodeCat::Agreement, detail:"3 active bilateral" },
-        GraphNode { id:"tsl",          label:"TSL Artifacts",  x:685., y:210., zone:NodeZone::Personhood, cat:NodeCat::Commons,   detail:"Threshold Shift License" },
-        GraphNode { id:"media",        label:"Media Assets",   x:510., y:265., zone:NodeZone::Personhood, cat:NodeCat::Media,     detail:"34 NQuin-anchored" },
-        GraphNode { id:"publications", label:"Commons Pub.",   x:670., y:345., zone:NodeZone::Personhood, cat:NodeCat::Commons,   detail:"WebTorrent seeded" },
-        GraphNode { id:"webtorrent",   label:"WebTorrent DHT", x:565., y:430., zone:NodeZone::Personhood, cat:NodeCat::Commons,   detail:"Permissive Commons seed" },
+        GraphNode {
+            id: "agreements",
+            label: "Agreements",
+            x: 560.,
+            y: 105.,
+            zone: NodeZone::Personhood,
+            cat: NodeCat::Agreement,
+            detail: "3 active bilateral",
+        },
+        GraphNode {
+            id: "tsl",
+            label: "TSL Artifacts",
+            x: 685.,
+            y: 210.,
+            zone: NodeZone::Personhood,
+            cat: NodeCat::Commons,
+            detail: "Threshold Shift License",
+        },
+        GraphNode {
+            id: "media",
+            label: "Media Assets",
+            x: 510.,
+            y: 265.,
+            zone: NodeZone::Personhood,
+            cat: NodeCat::Media,
+            detail: "34 NQuin-anchored",
+        },
+        GraphNode {
+            id: "publications",
+            label: "Commons Pub.",
+            x: 670.,
+            y: 345.,
+            zone: NodeZone::Personhood,
+            cat: NodeCat::Commons,
+            detail: "WebTorrent seeded",
+        },
+        GraphNode {
+            id: "webtorrent",
+            label: "WebTorrent DHT",
+            x: 565.,
+            y: 430.,
+            zone: NodeZone::Personhood,
+            cat: NodeCat::Commons,
+            detail: "Permissive Commons seed",
+        },
         // Bridge
-        GraphNode { id:"inforg",       label:"Inforg Agent",   x:400., y:175., zone:NodeZone::Bridge,     cat:NodeCat::Agent,     detail:"Local GGUF · Phase 8" },
-        GraphNode { id:"knowledge",    label:"Knowledge Base",  x:390., y:375., zone:NodeZone::Bridge,    cat:NodeCat::Knowledge, detail:"Standards + Ontologies" },
+        GraphNode {
+            id: "inforg",
+            label: "Inforg Agent",
+            x: 400.,
+            y: 175.,
+            zone: NodeZone::Bridge,
+            cat: NodeCat::Agent,
+            detail: "Local GGUF · Phase 8",
+        },
+        GraphNode {
+            id: "knowledge",
+            label: "Knowledge Base",
+            x: 390.,
+            y: 375.,
+            zone: NodeZone::Bridge,
+            cat: NodeCat::Knowledge,
+            detail: "Standards + Ontologies",
+        },
     ]
 }
 
 fn graph_edges() -> Vec<GraphEdge> {
     vec![
-        GraphEdge { from:"identity",    to:"keys" },
-        GraphEdge { from:"identity",    to:"did-doc" },
-        GraphEdge { from:"identity",    to:"inforg" },
-        GraphEdge { from:"inforg",      to:"agreements" },
-        GraphEdge { from:"did-doc",     to:"agreements" },
-        GraphEdge { from:"did-doc",     to:"tsl" },
-        GraphEdge { from:"enc-data",    to:"knowledge" },
-        GraphEdge { from:"agreements",  to:"media" },
-        GraphEdge { from:"agreements",  to:"tsl" },
-        GraphEdge { from:"media",       to:"publications" },
-        GraphEdge { from:"publications",to:"webtorrent" },
-        GraphEdge { from:"inforg",      to:"knowledge" },
+        GraphEdge {
+            from: "identity",
+            to: "keys",
+        },
+        GraphEdge {
+            from: "identity",
+            to: "did-doc",
+        },
+        GraphEdge {
+            from: "identity",
+            to: "inforg",
+        },
+        GraphEdge {
+            from: "inforg",
+            to: "agreements",
+        },
+        GraphEdge {
+            from: "did-doc",
+            to: "agreements",
+        },
+        GraphEdge {
+            from: "did-doc",
+            to: "tsl",
+        },
+        GraphEdge {
+            from: "enc-data",
+            to: "knowledge",
+        },
+        GraphEdge {
+            from: "agreements",
+            to: "media",
+        },
+        GraphEdge {
+            from: "agreements",
+            to: "tsl",
+        },
+        GraphEdge {
+            from: "media",
+            to: "publications",
+        },
+        GraphEdge {
+            from: "publications",
+            to: "webtorrent",
+        },
+        GraphEdge {
+            from: "inforg",
+            to: "knowledge",
+        },
     ]
 }
 
@@ -71,19 +220,43 @@ fn graph_edges() -> Vec<GraphEdge> {
 
 fn zone_color(zone: NodeZone) -> &'static str {
     match zone {
-        NodeZone::Selfhood   => "#d97706",
+        NodeZone::Selfhood => "#d97706",
         NodeZone::Personhood => "#0ea5e9",
-        NodeZone::Bridge     => "#8b5cf6",
+        NodeZone::Bridge => "#8b5cf6",
     }
 }
 
 fn node_opacity(cat: NodeCat, lens: Lens) -> f64 {
     match lens {
-        Lens::All       => 1.0,
-        Lens::Identity  => if matches!(cat, NodeCat::Identity | NodeCat::Keys | NodeCat::Agent)         { 1.0 } else { 0.12 },
-        Lens::Financial => if matches!(cat, NodeCat::Agreement | NodeCat::Commons)                       { 1.0 } else { 0.12 },
-        Lens::Social    => if matches!(cat, NodeCat::Agreement | NodeCat::Media | NodeCat::Commons)      { 1.0 } else { 0.12 },
-        Lens::Knowledge => if matches!(cat, NodeCat::Knowledge | NodeCat::Agent)                         { 1.0 } else { 0.12 },
+        Lens::All => 1.0,
+        Lens::Identity => {
+            if matches!(cat, NodeCat::Identity | NodeCat::Keys | NodeCat::Agent) {
+                1.0
+            } else {
+                0.12
+            }
+        }
+        Lens::Financial => {
+            if matches!(cat, NodeCat::Agreement | NodeCat::Commons) {
+                1.0
+            } else {
+                0.12
+            }
+        }
+        Lens::Social => {
+            if matches!(cat, NodeCat::Agreement | NodeCat::Media | NodeCat::Commons) {
+                1.0
+            } else {
+                0.12
+            }
+        }
+        Lens::Knowledge => {
+            if matches!(cat, NodeCat::Knowledge | NodeCat::Agent) {
+                1.0
+            } else {
+                0.12
+            }
+        }
     }
 }
 
@@ -106,7 +279,10 @@ fn inforg_reply(q: &str) -> String {
     } else if q.contains("commons") || q.contains("webtorrent") || q.contains("seed") {
         "Commons Gateway: 3 artifacts seeded to DHT (TSL-v1.3, PROV-O, ODRL-2.2). PermissiveRoutingLane: open. No micropayment gates active. 14 peers discovered.".into()
     } else {
-        format!("Querying NQuin space for '{}' — 0 grounded results. The Inforg Sentinel requires provenance citations for all responses. Try: identity, agreements, media, knowledge, or a SPARQL query.", q)
+        format!(
+            "Querying NQuin space for '{}' — 0 grounded results. The Inforg Sentinel requires provenance citations for all responses. Try: identity, agreements, media, knowledge, or a SPARQL query.",
+            q
+        )
     }
 }
 
@@ -115,24 +291,26 @@ fn inforg_reply(q: &str) -> String {
 #[component]
 pub fn ContextualWorkspace() -> Element {
     // Canvas state
-    let mut pan_x        = use_signal(|| 0.0_f64);
-    let mut pan_y        = use_signal(|| 0.0_f64);
-    let mut zoom         = use_signal(|| 1.0_f64);
-    let mut dragging     = use_signal(|| false);
-    let mut drag_sx      = use_signal(|| 0.0_f64);
-    let mut drag_sy      = use_signal(|| 0.0_f64);
-    let mut pan_at_dx    = use_signal(|| 0.0_f64);
-    let mut pan_at_dy    = use_signal(|| 0.0_f64);
+    let mut pan_x = use_signal(|| 0.0_f64);
+    let mut pan_y = use_signal(|| 0.0_f64);
+    let mut zoom = use_signal(|| 1.0_f64);
+    let mut dragging = use_signal(|| false);
+    let mut drag_sx = use_signal(|| 0.0_f64);
+    let mut drag_sy = use_signal(|| 0.0_f64);
+    let mut pan_at_dx = use_signal(|| 0.0_f64);
+    let mut pan_at_dy = use_signal(|| 0.0_f64);
 
     // UI state
-    let mut active_lens  = use_signal(|| Lens::All);
-    let mut selected     = use_signal(|| None::<String>);
-    let mut time_pos     = use_signal(|| 100u32);
+    let mut active_lens = use_signal(|| Lens::All);
+    let mut selected = use_signal(|| None::<String>);
+    let mut time_pos = use_signal(|| 100u32);
 
     // Chat
-    let mut msgs = use_signal(|| vec![
+    let mut msgs = use_signal(|| {
+        vec![
         ChatMsg { is_user: false, text: "Context Studio ready. I can query your semantic graph, navigate the Permissive Commons, or inspect the temporal ledger. What would you like to explore?".into() }
-    ]);
+    ]
+    });
     let mut chat_in = use_signal(|| String::new());
 
     // Commons
@@ -140,10 +318,10 @@ pub fn ContextualWorkspace() -> Element {
 
     // Derived
     let lens = active_lens();
-    let t    = time_pos();
-    let z    = zoom();
-    let vw   = 800.0 / z;
-    let vh   = 500.0 / z;
+    let t = time_pos();
+    let z = zoom();
+    let vw = 800.0 / z;
+    let vh = 500.0 / z;
     let vbox = format!("{:.1} {:.1} {:.1} {:.1}", pan_x(), pan_y(), vw, vh);
 
     let nodes = graph_nodes();
@@ -157,20 +335,32 @@ pub fn ContextualWorkspace() -> Element {
         format!("−{days_ago}d")
     };
 
-    let scrubber_accent = if t < 100 { "#f59e0b" } else { "var(--qualia-accent)" };
-    let cursor = if dragging() { "cursor:grabbing;" } else { "cursor:grab;" };
+    let scrubber_accent = if t < 100 {
+        "#f59e0b"
+    } else {
+        "var(--qualia-accent)"
+    };
+    let cursor = if dragging() {
+        "cursor:grabbing;"
+    } else {
+        "cursor:grab;"
+    };
 
     // ── Event handlers ──────────────────────────────────────────────────
 
     let on_md = move |evt: Event<MouseData>| {
         let c = evt.data().client_coordinates();
-        drag_sx.set(c.x); drag_sy.set(c.y);
-        pan_at_dx.set(pan_x()); pan_at_dy.set(pan_y());
+        drag_sx.set(c.x);
+        drag_sy.set(c.y);
+        pan_at_dx.set(pan_x());
+        pan_at_dy.set(pan_y());
         dragging.set(true);
     };
 
     let on_mm = move |evt: Event<MouseData>| {
-        if !dragging() { return; }
+        if !dragging() {
+            return;
+        }
         let c = evt.data().client_coordinates();
         pan_x.set(pan_at_dx() - (c.x - drag_sx()) / zoom());
         pan_y.set(pan_at_dy() - (c.y - drag_sy()) / zoom());
@@ -179,48 +369,80 @@ pub fn ContextualWorkspace() -> Element {
     let on_mu = move |_: Event<MouseData>| dragging.set(false);
 
     let on_zoom = move |e: Event<FormData>| {
-        if let Ok(v) = e.value().parse::<f64>() { zoom.set(v); }
+        if let Ok(v) = e.value().parse::<f64>() {
+            zoom.set(v);
+        }
     };
 
     let on_time = move |e: Event<FormData>| {
-        if let Ok(v) = e.value().parse::<u32>() { time_pos.set(v); }
+        if let Ok(v) = e.value().parse::<u32>() {
+            time_pos.set(v);
+        }
     };
 
     let submit_chat = move |_: Event<MouseData>| {
         let q = chat_in().trim().to_string();
-        if q.is_empty() { return; }
-        msgs.write().push(ChatMsg { is_user: true,  text: q.clone() });
-        msgs.write().push(ChatMsg { is_user: false, text: inforg_reply(&q) });
+        if q.is_empty() {
+            return;
+        }
+        msgs.write().push(ChatMsg {
+            is_user: true,
+            text: q.clone(),
+        });
+        msgs.write().push(ChatMsg {
+            is_user: false,
+            text: inforg_reply(&q),
+        });
         chat_in.set(String::new());
     };
 
     // ── Build edge SVG data (pre-compute to avoid complex closures in RSX) ──
     let chat_snapshot = msgs();
 
-    let edge_svgs: Vec<(f64, f64, f64, f64, f64)> = edges.iter().filter_map(|e| {
-        let (fx, fy) = find_xy(e.from, &nodes)?;
-        let (tx, ty) = find_xy(e.to, &nodes)?;
-        let fn_ = nodes.iter().find(|n| n.id == e.from)?;
-        let tn_ = nodes.iter().find(|n| n.id == e.to)?;
-        let op = ((node_opacity(fn_.cat, lens) + node_opacity(tn_.cat, lens)) / 2.0 * 0.55)
-            .max(0.06);
-        Some((fx, fy, tx, ty, op))
-    }).collect();
+    let edge_svgs: Vec<(f64, f64, f64, f64, f64)> = edges
+        .iter()
+        .filter_map(|e| {
+            let (fx, fy) = find_xy(e.from, &nodes)?;
+            let (tx, ty) = find_xy(e.to, &nodes)?;
+            let fn_ = nodes.iter().find(|n| n.id == e.from)?;
+            let tn_ = nodes.iter().find(|n| n.id == e.to)?;
+            let op = ((node_opacity(fn_.cat, lens) + node_opacity(tn_.cat, lens)) / 2.0 * 0.55)
+                .max(0.06);
+            Some((fx, fy, tx, ty, op))
+        })
+        .collect();
 
     // ── Build node render data ──
-    let node_renders: Vec<(&'static str, f64, f64, &'static str, f64, bool, &'static str, &'static str)> = nodes.iter().map(|n| {
-        let color = zone_color(n.zone);
-        let opacity = node_opacity(n.cat, lens);
-        let is_sel = selected().as_deref() == Some(n.id);
-        let stroke = if is_sel { "white" } else { "rgba(255,255,255,0.2)" };
-        let sw = if is_sel { "3" } else { "1.5" };
-        (n.id, n.x, n.y, color, opacity, is_sel, stroke, sw)
-    }).collect();
+    let node_renders: Vec<(
+        &'static str,
+        f64,
+        f64,
+        &'static str,
+        f64,
+        bool,
+        &'static str,
+        &'static str,
+    )> = nodes
+        .iter()
+        .map(|n| {
+            let color = zone_color(n.zone);
+            let opacity = node_opacity(n.cat, lens);
+            let is_sel = selected().as_deref() == Some(n.id);
+            let stroke = if is_sel {
+                "white"
+            } else {
+                "rgba(255,255,255,0.2)"
+            };
+            let sw = if is_sel { "3" } else { "1.5" };
+            (n.id, n.x, n.y, color, opacity, is_sel, stroke, sw)
+        })
+        .collect();
 
     // ── Node labels (separate pass so they render above circles) ──
-    let label_renders: Vec<(&'static str, f64, f64, f64)> = nodes.iter().map(|n| {
-        (n.label, n.x, n.y + 40.0, node_opacity(n.cat, lens))
-    }).collect();
+    let label_renders: Vec<(&'static str, f64, f64, f64)> = nodes
+        .iter()
+        .map(|n| (n.label, n.x, n.y + 40.0, node_opacity(n.cat, lens)))
+        .collect();
 
     rsx! {
         div {

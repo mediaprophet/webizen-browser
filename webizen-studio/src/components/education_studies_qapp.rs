@@ -12,13 +12,13 @@ pub fn EducationStudiesQapp() -> Element {
 
     rsx! {
         div {
-            style: "padding: 20px; background: #1e1e2e; color: #cdd6f4; border-radius: 12px; font-family: monospace; display: flex; flex-direction: column; gap: 16px; height: 100%; box-sizing: border-box; overflow-y: auto;",
-            h2 { style: "margin: 0; color: #a6e3a1; border-bottom: 1px solid #313244; padding-bottom: 8px;", "Education Studies QApp" }
+            style: "padding: 20px; background: var(--qualia-surface); color: var(--qualia-text); border-radius: 12px; font-family: monospace; display: flex; flex-direction: column; gap: 16px; height: 100%; box-sizing: border-box; overflow-y: auto;",
+            h2 { style: "margin: 0; color: var(--qualia-accent); border-bottom: 1px solid var(--qualia-border); padding-bottom: 8px;", "Education Studies QApp" }
 
             div { style: "display: flex; flex-direction: column; gap: 8px;",
-                label { style: "font-size: 0.85rem; color: #a6adc8;", "Educational Level" }
+                label { style: "font-size: 0.85rem; color: var(--qualia-text-muted);", "Educational Level" }
                 select {
-                    style: "background: #313244; color: #cdd6f4; border: 1px solid #45475a; border-radius: 6px; padding: 6px 8px; font-family: monospace; width: 100%; box-sizing: border-box;",
+                    style: "background: var(--qualia-border); color: var(--qualia-text); border: 1px solid var(--qualia-border); border-radius: 6px; padding: 6px 8px; font-family: monospace; width: 100%; box-sizing: border-box;",
                     onchange: move |e| educational_level.set(e.value()),
                     option { "Early Childhood" }
                     option { "Primary" }
@@ -31,9 +31,9 @@ pub fn EducationStudiesQapp() -> Element {
             }
 
             div { style: "display: flex; flex-direction: column; gap: 8px;",
-                label { style: "font-size: 0.85rem; color: #a6adc8;", "Pedagogical Approach" }
+                label { style: "font-size: 0.85rem; color: var(--qualia-text-muted);", "Pedagogical Approach" }
                 select {
-                    style: "background: #313244; color: #cdd6f4; border: 1px solid #45475a; border-radius: 6px; padding: 6px 8px; font-family: monospace; width: 100%; box-sizing: border-box;",
+                    style: "background: var(--qualia-border); color: var(--qualia-text); border: 1px solid var(--qualia-border); border-radius: 6px; padding: 6px 8px; font-family: monospace; width: 100%; box-sizing: border-box;",
                     onchange: move |e| pedagogical_approach.set(e.value()),
                     option { "Behaviourist" }
                     option { selected: true, "Constructivist" }
@@ -48,9 +48,9 @@ pub fn EducationStudiesQapp() -> Element {
             }
 
             div { style: "display: flex; flex-direction: column; gap: 8px;",
-                label { style: "font-size: 0.85rem; color: #a6adc8;", "Curriculum Type" }
+                label { style: "font-size: 0.85rem; color: var(--qualia-text-muted);", "Curriculum Type" }
                 select {
-                    style: "background: #313244; color: #cdd6f4; border: 1px solid #45475a; border-radius: 6px; padding: 6px 8px; font-family: monospace; width: 100%; box-sizing: border-box;",
+                    style: "background: var(--qualia-border); color: var(--qualia-text); border: 1px solid var(--qualia-border); border-radius: 6px; padding: 6px 8px; font-family: monospace; width: 100%; box-sizing: border-box;",
                     onchange: move |e| curriculum_type.set(e.value()),
                     option { "Core Knowledge" }
                     option { selected: true, "Competency-Based" }
@@ -63,9 +63,9 @@ pub fn EducationStudiesQapp() -> Element {
             }
 
             div { style: "display: flex; flex-direction: column; gap: 8px;",
-                label { style: "font-size: 0.85rem; color: #a6adc8;", "Assessment Method" }
+                label { style: "font-size: 0.85rem; color: var(--qualia-text-muted);", "Assessment Method" }
                 select {
-                    style: "background: #313244; color: #cdd6f4; border: 1px solid #45475a; border-radius: 6px; padding: 6px 8px; font-family: monospace; width: 100%; box-sizing: border-box;",
+                    style: "background: var(--qualia-border); color: var(--qualia-text); border: 1px solid var(--qualia-border); border-radius: 6px; padding: 6px 8px; font-family: monospace; width: 100%; box-sizing: border-box;",
                     onchange: move |e| assessment_method.set(e.value()),
                     option { "Standardised Test" }
                     option { "Portfolio" }
@@ -77,9 +77,9 @@ pub fn EducationStudiesQapp() -> Element {
             }
 
             div { style: "display: flex; flex-direction: column; gap: 8px;",
-                label { style: "font-size: 0.85rem; color: #a6adc8;", "Learning Theory" }
+                label { style: "font-size: 0.85rem; color: var(--qualia-text-muted);", "Learning Theory" }
                 select {
-                    style: "background: #313244; color: #cdd6f4; border: 1px solid #45475a; border-radius: 6px; padding: 6px 8px; font-family: monospace; width: 100%; box-sizing: border-box;",
+                    style: "background: var(--qualia-border); color: var(--qualia-text); border: 1px solid var(--qualia-border); border-radius: 6px; padding: 6px 8px; font-family: monospace; width: 100%; box-sizing: border-box;",
                     onchange: move |e| learning_theory.set(e.value()),
                     option { "Bloom's Taxonomy" }
                     option { selected: true, "Vygotsky ZPD" }
@@ -90,36 +90,36 @@ pub fn EducationStudiesQapp() -> Element {
             }
 
             div { style: "display: flex; flex-direction: column; gap: 8px;",
-                label { style: "font-size: 0.85rem; color: #a6adc8;", "Class Size: {class_size()}" }
+                label { style: "font-size: 0.85rem; color: var(--qualia-text-muted);", "Class Size: {class_size()}" }
                 input {
                     r#type: "number",
                     min: "1",
                     max: "500",
                     value: "{class_size()}",
-                    style: "background: #313244; color: #cdd6f4; border: 1px solid #45475a; border-radius: 6px; padding: 6px 8px; font-family: monospace; width: 100%; box-sizing: border-box;",
+                    style: "background: var(--qualia-border); color: var(--qualia-text); border: 1px solid var(--qualia-border); border-radius: 6px; padding: 6px 8px; font-family: monospace; width: 100%; box-sizing: border-box;",
                     oninput: move |e| class_size.set(e.value().parse().unwrap_or(25)),
                 }
             }
 
             div { style: "display: flex; flex-direction: column; gap: 8px;",
-                label { style: "font-size: 0.85rem; color: #a6adc8;", "Notes" }
+                label { style: "font-size: 0.85rem; color: var(--qualia-text-muted);", "Notes" }
                 textarea {
-                    style: "background: #313244; color: #cdd6f4; border: 1px solid #45475a; border-radius: 6px; padding: 6px 8px; font-family: monospace; width: 100%; box-sizing: border-box; min-height: 60px; resize: vertical;",
+                    style: "background: var(--qualia-border); color: var(--qualia-text); border: 1px solid var(--qualia-border); border-radius: 6px; padding: 6px 8px; font-family: monospace; width: 100%; box-sizing: border-box; min-height: 60px; resize: vertical;",
                     placeholder: "Research notes...",
                     oninput: move |e| notes.set(e.value()),
                 }
             }
 
             div {
-                style: "background: #11111b; padding: 16px; border-radius: 8px; border-left: 4px solid #a6e3a1; flex: 1;",
-                h3 { style: "margin-top: 0; color: #a6e3a1; font-size: 0.9rem;", "QualiaDB Output" }
-                div { style: "font-size: 0.8rem; color: #a6adc8; display: flex; flex-direction: column; gap: 4px;",
+                style: "background: var(--qualia-bg); padding: 16px; border-radius: 8px; border-left: 4px solid var(--qualia-accent); flex: 1;",
+                h3 { style: "margin-top: 0; color: var(--qualia-accent); font-size: 0.9rem;", "QualiaDB Output" }
+                div { style: "font-size: 0.8rem; color: var(--qualia-text-muted); display: flex; flex-direction: column; gap: 4px;",
                     div { "Level: {educational_level()}" }
                     div { "Pedagogy: {pedagogical_approach()}" }
                     div { "Theory: {learning_theory()}" }
-                    div { style: "color: if class_size() <= 20 { \"#a6e3a1\" } else { \"#f9e2af\" };", "Class Size: {class_size()}" }
+                    div { style: "color: if class_size() <= 20 { \"var(--qualia-accent)\" } else { \"var(--qualia-accent)\" };", "Class Size: {class_size()}" }
                 }
-                div { style: "font-size: 0.75rem; color: #585b70; margin-top: 8px;", "QualiaDB → epistemic logic | graph theory | knowledge sieve" }
+                div { style: "font-size: 0.75rem; color: var(--qualia-text-muted); margin-top: 8px;", "QualiaDB → epistemic logic | graph theory | knowledge sieve" }
             }
         }
     }

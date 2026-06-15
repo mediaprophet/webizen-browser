@@ -12,13 +12,13 @@ pub fn AsianStudiesQapp() -> Element {
 
     rsx! {
         div {
-            style: "padding: 20px; background: #1e1e2e; color: #cdd6f4; border-radius: 12px; font-family: monospace; display: flex; flex-direction: column; gap: 16px; height: 100%; box-sizing: border-box; overflow-y: auto;",
-            h2 { style: "margin: 0; color: #a6e3a1; border-bottom: 1px solid #313244; padding-bottom: 8px;", "Asian Studies QApp" }
+            style: "padding: 20px; background: var(--qualia-surface); color: var(--qualia-text); border-radius: 12px; font-family: monospace; display: flex; flex-direction: column; gap: 16px; height: 100%; box-sizing: border-box; overflow-y: auto;",
+            h2 { style: "margin: 0; color: var(--qualia-accent); border-bottom: 1px solid var(--qualia-border); padding-bottom: 8px;", "Asian Studies QApp" }
 
             div { style: "display: flex; flex-direction: column; gap: 8px;",
-                label { style: "font-size: 0.85rem; color: #a6adc8;", "Region" }
+                label { style: "font-size: 0.85rem; color: var(--qualia-text-muted);", "Region" }
                 select {
-                    style: "background: #313244; color: #cdd6f4; border: 1px solid #45475a; border-radius: 6px; padding: 6px 8px; font-family: monospace; width: 100%; box-sizing: border-box;",
+                    style: "background: var(--qualia-border); color: var(--qualia-text); border: 1px solid var(--qualia-border); border-radius: 6px; padding: 6px 8px; font-family: monospace; width: 100%; box-sizing: border-box;",
                     onchange: move |e| region.set(e.value()),
                     option { selected: true, "East Asia" }
                     option { "South Asia" }
@@ -29,18 +29,18 @@ pub fn AsianStudiesQapp() -> Element {
             }
 
             div { style: "display: flex; flex-direction: column; gap: 8px;",
-                label { style: "font-size: 0.85rem; color: #a6adc8;", "Country Focus" }
+                label { style: "font-size: 0.85rem; color: var(--qualia-text-muted);", "Country Focus" }
                 input {
-                    style: "background: #313244; color: #cdd6f4; border: 1px solid #45475a; border-radius: 6px; padding: 6px 8px; font-family: monospace; width: 100%; box-sizing: border-box;",
+                    style: "background: var(--qualia-border); color: var(--qualia-text); border: 1px solid var(--qualia-border); border-radius: 6px; padding: 6px 8px; font-family: monospace; width: 100%; box-sizing: border-box;",
                     placeholder: "e.g. Japan, India, Vietnam...",
                     oninput: move |e| country_focus.set(e.value()),
                 }
             }
 
             div { style: "display: flex; flex-direction: column; gap: 8px;",
-                label { style: "font-size: 0.85rem; color: #a6adc8;", "Disciplinary Lens" }
+                label { style: "font-size: 0.85rem; color: var(--qualia-text-muted);", "Disciplinary Lens" }
                 select {
-                    style: "background: #313244; color: #cdd6f4; border: 1px solid #45475a; border-radius: 6px; padding: 6px 8px; font-family: monospace; width: 100%; box-sizing: border-box;",
+                    style: "background: var(--qualia-border); color: var(--qualia-text); border: 1px solid var(--qualia-border); border-radius: 6px; padding: 6px 8px; font-family: monospace; width: 100%; box-sizing: border-box;",
                     onchange: move |e| disciplinary_lens.set(e.value()),
                     option { selected: true, "History" }
                     option { "Political Economy" }
@@ -53,9 +53,9 @@ pub fn AsianStudiesQapp() -> Element {
             }
 
             div { style: "display: flex; flex-direction: column; gap: 8px;",
-                label { style: "font-size: 0.85rem; color: #a6adc8;", "Period" }
+                label { style: "font-size: 0.85rem; color: var(--qualia-text-muted);", "Period" }
                 select {
-                    style: "background: #313244; color: #cdd6f4; border: 1px solid #45475a; border-radius: 6px; padding: 6px 8px; font-family: monospace; width: 100%; box-sizing: border-box;",
+                    style: "background: var(--qualia-border); color: var(--qualia-text); border: 1px solid var(--qualia-border); border-radius: 6px; padding: 6px 8px; font-family: monospace; width: 100%; box-sizing: border-box;",
                     onchange: move |e| period.set(e.value()),
                     option { "Classical" }
                     option { "Medieval" }
@@ -67,9 +67,9 @@ pub fn AsianStudiesQapp() -> Element {
             }
 
             div { style: "display: flex; flex-direction: column; gap: 8px;",
-                label { style: "font-size: 0.85rem; color: #a6adc8;", "Language Competency" }
+                label { style: "font-size: 0.85rem; color: var(--qualia-text-muted);", "Language Competency" }
                 select {
-                    style: "background: #313244; color: #cdd6f4; border: 1px solid #45475a; border-radius: 6px; padding: 6px 8px; font-family: monospace; width: 100%; box-sizing: border-box;",
+                    style: "background: var(--qualia-border); color: var(--qualia-text); border: 1px solid var(--qualia-border); border-radius: 6px; padding: 6px 8px; font-family: monospace; width: 100%; box-sizing: border-box;",
                     onchange: move |e| language_competency.set(e.value()),
                     option { selected: true, "None" }
                     option { "Reading" }
@@ -79,9 +79,9 @@ pub fn AsianStudiesQapp() -> Element {
             }
 
             div { style: "display: flex; flex-direction: column; gap: 8px;",
-                label { style: "font-size: 0.85rem; color: #a6adc8;", "Theoretical Framework" }
+                label { style: "font-size: 0.85rem; color: var(--qualia-text-muted);", "Theoretical Framework" }
                 select {
-                    style: "background: #313244; color: #cdd6f4; border: 1px solid #45475a; border-radius: 6px; padding: 6px 8px; font-family: monospace; width: 100%; box-sizing: border-box;",
+                    style: "background: var(--qualia-border); color: var(--qualia-text); border: 1px solid var(--qualia-border); border-radius: 6px; padding: 6px 8px; font-family: monospace; width: 100%; box-sizing: border-box;",
                     onchange: move |e| theoretical_framework.set(e.value()),
                     option { selected: true, "Postcolonial" }
                     option { "World-Systems" }
@@ -93,23 +93,23 @@ pub fn AsianStudiesQapp() -> Element {
             }
 
             div { style: "display: flex; flex-direction: column; gap: 8px;",
-                label { style: "font-size: 0.85rem; color: #a6adc8;", "Notes" }
+                label { style: "font-size: 0.85rem; color: var(--qualia-text-muted);", "Notes" }
                 textarea {
-                    style: "background: #313244; color: #cdd6f4; border: 1px solid #45475a; border-radius: 6px; padding: 6px 8px; font-family: monospace; width: 100%; box-sizing: border-box; min-height: 60px; resize: vertical;",
+                    style: "background: var(--qualia-border); color: var(--qualia-text); border: 1px solid var(--qualia-border); border-radius: 6px; padding: 6px 8px; font-family: monospace; width: 100%; box-sizing: border-box; min-height: 60px; resize: vertical;",
                     placeholder: "Additional notes...",
                     oninput: move |e| notes.set(e.value()),
                 }
             }
 
             div {
-                style: "background: #11111b; padding: 16px; border-radius: 8px; border-left: 4px solid #a6e3a1; flex: 1;",
-                h3 { style: "margin-top: 0; color: #a6e3a1; font-size: 0.9rem;", "QualiaDB Output" }
-                div { style: "font-size: 0.8rem; color: #a6adc8; display: flex; flex-direction: column; gap: 4px;",
+                style: "background: var(--qualia-bg); padding: 16px; border-radius: 8px; border-left: 4px solid var(--qualia-accent); flex: 1;",
+                h3 { style: "margin-top: 0; color: var(--qualia-accent); font-size: 0.9rem;", "QualiaDB Output" }
+                div { style: "font-size: 0.8rem; color: var(--qualia-text-muted); display: flex; flex-direction: column; gap: 4px;",
                     div { "Region: {region()}" }
                     div { "Country: {country_focus()}" }
                     div { "Framework: {theoretical_framework()}" }
                 }
-                div { style: "font-size: 0.75rem; color: #585b70; margin-top: 8px;", "QualiaDB → knowledge graph | Allen Interval | geospatial sieve" }
+                div { style: "font-size: 0.75rem; color: var(--qualia-text-muted); margin-top: 8px;", "QualiaDB → knowledge graph | Allen Interval | geospatial sieve" }
             }
         }
     }

@@ -3,7 +3,7 @@ use dioxus::prelude::*;
 #[component]
 pub fn StatisticalAnalysis() -> Element {
     let mut data = use_signal(|| "1.2, 2.3, 3.4, 4.5, 5.6".to_string());
-    
+
     rsx! {
         div {
             style: "padding: 20px; background: #1e1e2e; color: #cdd6f4; border-radius: 12px; font-family: monospace; display: flex; flex-direction: column; gap: 16px; height: 100%;",

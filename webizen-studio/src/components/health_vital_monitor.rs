@@ -12,7 +12,7 @@ pub fn HealthVitalMonitor() -> Element {
     rsx! {
         div {
             style: "padding: 2rem; background: #050505; border-radius: 16px; border: 1px solid #1f2937; color: #f8fafc; font-family: 'Consolas', 'Courier New', monospace; box-shadow: 0 15px 35px rgba(0,0,0,0.8); display: flex; flex-direction: column; gap: 1.5rem;",
-            
+
             div {
                 style: "display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #1f2937; padding-bottom: 1rem;",
                 div {
@@ -25,11 +25,11 @@ pub fn HealthVitalMonitor() -> Element {
 
             div {
                 style: "display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem;",
-                
+
                 // Left Column: Waves
                 div {
                     style: "display: flex; flex-direction: column; gap: 1rem;",
-                    
+
                     // ECG Wave
                     div {
                         style: "background: #0a0a0a; border: 1px solid #1f2937; border-radius: 12px; padding: 1rem; height: 120px; position: relative; overflow: hidden;",
@@ -77,7 +77,7 @@ pub fn HealthVitalMonitor() -> Element {
                 // Right Column: Digital Values
                 div {
                     style: "display: grid; grid-template-rows: repeat(4, 1fr); gap: 1rem;",
-                    
+
                     // HR
                     div {
                         style: "background: rgba(16, 185, 129, 0.05); border: 1px solid rgba(16, 185, 129, 0.2); border-radius: 12px; padding: 1rem; display: flex; flex-direction: column; justify-content: center; position: relative;",

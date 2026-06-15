@@ -1,7 +1,7 @@
 #![allow(non_snake_case)]
+use crate::components::shoelace::*;
 use dioxus::prelude::*;
 use serde::{Deserialize, Serialize};
-use crate::components::shoelace::*;
 
 /// Exact field structure for the ModuleAttachmentArgs payload.
 /// This will be serialized into binary (bincode) and sent as the `arguments_raw`
@@ -47,13 +47,15 @@ pub fn HardwareConfigurator() -> Element {
         if let Some(window) = web_sys::window() {
             let location = window.location();
             let mut clean_url = location.pathname().unwrap_or_else(|_| "/".to_string());
-            if let Ok(hash) = location.hash() { 
-                clean_url.push_str(&hash); 
+            if let Ok(hash) = location.hash() {
+                clean_url.push_str(&hash);
             }
             // Scrub qualia_token from the URL history
-            let _ = window.history()
-                .unwrap()
-                .replace_state_with_url(&wasm_bindgen::JsValue::NULL, "", Some(&clean_url));
+            let _ = window.history().unwrap().replace_state_with_url(
+                &wasm_bindgen::JsValue::NULL,
+                "",
+                Some(&clean_url),
+            );
         }
     });
 
@@ -68,7 +70,9 @@ pub fn HardwareConfigurator() -> Element {
             let mut current = state.read().clone();
             // Simulate validation logic (e.g. power draw > 100W fails)
             if module.expected_power_draw_w > 100.0 {
-                current.status = ConfigStatus::Violated("Exceeds maximum power draw for this routing lane.".to_string());
+                current.status = ConfigStatus::Violated(
+                    "Exceeds maximum power draw for this routing lane.".to_string(),
+                );
                 current.pending_module = None;
             } else {
                 current.status = ConfigStatus::Approved;
@@ -91,12 +95,12 @@ pub fn HardwareConfigurator() -> Element {
                         ConfigStatus::Violated(_) => rsx! { SlBadge { variant: "danger", "Violation Detected" } },
                     }
                 }
-                
+
                 div { class: "flex-col flex gap-4",
                     p { class: "text-sm text-gray-400",
                         "Snap components onto the baseplate. The local daemon will validate structural and electrical compliance via Sanctuary Gates."
                     }
-                    
+
                     // Render any violation messages from the daemon
                     if let ConfigStatus::Violated(err_msg) = &state.read().status {
                         SlAlert { variant: "danger", open: true,
@@ -110,7 +114,7 @@ pub fn HardwareConfigurator() -> Element {
                     div { class: "relative w-full h-64 bg-gray-900 border-2 border-gray-700 rounded overflow-hidden",
                         svg {
                             width: "100%", height: "100%",
-                            
+
                             // Grid pattern
                             defs {
                                 pattern { id: "grid", width: "40", height: "40", pattern_units: "userSpaceOnUse",
@@ -118,7 +122,7 @@ pub fn HardwareConfigurator() -> Element {
                                 }
                             }
                             rect { width: "100%", height: "100%", fill: "url(#grid)" }
-                            
+
                             // Render previously attached modules
                             for (i, m) in state.read().attached_modules.iter().enumerate() {
                                 rect {
@@ -158,9 +162,9 @@ pub fn HardwareConfigurator() -> Element {
                                 grid_x: 2, grid_y: 2, width: 2, height: 1,
                                 expected_power_draw_w: 15.0, // Safe
                             }),
-                            SlButton { 
+                            SlButton {
                                 variant: "default",
-                                "Snap Wi-Fi Module (Safe)" 
+                                "Snap Wi-Fi Module (Safe)"
                             }
                         }
                         div {
@@ -170,9 +174,9 @@ pub fn HardwareConfigurator() -> Element {
                                 grid_x: 4, grid_y: 2, width: 3, height: 2,
                                 expected_power_draw_w: 150.0, // Should trigger violation
                             }),
-                            SlButton { 
+                            SlButton {
                                 variant: "danger", outline: true,
-                                "Snap Heater (Will Fail)" 
+                                "Snap Heater (Will Fail)"
                             }
                         }
                     }

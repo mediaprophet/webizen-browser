@@ -11,16 +11,42 @@ struct Asset {
 
 #[component]
 pub fn PortfolioAnalyzer() -> Element {
-    let mut assets = use_signal(|| vec![
-        Asset { id: 1, ticker: "AAPL".to_string(), weight: 0.4, expected_return: 0.12, volatility: 0.20 },
-        Asset { id: 2, ticker: "GOOGL".to_string(), weight: 0.3, expected_return: 0.10, volatility: 0.25 },
-        Asset { id: 3, ticker: "TSLA".to_string(), weight: 0.3, expected_return: 0.15, volatility: 0.40 },
-    ]);
+    let mut assets = use_signal(|| {
+        vec![
+            Asset {
+                id: 1,
+                ticker: "AAPL".to_string(),
+                weight: 0.4,
+                expected_return: 0.12,
+                volatility: 0.20,
+            },
+            Asset {
+                id: 2,
+                ticker: "GOOGL".to_string(),
+                weight: 0.3,
+                expected_return: 0.10,
+                volatility: 0.25,
+            },
+            Asset {
+                id: 3,
+                ticker: "TSLA".to_string(),
+                weight: 0.3,
+                expected_return: 0.15,
+                volatility: 0.40,
+            },
+        ]
+    });
 
     let add_asset = move |_| {
         let mut list = assets.write();
         let new_id = list.iter().map(|a| a.id).max().unwrap_or(0) + 1;
-        list.push(Asset { id: new_id, ticker: "NEW".to_string(), weight: 0.0, expected_return: 0.0, volatility: 0.0 });
+        list.push(Asset {
+            id: new_id,
+            ticker: "NEW".to_string(),
+            weight: 0.0,
+            expected_return: 0.0,
+            volatility: 0.0,
+        });
     };
 
     let mut update_ticker = move |id: usize, val: String| {
@@ -52,11 +78,21 @@ pub fn PortfolioAnalyzer() -> Element {
     };
 
     let portfolio_return = use_memo(move || {
-        assets.read().clone().into_iter().map(|a| a.weight * a.expected_return).sum::<f64>()
+        assets
+            .read()
+            .clone()
+            .into_iter()
+            .map(|a| a.weight * a.expected_return)
+            .sum::<f64>()
     });
 
     let portfolio_volatility = use_memo(move || {
-        let var: f64 = assets.read().clone().into_iter().map(|a| (a.weight * a.volatility).powi(2)).sum();
+        let var: f64 = assets
+            .read()
+            .clone()
+            .into_iter()
+            .map(|a| (a.weight * a.volatility).powi(2))
+            .sum();
         var.sqrt()
     });
 
@@ -69,12 +105,12 @@ pub fn PortfolioAnalyzer() -> Element {
     rsx! {
         div {
             style: "flex: 1; padding: 2.5rem; background: linear-gradient(135deg, #0f172a, #1e293b); border-radius: 16px; color: #f8fafc; font-family: 'Inter', system-ui, sans-serif; box-shadow: 0 20px 40px rgba(0,0,0,0.4); display: flex; flex-direction: column; gap: 2rem; overflow-y: auto;",
-            
+
             div {
                 style: "display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 1rem;",
-                h2 { 
-                    style: "margin: 0; font-size: 2.5rem; font-weight: 800; background: linear-gradient(to right, #38bdf8, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent;", 
-                    "Portfolio Analyzer" 
+                h2 {
+                    style: "margin: 0; font-size: 2.5rem; font-weight: 800; background: linear-gradient(to right, #38bdf8, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent;",
+                    "Portfolio Analyzer"
                 }
                 div {
                     style: "display: flex; gap: 1rem; align-items: center;",
@@ -88,7 +124,7 @@ pub fn PortfolioAnalyzer() -> Element {
 
             div {
                 style: "display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;",
-                
+
                 div {
                     style: "background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; padding: 1.5rem; display: flex; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(10px); transition: transform 0.2s; cursor: default;",
                     span { style: "color: #94a3b8; font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem;", "Expected Return" }

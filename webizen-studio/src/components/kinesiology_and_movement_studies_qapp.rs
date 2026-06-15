@@ -10,48 +10,67 @@ pub fn KinesiologyAndMovementStudiesQapp() -> Element {
     let mut vo2_max = use_signal(|| 45.0f64);
     let mut notes = use_signal(|| String::new());
 
-    let domains = ["Exercise Physiology", "Biomechanics", "Motor Learning", "Sport Psychology", "Physical Education", "Athletic Training", "Adapted Physical Activity"];
-    let movement_types = ["Locomotion", "Throwing", "Jumping", "Swimming", "Cycling", "Gymnastics", "Balance", "Manual Skill"];
-    let joints = ["Hip", "Knee", "Ankle", "Shoulder", "Elbow", "Wrist", "Spine"];
+    let domains = [
+        "Exercise Physiology",
+        "Biomechanics",
+        "Motor Learning",
+        "Sport Psychology",
+        "Physical Education",
+        "Athletic Training",
+        "Adapted Physical Activity",
+    ];
+    let movement_types = [
+        "Locomotion",
+        "Throwing",
+        "Jumping",
+        "Swimming",
+        "Cycling",
+        "Gymnastics",
+        "Balance",
+        "Manual Skill",
+    ];
+    let joints = [
+        "Hip", "Knee", "Ankle", "Shoulder", "Elbow", "Wrist", "Spine",
+    ];
 
     rsx! {
         div {
-            style: "padding: 20px; background: #1e1e2e; color: #cdd6f4; border-radius: 12px; font-family: monospace; display: flex; flex-direction: column; gap: 16px; height: 100%; box-sizing: border-box;",
-            h2 { style: "margin: 0; color: #fab387; border-bottom: 1px solid #313244; padding-bottom: 8px;", "Kinesiology & Movement Studies" }
+            style: "padding: 20px; background: var(--qualia-surface); color: var(--qualia-text); border-radius: 12px; font-family: monospace; display: flex; flex-direction: column; gap: 16px; height: 100%; box-sizing: border-box;",
+            h2 { style: "margin: 0; color: var(--qualia-accent); border-bottom: 1px solid var(--qualia-border); padding-bottom: 8px;", "Kinesiology & Movement Studies" }
 
             div {
                 style: "display: grid; grid-template-columns: 1fr 1fr; gap: 12px;",
                 div {
-                    label { style: "font-size: 0.8rem; color: #a6adc8;", "Domain" }
+                    label { style: "font-size: 0.8rem; color: var(--qualia-text-muted);", "Domain" }
                     select {
                         value: "{domain}",
                         onchange: move |e| domain.set(e.value()),
-                        style: "width: 100%; padding: 8px; background: #181825; border: 1px solid #45475a; color: #cdd6f4; border-radius: 4px; margin-top: 4px; box-sizing: border-box;",
+                        style: "width: 100%; padding: 8px; background: var(--qualia-bg); border: 1px solid var(--qualia-border); color: var(--qualia-text); border-radius: 4px; margin-top: 4px; box-sizing: border-box;",
                         for x in domains { option { value: "{x}", "{x}" } }
                     }
                 }
                 div {
-                    label { style: "font-size: 0.8rem; color: #a6adc8;", "Movement Type" }
+                    label { style: "font-size: 0.8rem; color: var(--qualia-text-muted);", "Movement Type" }
                     select {
                         value: "{movement_type}",
                         onchange: move |e| movement_type.set(e.value()),
-                        style: "width: 100%; padding: 8px; background: #181825; border: 1px solid #45475a; color: #cdd6f4; border-radius: 4px; margin-top: 4px; box-sizing: border-box;",
+                        style: "width: 100%; padding: 8px; background: var(--qualia-bg); border: 1px solid var(--qualia-border); color: var(--qualia-text); border-radius: 4px; margin-top: 4px; box-sizing: border-box;",
                         for x in movement_types { option { value: "{x}", "{x}" } }
                     }
                 }
                 div {
-                    label { style: "font-size: 0.8rem; color: #a6adc8;", "Joint Focus" }
+                    label { style: "font-size: 0.8rem; color: var(--qualia-text-muted);", "Joint Focus" }
                     select {
                         value: "{joint_focus}",
                         onchange: move |e| joint_focus.set(e.value()),
-                        style: "width: 100%; padding: 8px; background: #181825; border: 1px solid #45475a; color: #cdd6f4; border-radius: 4px; margin-top: 4px; box-sizing: border-box;",
+                        style: "width: 100%; padding: 8px; background: var(--qualia-bg); border: 1px solid var(--qualia-border); color: var(--qualia-text); border-radius: 4px; margin-top: 4px; box-sizing: border-box;",
                         for x in joints { option { value: "{x}", "{x}" } }
                     }
                 }
             }
 
             div {
-                label { style: "font-size: 0.8rem; color: #a6adc8;", "Force (N): {force_n:.0}" }
+                label { style: "font-size: 0.8rem; color: var(--qualia-text-muted);", "Force (N): {force_n:.0}" }
                 input {
                     r#type: "range",
                     min: "0",
@@ -64,7 +83,7 @@ pub fn KinesiologyAndMovementStudiesQapp() -> Element {
             }
 
             div {
-                label { style: "font-size: 0.8rem; color: #a6adc8;", "VO₂ Max (ml/kg/min): {vo2_max:.1}" }
+                label { style: "font-size: 0.8rem; color: var(--qualia-text-muted);", "VO₂ Max (ml/kg/min): {vo2_max:.1}" }
                 input {
                     r#type: "range",
                     min: "20",
@@ -78,18 +97,18 @@ pub fn KinesiologyAndMovementStudiesQapp() -> Element {
 
             div {
                 style: "flex: 1; display: flex; flex-direction: column;",
-                label { style: "font-size: 0.8rem; color: #a6adc8;", "Notes" }
+                label { style: "font-size: 0.8rem; color: var(--qualia-text-muted);", "Notes" }
                 textarea {
                     value: "{notes}",
                     oninput: move |e| notes.set(e.value()),
-                    style: "flex: 1; width: 100%; padding: 8px; background: #181825; border: 1px solid #45475a; color: #cdd6f4; border-radius: 4px; margin-top: 4px; resize: none; box-sizing: border-box; min-height: 80px;"
+                    style: "flex: 1; width: 100%; padding: 8px; background: var(--qualia-bg); border: 1px solid var(--qualia-border); color: var(--qualia-text); border-radius: 4px; margin-top: 4px; resize: none; box-sizing: border-box; min-height: 80px;"
                 }
             }
 
             div {
-                style: "background: #11111b; padding: 12px 16px; border-radius: 8px; border-left: 4px solid #fab387;",
-                span { style: "font-size: 0.8rem; color: #a6adc8;", "{domain} | {movement_type} | {joint_focus} | F:{force_n:.0}N | VO₂max:{vo2_max:.0}" }
-                div { style: "font-size: 0.75rem; color: #585b70; margin-top: 6px;", "QualiaDB → biomechanics engine | force analysis sieve | movement anchor" }
+                style: "background: var(--qualia-bg); padding: 12px 16px; border-radius: 8px; border-left: 4px solid var(--qualia-accent);",
+                span { style: "font-size: 0.8rem; color: var(--qualia-text-muted);", "{domain} | {movement_type} | {joint_focus} | F:{force_n:.0}N | VO₂max:{vo2_max:.0}" }
+                div { style: "font-size: 0.75rem; color: var(--qualia-text-muted); margin-top: 6px;", "QualiaDB → biomechanics engine | force analysis sieve | movement anchor" }
             }
         }
     }

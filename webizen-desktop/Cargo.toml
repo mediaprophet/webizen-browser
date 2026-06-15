@@ -33,6 +33,7 @@ ed25519-dalek = { version = "2.0.0", features = ["rand_core"] }
 hex = "0.4.3"
 uuid = { version = "1.10", features = ["v4"] }
 urlencoding = "2.1"
+chrono = "0.4"
 crossbeam-channel = "0.5.15"
 pollster = "0.4.0"
 

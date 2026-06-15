@@ -12,59 +12,77 @@ pub fn ArtConservationQapp() -> Element {
     let mut notes = use_signal(|| String::new());
 
     let object_types = [
-        "Panel Painting", "Canvas Painting", "Works on Paper", "Textile",
-        "Ceramics", "Glass", "Metal", "Stone", "Organic Material",
-        "Photographic", "Born-Digital",
+        "Panel Painting",
+        "Canvas Painting",
+        "Works on Paper",
+        "Textile",
+        "Ceramics",
+        "Glass",
+        "Metal",
+        "Stone",
+        "Organic Material",
+        "Photographic",
+        "Born-Digital",
     ];
     let conditions = ["Excellent", "Good", "Fair", "Poor", "Critical"];
     let treatments = [
-        "Preventive Conservation", "Consolidation", "Cleaning", "Inpainting",
-        "Structural Repair", "Environmental Control", "Digital Preservation",
+        "Preventive Conservation",
+        "Consolidation",
+        "Cleaning",
+        "Inpainting",
+        "Structural Repair",
+        "Environmental Control",
+        "Digital Preservation",
     ];
     let dating_methods = [
-        "XRF", "UV", "IR Reflectography", "Carbon-14", "Dendrochronology", "Stylistic",
+        "XRF",
+        "UV",
+        "IR Reflectography",
+        "Carbon-14",
+        "Dendrochronology",
+        "Stylistic",
     ];
 
     rsx! {
         div {
-            style: "padding: 20px; background: #1e1e2e; color: #cdd6f4; border-radius: 12px; font-family: monospace; display: flex; flex-direction: column; gap: 16px; height: 100%; box-sizing: border-box;",
-            h2 { style: "margin: 0; color: #f9e2af; border-bottom: 1px solid #313244; padding-bottom: 8px;", "Art Conservation" }
+            style: "padding: 20px; background: var(--qualia-surface); color: var(--qualia-text); border-radius: 12px; font-family: monospace; display: flex; flex-direction: column; gap: 16px; height: 100%; box-sizing: border-box;",
+            h2 { style: "margin: 0; color: var(--qualia-accent); border-bottom: 1px solid var(--qualia-border); padding-bottom: 8px;", "Art Conservation" }
 
             div {
                 style: "display: grid; grid-template-columns: 1fr 1fr; gap: 12px;",
                 div {
-                    label { style: "font-size: 0.8rem; color: #a6adc8;", "Object Type" }
+                    label { style: "font-size: 0.8rem; color: var(--qualia-text-muted);", "Object Type" }
                     select {
                         value: "{object_type}",
                         onchange: move |e| object_type.set(e.value()),
-                        style: "width: 100%; padding: 8px; background: #181825; border: 1px solid #45475a; color: #cdd6f4; border-radius: 4px; margin-top: 4px; box-sizing: border-box;",
+                        style: "width: 100%; padding: 8px; background: var(--qualia-bg); border: 1px solid var(--qualia-border); color: var(--qualia-text); border-radius: 4px; margin-top: 4px; box-sizing: border-box;",
                         for x in object_types { option { value: "{x}", "{x}" } }
                     }
                 }
                 div {
-                    label { style: "font-size: 0.8rem; color: #a6adc8;", "Condition Assessment" }
+                    label { style: "font-size: 0.8rem; color: var(--qualia-text-muted);", "Condition Assessment" }
                     select {
                         value: "{condition_assessment}",
                         onchange: move |e| condition_assessment.set(e.value()),
-                        style: "width: 100%; padding: 8px; background: #181825; border: 1px solid #45475a; color: #cdd6f4; border-radius: 4px; margin-top: 4px; box-sizing: border-box;",
+                        style: "width: 100%; padding: 8px; background: var(--qualia-bg); border: 1px solid var(--qualia-border); color: var(--qualia-text); border-radius: 4px; margin-top: 4px; box-sizing: border-box;",
                         for x in conditions { option { value: "{x}", "{x}" } }
                     }
                 }
                 div {
-                    label { style: "font-size: 0.8rem; color: #a6adc8;", "Treatment Approach" }
+                    label { style: "font-size: 0.8rem; color: var(--qualia-text-muted);", "Treatment Approach" }
                     select {
                         value: "{treatment_approach}",
                         onchange: move |e| treatment_approach.set(e.value()),
-                        style: "width: 100%; padding: 8px; background: #181825; border: 1px solid #45475a; color: #cdd6f4; border-radius: 4px; margin-top: 4px; box-sizing: border-box;",
+                        style: "width: 100%; padding: 8px; background: var(--qualia-bg); border: 1px solid var(--qualia-border); color: var(--qualia-text); border-radius: 4px; margin-top: 4px; box-sizing: border-box;",
                         for x in treatments { option { value: "{x}", "{x}" } }
                     }
                 }
                 div {
-                    label { style: "font-size: 0.8rem; color: #a6adc8;", "Dating Method" }
+                    label { style: "font-size: 0.8rem; color: var(--qualia-text-muted);", "Dating Method" }
                     select {
                         value: "{dating_method}",
                         onchange: move |e| dating_method.set(e.value()),
-                        style: "width: 100%; padding: 8px; background: #181825; border: 1px solid #45475a; color: #cdd6f4; border-radius: 4px; margin-top: 4px; box-sizing: border-box;",
+                        style: "width: 100%; padding: 8px; background: var(--qualia-bg); border: 1px solid var(--qualia-border); color: var(--qualia-text); border-radius: 4px; margin-top: 4px; box-sizing: border-box;",
                         for x in dating_methods { option { value: "{x}", "{x}" } }
                     }
                 }
@@ -73,7 +91,7 @@ pub fn ArtConservationQapp() -> Element {
             div {
                 style: "display: grid; grid-template-columns: 1fr 1fr; gap: 12px;",
                 div {
-                    label { style: "font-size: 0.8rem; color: #a6adc8;", "RH % (30–70): {environmental_rh_pct:.0}" }
+                    label { style: "font-size: 0.8rem; color: var(--qualia-text-muted);", "RH % (30–70): {environmental_rh_pct:.0}" }
                     input {
                         r#type: "range",
                         min: "30",
@@ -85,19 +103,19 @@ pub fn ArtConservationQapp() -> Element {
                     }
                 }
                 div {
-                    label { style: "font-size: 0.8rem; color: #a6adc8;", "Temperature °C: {temperature_c:.1}" }
+                    label { style: "font-size: 0.8rem; color: var(--qualia-text-muted);", "Temperature °C: {temperature_c:.1}" }
                     input {
                         r#type: "number",
                         step: "0.5",
                         value: "{temperature_c}",
                         oninput: move |e| temperature_c.set(e.value().parse().unwrap_or(18.0)),
-                        style: "width: 100%; padding: 8px; background: #181825; border: 1px solid #45475a; color: #cdd6f4; border-radius: 4px; margin-top: 4px; box-sizing: border-box;"
+                        style: "width: 100%; padding: 8px; background: var(--qualia-bg); border: 1px solid var(--qualia-border); color: var(--qualia-text); border-radius: 4px; margin-top: 4px; box-sizing: border-box;"
                     }
                 }
             }
 
             div {
-                label { style: "font-size: 0.8rem; color: #a6adc8;", "Provenance Confidence (0–100): {provenance_confidence}%" }
+                label { style: "font-size: 0.8rem; color: var(--qualia-text-muted);", "Provenance Confidence (0–100): {provenance_confidence}%" }
                 input {
                     r#type: "range",
                     min: "0",
@@ -110,18 +128,18 @@ pub fn ArtConservationQapp() -> Element {
 
             div {
                 style: "flex: 1; display: flex; flex-direction: column;",
-                label { style: "font-size: 0.8rem; color: #a6adc8;", "Notes" }
+                label { style: "font-size: 0.8rem; color: var(--qualia-text-muted);", "Notes" }
                 textarea {
                     value: "{notes}",
                     oninput: move |e| notes.set(e.value()),
-                    style: "flex: 1; width: 100%; padding: 8px; background: #181825; border: 1px solid #45475a; color: #cdd6f4; border-radius: 4px; margin-top: 4px; resize: none; box-sizing: border-box; min-height: 50px;"
+                    style: "flex: 1; width: 100%; padding: 8px; background: var(--qualia-bg); border: 1px solid var(--qualia-border); color: var(--qualia-text); border-radius: 4px; margin-top: 4px; resize: none; box-sizing: border-box; min-height: 50px;"
                 }
             }
 
             div {
-                style: "background: #11111b; padding: 12px 16px; border-radius: 8px; border-left: 4px solid #f9e2af;",
-                span { style: "font-size: 0.8rem; color: #a6adc8;", "{object_type} | {condition_assessment} | {treatment_approach} | RH={environmental_rh_pct:.0}% | Prov={provenance_confidence}%" }
-                div { style: "font-size: 0.75rem; color: #585b70; margin-top: 6px;", "QualiaDB → material analysis engine | provenance graph | environmental monitoring sieve" }
+                style: "background: var(--qualia-bg); padding: 12px 16px; border-radius: 8px; border-left: 4px solid var(--qualia-accent);",
+                span { style: "font-size: 0.8rem; color: var(--qualia-text-muted);", "{object_type} | {condition_assessment} | {treatment_approach} | RH={environmental_rh_pct:.0}% | Prov={provenance_confidence}%" }
+                div { style: "font-size: 0.75rem; color: var(--qualia-text-muted); margin-top: 6px;", "QualiaDB → material analysis engine | provenance graph | environmental monitoring sieve" }
             }
         }
     }

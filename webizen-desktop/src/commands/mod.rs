@@ -551,7 +551,7 @@ pub fn save_qlink(url: String, title: String, context_assertions: Option<Vec<ser
         "@type": "Bookmark",
         "url": url,
         "name": title,
-        "dateCreated": "2026-06-13T00:00:00Z"
+        "dateCreated": chrono::Utc::now().to_rfc3339()
     });
 
     if let Some(assertions) = context_assertions {
@@ -576,6 +576,84 @@ pub fn compute_context_hash(url: String) -> serde_json::Value {
         "url": url,
         "context_hash": context_hash,
         "context_hash_hex": format!("{:016x}", context_hash),
+    })
+}
+
+// ── QApp ↔ QualiaDB analysis contract ───────────────────────────────────────────
+// Mirrors `webizen-studio/src/components/qapp_engine.rs`. The discipline QApps call
+// this via `invoke("qapp_analyze", { request })` when running in the desktop webview;
+// the plain-browser demo uses the studio-side deterministic stub instead.
+
+#[derive(Debug, Clone, serde::Deserialize)]
+pub struct QappAnalysisRequest {
+    pub discipline: String,
+    pub fields: Vec<(String, String)>,
+    pub notes: String,
+}
+
+#[derive(Debug, Clone, serde::Serialize)]
+pub struct QappAnalysisResult {
+    pub summary: String,
+    pub assertions: Vec<String>,
+    pub provenance_hash: String,
+    pub engine: String,
+}
+
+fn qapp_slug(s: &str) -> String {
+    let mut out = String::with_capacity(s.len());
+    for ch in s.chars() {
+        if ch.is_ascii_alphanumeric() {
+            out.push(ch.to_ascii_lowercase());
+        } else if !out.ends_with('_') {
+            out.push('_');
+        }
+    }
+    out.trim_matches('_').to_string()
+}
+
+#[command]
+pub fn qapp_analyze(request: QappAnalysisRequest) -> Result<QappAnalysisResult, String> {
+    // Build a canonical encoding of the request and derive a real provenance
+    // stamp from the QualiaDB engine's q_hash.
+    let mut canonical = String::new();
+    canonical.push_str(&request.discipline);
+
+    let mut assertions = Vec::new();
+    for (key, value) in &request.fields {
+        if value.trim().is_empty() {
+            continue;
+        }
+        canonical.push('|');
+        canonical.push_str(key);
+        canonical.push('=');
+        canonical.push_str(value);
+        assertions.push(format!(
+            "{} :{} \"{}\" .",
+            request.discipline,
+            qapp_slug(key),
+            value
+        ));
+    }
+    if !request.notes.trim().is_empty() {
+        canonical.push_str("|notes=");
+        canonical.push_str(request.notes.trim());
+        assertions.push(format!(
+            "{} :hasNote \"{}\" .",
+            request.discipline,
+            request.notes.trim()
+        ));
+    }
+
+    let hash = qualia_core_db::q_hash(&canonical);
+    Ok(QappAnalysisResult {
+        summary: format!(
+            "{} analysis derived {} assertion(s) with a QualiaDB provenance stamp.",
+            request.discipline,
+            assertions.len()
+        ),
+        assertions,
+        provenance_hash: format!("q42:{:016x}", hash),
+        engine: "qualia-core-db".to_string(),
     })
 }
 
@@ -739,6 +817,7 @@ pub fn get_invoke_handler() -> impl Fn(tauri::Invoke) {
         apply_semantic_handshake,
         save_qlink,
         compute_context_hash,
+        qapp_analyze,
         get_latest_diffusion_snapshot,
         reconfigure_diffusion,
         get_diffusion_frame_rgba,

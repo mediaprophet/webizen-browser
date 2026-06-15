@@ -1,10 +1,17 @@
 use dioxus::prelude::*;
 
-struct Lcg { state: u64 }
+struct Lcg {
+    state: u64,
+}
 impl Lcg {
-    fn new(seed: u64) -> Self { Self { state: seed } }
+    fn new(seed: u64) -> Self {
+        Self { state: seed }
+    }
     fn next_f64(&mut self) -> f64 {
-        self.state = self.state.wrapping_mul(6364136223846793005).wrapping_add(1442695040888963407);
+        self.state = self
+            .state
+            .wrapping_mul(6364136223846793005)
+            .wrapping_add(1442695040888963407);
         let res = (self.state >> 11) as f64 * (1.0 / (1u64 << 53) as f64);
         if res == 0.0 { 0.000001 } else { res }
     }
@@ -32,17 +39,19 @@ pub fn GbmSimulator() -> Element {
         let paths_val = num_paths().min(100);
         let steps = 100;
         let dt = t_val / steps as f64;
-        
+
         let mut rng = Lcg::new(seed());
         let mut all_paths = Vec::new();
-        
+
         for _ in 0..paths_val {
             let mut path = Vec::with_capacity(steps + 1);
             path.push(s0_val);
             let mut current_s = s0_val;
             for _ in 0..steps {
                 let z = rng.next_normal();
-                current_s = current_s * ((mu_val - 0.5 * sigma_val * sigma_val) * dt + sigma_val * dt.sqrt() * z).exp();
+                current_s = current_s
+                    * ((mu_val - 0.5 * sigma_val * sigma_val) * dt + sigma_val * dt.sqrt() * z)
+                        .exp();
                 path.push(current_s);
             }
             all_paths.push(path);
@@ -56,35 +65,52 @@ pub fn GbmSimulator() -> Element {
         let mut max = s0();
         for path in p.iter() {
             for &val in path.iter() {
-                if val < min { min = val; }
-                if val > max { max = val; }
+                if val < min {
+                    min = val;
+                }
+                if val > max {
+                    max = val;
+                }
             }
         }
         let diff = max - min;
-        if diff == 0.0 { (min * 0.9, max * 1.1) } else { (min - diff * 0.1, max + diff * 0.1) }
+        if diff == 0.0 {
+            (min * 0.9, max * 1.1)
+        } else {
+            (min - diff * 0.1, max + diff * 0.1)
+        }
     });
 
-    let svg_paths = paths().iter().enumerate().map(|(idx, path)| {
-        let min = min_max().0;
-        let max = min_max().1;
-        let range = max - min;
-        let pts = path.iter().enumerate().map(|(i, &v)| {
-            let x = (i as f64 / 100.0) * 1000.0;
-            let y = 400.0 - ((v - min) / range) * 400.0;
-            format!("{},{}", x, y)
-        }).collect::<Vec<_>>().join(" ");
-        (idx, pts)
-    }).collect::<Vec<_>>();
+    let svg_paths = paths()
+        .iter()
+        .enumerate()
+        .map(|(idx, path)| {
+            let min = min_max().0;
+            let max = min_max().1;
+            let range = max - min;
+            let pts = path
+                .iter()
+                .enumerate()
+                .map(|(i, &v)| {
+                    let x = (i as f64 / 100.0) * 1000.0;
+                    let y = 400.0 - ((v - min) / range) * 400.0;
+                    format!("{},{}", x, y)
+                })
+                .collect::<Vec<_>>()
+                .join(" ");
+            (idx, pts)
+        })
+        .collect::<Vec<_>>();
 
     rsx! {
         div {
             style: "flex: 1; padding: 2.5rem; background: linear-gradient(135deg, #1e1b4b, #312e81); border-radius: 16px; color: #e0e7ff; font-family: 'Inter', system-ui, sans-serif; box-shadow: 0 20px 40px rgba(0,0,0,0.5); display: flex; flex-direction: column; gap: 2rem; overflow-y: auto;",
-            
+
             div {
                 style: "display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 1rem;",
-                h2 { 
-                    style: "margin: 0; font-size: 2.5rem; font-weight: 800; background: linear-gradient(to right, #818cf8, #c084fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent;", 
-                    "Geometric Brownian Motion" 
+                h2 {
+                    style: "margin: 0; font-size: 2.5rem; font-weight: 800; background: linear-gradient(to right, #818cf8, #c084fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent;",
+                    "Geometric Brownian Motion"
                 }
                 button {
                     onclick: move |_| seed.set(seed() + 1),
@@ -95,7 +121,7 @@ pub fn GbmSimulator() -> Element {
 
             div {
                 style: "display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1.5rem;",
-                
+
                 div {
                     style: "background: rgba(0,0,0,0.2); padding: 1.2rem; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);",
                     label { style: "display: block; font-size: 0.8rem; color: #a5b4fc; text-transform: uppercase; margin-bottom: 0.5rem; letter-spacing: 0.05em;", "Initial Price (S0)" }
@@ -152,7 +178,7 @@ pub fn GbmSimulator() -> Element {
                 style: "background: rgba(0,0,0,0.3); border-radius: 16px; padding: 1.5rem; border: 1px solid rgba(255,255,255,0.05); height: 400px; position: relative; overflow: hidden; box-shadow: inset 0 4px 20px rgba(0,0,0,0.4);",
                 svg {
                     width: "100%", height: "100%", preserve_aspect_ratio: "none", view_box: "0 0 1000 400",
-                    
+
                     // Grid lines
                     for i in 0..5 {
                         line {
@@ -172,7 +198,7 @@ pub fn GbmSimulator() -> Element {
                         }
                     }
                 }
-                
+
                 // Labels
                 div { style: "position: absolute; top: 1.5rem; left: 2rem; color: #a5b4fc; font-size: 0.9rem; font-weight: bold; background: rgba(0,0,0,0.5); padding: 0.2rem 0.5rem; border-radius: 4px;", "${min_max().1:.2}" }
                 div { style: "position: absolute; bottom: 1.5rem; left: 2rem; color: #a5b4fc; font-size: 0.9rem; font-weight: bold; background: rgba(0,0,0,0.5); padding: 0.2rem 0.5rem; border-radius: 4px;", "${min_max().0:.2}" }

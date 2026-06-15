@@ -11,13 +11,13 @@ pub fn PeaceAndConflictStudiesQapp() -> Element {
 
     rsx! {
         div {
-            style: "padding: 20px; background: #1e1e2e; color: #cdd6f4; border-radius: 12px; font-family: monospace; display: flex; flex-direction: column; gap: 16px; height: 100%; box-sizing: border-box; overflow-y: auto;",
-            h2 { style: "margin: 0; color: #f38ba8; border-bottom: 1px solid #313244; padding-bottom: 8px;", "Peace & Conflict Studies QApp" }
+            style: "padding: 20px; background: var(--qualia-surface); color: var(--qualia-text); border-radius: 12px; font-family: monospace; display: flex; flex-direction: column; gap: 16px; height: 100%; box-sizing: border-box; overflow-y: auto;",
+            h2 { style: "margin: 0; color: var(--qualia-accent); border-bottom: 1px solid var(--qualia-border); padding-bottom: 8px;", "Peace & Conflict Studies QApp" }
 
             div { style: "display: flex; flex-direction: column; gap: 8px;",
-                label { style: "font-size: 0.85rem; color: #a6adc8;", "Conflict Type" }
+                label { style: "font-size: 0.85rem; color: var(--qualia-text-muted);", "Conflict Type" }
                 select {
-                    style: "background: #313244; color: #cdd6f4; border: 1px solid #45475a; border-radius: 6px; padding: 6px 8px; font-family: monospace; width: 100%; box-sizing: border-box;",
+                    style: "background: var(--qualia-border); color: var(--qualia-text); border: 1px solid var(--qualia-border); border-radius: 6px; padding: 6px 8px; font-family: monospace; width: 100%; box-sizing: border-box;",
                     onchange: move |e| conflict_type.set(e.value()),
                     option { "Interstate War" }
                     option { selected: true, "Civil War" }
@@ -31,9 +31,9 @@ pub fn PeaceAndConflictStudiesQapp() -> Element {
             }
 
             div { style: "display: flex; flex-direction: column; gap: 8px;",
-                label { style: "font-size: 0.85rem; color: #a6adc8;", "Peace Type" }
+                label { style: "font-size: 0.85rem; color: var(--qualia-text-muted);", "Peace Type" }
                 select {
-                    style: "background: #313244; color: #cdd6f4; border: 1px solid #45475a; border-radius: 6px; padding: 6px 8px; font-family: monospace; width: 100%; box-sizing: border-box;",
+                    style: "background: var(--qualia-border); color: var(--qualia-text); border: 1px solid var(--qualia-border); border-radius: 6px; padding: 6px 8px; font-family: monospace; width: 100%; box-sizing: border-box;",
                     onchange: move |e| peace_type.set(e.value()),
                     option { "Negative Peace" }
                     option { selected: true, "Positive Peace" }
@@ -44,9 +44,9 @@ pub fn PeaceAndConflictStudiesQapp() -> Element {
             }
 
             div { style: "display: flex; flex-direction: column; gap: 8px;",
-                label { style: "font-size: 0.85rem; color: #a6adc8;", "Actors" }
+                label { style: "font-size: 0.85rem; color: var(--qualia-text-muted);", "Actors" }
                 select {
-                    style: "background: #313244; color: #cdd6f4; border: 1px solid #45475a; border-radius: 6px; padding: 6px 8px; font-family: monospace; width: 100%; box-sizing: border-box;",
+                    style: "background: var(--qualia-border); color: var(--qualia-text); border: 1px solid var(--qualia-border); border-radius: 6px; padding: 6px 8px; font-family: monospace; width: 100%; box-sizing: border-box;",
                     onchange: move |e| actors.set(e.value()),
                     option { "State vs State" }
                     option { selected: true, "State vs Non-State" }
@@ -56,22 +56,22 @@ pub fn PeaceAndConflictStudiesQapp() -> Element {
             }
 
             div { style: "display: flex; flex-direction: column; gap: 8px;",
-                label { style: "font-size: 0.85rem; color: #a6adc8;", "Conflict Intensity (0-5): {conflict_intensity()}" }
+                label { style: "font-size: 0.85rem; color: var(--qualia-text-muted);", "Conflict Intensity (0-5): {conflict_intensity()}" }
                 input {
                     r#type: "range",
                     min: "0",
                     max: "5",
                     step: "1",
                     value: "{conflict_intensity()}",
-                    style: "width: 100%; box-sizing: border-box; accent-color: if conflict_intensity() > 3 { \"#f38ba8\" } else { \"#a6e3a1\" };",
+                    style: "width: 100%; box-sizing: border-box; accent-color: if conflict_intensity() > 3 { \"var(--qualia-accent)\" } else { \"var(--qualia-accent)\" };",
                     oninput: move |e| conflict_intensity.set(e.value().parse().unwrap_or(3)),
                 }
             }
 
             div { style: "display: flex; flex-direction: column; gap: 8px;",
-                label { style: "font-size: 0.85rem; color: #a6adc8;", "Mediation Mechanism" }
+                label { style: "font-size: 0.85rem; color: var(--qualia-text-muted);", "Mediation Mechanism" }
                 select {
-                    style: "background: #313244; color: #cdd6f4; border: 1px solid #45475a; border-radius: 6px; padding: 6px 8px; font-family: monospace; width: 100%; box-sizing: border-box;",
+                    style: "background: var(--qualia-border); color: var(--qualia-text); border: 1px solid var(--qualia-border); border-radius: 6px; padding: 6px 8px; font-family: monospace; width: 100%; box-sizing: border-box;",
                     onchange: move |e| mediation_mechanism.set(e.value()),
                     option { selected: true, "UN Peacekeeping" }
                     option { "Regional Organisation" }
@@ -83,24 +83,24 @@ pub fn PeaceAndConflictStudiesQapp() -> Element {
             }
 
             div { style: "display: flex; flex-direction: column; gap: 8px;",
-                label { style: "font-size: 0.85rem; color: #a6adc8;", "Notes" }
+                label { style: "font-size: 0.85rem; color: var(--qualia-text-muted);", "Notes" }
                 textarea {
-                    style: "background: #313244; color: #cdd6f4; border: 1px solid #45475a; border-radius: 6px; padding: 6px 8px; font-family: monospace; width: 100%; box-sizing: border-box; min-height: 60px; resize: vertical;",
+                    style: "background: var(--qualia-border); color: var(--qualia-text); border: 1px solid var(--qualia-border); border-radius: 6px; padding: 6px 8px; font-family: monospace; width: 100%; box-sizing: border-box; min-height: 60px; resize: vertical;",
                     placeholder: "Research notes...",
                     oninput: move |e| notes.set(e.value()),
                 }
             }
 
             div {
-                style: "background: #11111b; padding: 16px; border-radius: 8px; border-left: 4px solid #f38ba8; flex: 1;",
-                h3 { style: "margin-top: 0; color: #f38ba8; font-size: 0.9rem;", "QualiaDB Output" }
-                div { style: "font-size: 0.8rem; color: #a6adc8; display: flex; flex-direction: column; gap: 4px;",
+                style: "background: var(--qualia-bg); padding: 16px; border-radius: 8px; border-left: 4px solid var(--qualia-accent); flex: 1;",
+                h3 { style: "margin-top: 0; color: var(--qualia-accent); font-size: 0.9rem;", "QualiaDB Output" }
+                div { style: "font-size: 0.8rem; color: var(--qualia-text-muted); display: flex; flex-direction: column; gap: 4px;",
                     div { "Conflict: {conflict_type()}" }
                     div { "Peace Model: {peace_type()}" }
                     div { "Mechanism: {mediation_mechanism()}" }
-                    div { style: "color: if conflict_intensity() > 3 { \"#f38ba8\" } else { \"#a6e3a1\" };", "Intensity: {conflict_intensity()}/5" }
+                    div { style: "color: if conflict_intensity() > 3 { \"var(--qualia-accent)\" } else { \"var(--qualia-accent)\" };", "Intensity: {conflict_intensity()}/5" }
                 }
-                div { style: "font-size: 0.75rem; color: #585b70; margin-top: 8px;", "QualiaDB → deontic logic | Allen Interval | graph theory conflict network" }
+                div { style: "font-size: 0.75rem; color: var(--qualia-text-muted); margin-top: 8px;", "QualiaDB → deontic logic | Allen Interval | graph theory conflict network" }
             }
         }
     }

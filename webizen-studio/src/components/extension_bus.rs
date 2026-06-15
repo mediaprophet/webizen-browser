@@ -2,11 +2,13 @@ use dioxus::prelude::*;
 
 #[component]
 pub fn ExtensionBus() -> Element {
-    let mut extensions = use_signal(|| vec![
-        ("Python ML Bindings", "Running", "12.4 MB"),
-        ("React DevTools Protocol", "Idle", "1.2 MB"),
-        ("Custom Graph Visualizer", "Crashed", "0 MB"),
-    ]);
+    let mut extensions = use_signal(|| {
+        vec![
+            ("Python ML Bindings", "Running", "12.4 MB"),
+            ("React DevTools Protocol", "Idle", "1.2 MB"),
+            ("Custom Graph Visualizer", "Crashed", "0 MB"),
+        ]
+    });
 
     rsx! {
         div { style: "padding: 24px; background: #fff; color: #333; height: 100vh; font-family: sans-serif;",
@@ -17,7 +19,7 @@ pub fn ExtensionBus() -> Element {
                 for (i, (name, status, mem)) in extensions.read().iter().enumerate() {
                     div { style: "border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); position: relative; overflow: hidden;",
                         div { style: "position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: var(--qualia-surface);" }
-                        
+
                         h3 { style: "margin: 0 0 12px 0; font-size: 18px;", "{name}" }
                         div { style: "display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;",
                             span { style: "font-size: 14px; color: #64748b;", "Status: ", b { style: "color: #10b981;", "{status}" } }

@@ -6,13 +6,15 @@ pub fn N3LogicStudio() -> Element {
     let mut validation_msg = use_signal(|| String::new());
 
     let validate = move |_| {
-        validation_msg.set("Rule is valid. Forward-chaining semantics applied (Strict Modus Ponens).".to_string());
+        validation_msg.set(
+            "Rule is valid. Forward-chaining semantics applied (Strict Modus Ponens).".to_string(),
+        );
     };
 
     rsx! {
         div {
             style: "flex: 1; display: flex; flex-direction: column; gap: 1.5rem; padding: 2.5rem; background: rgba(20, 20, 30, 0.7); backdrop-filter: blur(16px); border: 1px solid rgba(200, 200, 255, 0.1); border-radius: 20px; color: var(--qualia-text); box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.5);",
-            
+
             div {
                 style: "display: flex; justify-content: space-between; align-items: center;",
                 h2 {
@@ -24,7 +26,7 @@ pub fn N3LogicStudio() -> Element {
                     "Tier-2 Modality Active"
                 }
             }
-            
+
             p { style: "color: #B0B0C0; font-size: 1.1rem; max-width: 600px;", "Define defeasible, strict, and linear rules directly manipulating the 48-byte Super-Quin evaluator." }
 
             div {

@@ -5,7 +5,7 @@ pub fn P2pDashboard() -> Element {
     rsx! {
         div { style: "padding: 30px; background-color: #121212; color: #e0e0e0; min-height: 100vh; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;",
             h1 { style: "color: #bb86fc; border-bottom: 2px solid #333; padding-bottom: 10px;", "P2P Network Topology" }
-            
+
             div { style: "display: flex; gap: 20px; margin-top: 20px;",
                 div { style: "flex: 1; background: #1e1e1e; padding: 20px; border-radius: 10px;",
                     h2 { style: "margin-top: 0; font-size: 18px; color: #03dac6;", "Node Identity" }
@@ -27,7 +27,7 @@ pub fn P2pDashboard() -> Element {
                     }
                 }
             }
-            
+
             div { style: "margin-top: 20px; background: #1e1e1e; padding: 20px; border-radius: 10px;",
                 h2 { style: "margin-top: 0; font-size: 18px; color: #03dac6;", "DHT Routing Table" }
                 div { style: "display: grid; grid-template-columns: repeat(16, 1fr); gap: 4px;",

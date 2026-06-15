@@ -3,7 +3,7 @@ use dioxus::prelude::*;
 #[component]
 pub fn ChemistryModeler() -> Element {
     let mut smiles = use_signal(|| "CCO".to_string());
-    
+
     rsx! {
         div {
             style: "padding: 20px; background: #1e1e2e; color: #cdd6f4; border-radius: 12px; font-family: monospace; display: flex; flex-direction: column; gap: 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); height: 100%;",

@@ -14,14 +14,14 @@ pub fn StatisticsQapp() -> Element {
 
     rsx! {
         div {
-            style: "padding: 20px; background: #1e1e2e; color: #cdd6f4; border-radius: 12px; font-family: monospace; display: flex; flex-direction: column; gap: 16px; height: 100%; box-sizing: border-box;",
-            h2 { style: "margin: 0; color: #89dceb; border-bottom: 1px solid #313244; padding-bottom: 8px;", "Statistics QApp" }
+            style: "padding: 20px; background: var(--qualia-surface); color: var(--qualia-text); border-radius: 12px; font-family: monospace; display: flex; flex-direction: column; gap: 16px; height: 100%; box-sizing: border-box;",
+            h2 { style: "margin: 0; color: var(--qualia-accent); border-bottom: 1px solid var(--qualia-border); padding-bottom: 8px;", "Statistics QApp" }
 
             div { style: "display: grid; grid-template-columns: 1fr 1fr; gap: 12px;",
                 div {
-                    label { style: "font-size: 0.8rem; color: #a6adc8;", "Statistical Paradigm" }
+                    label { style: "font-size: 0.8rem; color: var(--qualia-text-muted);", "Statistical Paradigm" }
                     select {
-                        style: "width: 100%; padding: 6px; background: #181825; border: 1px solid #45475a; color: #cdd6f4; border-radius: 4px; margin-top: 4px; box-sizing: border-box;",
+                        style: "width: 100%; padding: 6px; background: var(--qualia-bg); border: 1px solid var(--qualia-border); color: var(--qualia-text); border-radius: 4px; margin-top: 4px; box-sizing: border-box;",
                         onchange: move |e| paradigm.set(e.value()),
                         option { "Frequentist" }
                         option { "Bayesian" }
@@ -31,9 +31,9 @@ pub fn StatisticsQapp() -> Element {
                     }
                 }
                 div {
-                    label { style: "font-size: 0.8rem; color: #a6adc8;", "Test Type" }
+                    label { style: "font-size: 0.8rem; color: var(--qualia-text-muted);", "Test Type" }
                     select {
-                        style: "width: 100%; padding: 6px; background: #181825; border: 1px solid #45475a; color: #cdd6f4; border-radius: 4px; margin-top: 4px; box-sizing: border-box;",
+                        style: "width: 100%; padding: 6px; background: var(--qualia-bg); border: 1px solid var(--qualia-border); color: var(--qualia-text); border-radius: 4px; margin-top: 4px; box-sizing: border-box;",
                         onchange: move |e| test_type.set(e.value()),
                         option { "t-test" }
                         option { "ANOVA" }
@@ -50,9 +50,9 @@ pub fn StatisticsQapp() -> Element {
                     }
                 }
                 div {
-                    label { style: "font-size: 0.8rem; color: #a6adc8;", "Confidence Level" }
+                    label { style: "font-size: 0.8rem; color: var(--qualia-text-muted);", "Confidence Level" }
                     select {
-                        style: "width: 100%; padding: 6px; background: #181825; border: 1px solid #45475a; color: #cdd6f4; border-radius: 4px; margin-top: 4px; box-sizing: border-box;",
+                        style: "width: 100%; padding: 6px; background: var(--qualia-bg); border: 1px solid var(--qualia-border); color: var(--qualia-text); border-radius: 4px; margin-top: 4px; box-sizing: border-box;",
                         onchange: move |e| confidence_level.set(e.value()),
                         option { "90" }
                         option { "95" }
@@ -61,9 +61,9 @@ pub fn StatisticsQapp() -> Element {
                     }
                 }
                 div {
-                    label { style: "font-size: 0.8rem; color: #a6adc8;", "Distribution" }
+                    label { style: "font-size: 0.8rem; color: var(--qualia-text-muted);", "Distribution" }
                     select {
-                        style: "width: 100%; padding: 6px; background: #181825; border: 1px solid #45475a; color: #cdd6f4; border-radius: 4px; margin-top: 4px; box-sizing: border-box;",
+                        style: "width: 100%; padding: 6px; background: var(--qualia-bg); border: 1px solid var(--qualia-border); color: var(--qualia-text); border-radius: 4px; margin-top: 4px; box-sizing: border-box;",
                         onchange: move |e| distribution.set(e.value()),
                         option { "Normal" }
                         option { "Binomial" }
@@ -79,7 +79,7 @@ pub fn StatisticsQapp() -> Element {
                     }
                 }
                 div {
-                    label { style: "font-size: 0.8rem; color: #a6adc8;", "α (significance): {alpha:.3}" }
+                    label { style: "font-size: 0.8rem; color: var(--qualia-text-muted);", "α (significance): {alpha:.3}" }
                     input {
                         r#type: "range",
                         min: "0.001",
@@ -91,7 +91,7 @@ pub fn StatisticsQapp() -> Element {
                     }
                 }
                 div {
-                    label { style: "font-size: 0.8rem; color: #a6adc8;", "Power (1-β): {power:.2}" }
+                    label { style: "font-size: 0.8rem; color: var(--qualia-text-muted);", "Power (1-β): {power:.2}" }
                     input {
                         r#type: "range",
                         min: "0.50",
@@ -103,18 +103,18 @@ pub fn StatisticsQapp() -> Element {
                     }
                 }
                 div {
-                    label { style: "font-size: 0.8rem; color: #a6adc8;", "Sample N" }
+                    label { style: "font-size: 0.8rem; color: var(--qualia-text-muted);", "Sample N" }
                     input {
                         r#type: "number",
                         value: "{sample_n}",
                         min: "2",
                         step: "1",
-                        style: "width: 100%; padding: 6px; background: #181825; border: 1px solid #45475a; color: #cdd6f4; border-radius: 4px; margin-top: 4px; box-sizing: border-box;",
+                        style: "width: 100%; padding: 6px; background: var(--qualia-bg); border: 1px solid var(--qualia-border); color: var(--qualia-text); border-radius: 4px; margin-top: 4px; box-sizing: border-box;",
                         oninput: move |e| sample_n.set(e.value().parse().unwrap_or(100)),
                     }
                 }
                 div {
-                    label { style: "font-size: 0.8rem; color: #a6adc8;", "Effect Size (f / Cohen's d): {effect_size_f:.3}" }
+                    label { style: "font-size: 0.8rem; color: var(--qualia-text-muted);", "Effect Size (f / Cohen's d): {effect_size_f:.3}" }
                     input {
                         r#type: "range",
                         min: "0.0",
@@ -128,9 +128,9 @@ pub fn StatisticsQapp() -> Element {
             }
 
             div {
-                label { style: "font-size: 0.8rem; color: #a6adc8;", "Notes" }
+                label { style: "font-size: 0.8rem; color: var(--qualia-text-muted);", "Notes" }
                 textarea {
-                    style: "width: 100%; padding: 8px; background: #181825; border: 1px solid #45475a; color: #cdd6f4; border-radius: 4px; margin-top: 4px; min-height: 55px; box-sizing: border-box; resize: vertical;",
+                    style: "width: 100%; padding: 8px; background: var(--qualia-bg); border: 1px solid var(--qualia-border); color: var(--qualia-text); border-radius: 4px; margin-top: 4px; min-height: 55px; box-sizing: border-box; resize: vertical;",
                     placeholder: "Data description, assumptions, prior distributions, software used...",
                     oninput: move |e| notes.set(e.value()),
                     "{notes}"
@@ -138,23 +138,23 @@ pub fn StatisticsQapp() -> Element {
             }
 
             div {
-                style: "background: #11111b; padding: 16px; border-radius: 8px; border-left: 4px solid #89dceb; flex: 1;",
-                h3 { style: "margin-top: 0; color: #89dceb; font-size: 0.9rem;", "Output / Analysis" }
+                style: "background: var(--qualia-bg); padding: 16px; border-radius: 8px; border-left: 4px solid var(--qualia-accent); flex: 1;",
+                h3 { style: "margin-top: 0; color: var(--qualia-accent); font-size: 0.9rem;", "Output / Analysis" }
                 div { style: "display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 0.8rem;",
-                    div { style: "color: #a6adc8;", "Paradigm:" }
-                    div { style: "color: #cdd6f4;", "{paradigm}" }
-                    div { style: "color: #a6adc8;", "Test:" }
-                    div { style: "color: #cdd6f4;", "{test_type}" }
-                    div { style: "color: #a6adc8;", "α / Power:" }
-                    div { style: "color: #cdd6f4;", "{alpha:.3} / {power:.2}" }
-                    div { style: "color: #a6adc8;", "N:" }
-                    div { style: "color: #cdd6f4;", "{sample_n}" }
-                    div { style: "color: #a6adc8;", "Effect Size:" }
-                    div { style: "color: #cdd6f4;", "{effect_size_f:.3}" }
-                    div { style: "color: #a6adc8;", "CI / Distribution:" }
-                    div { style: "color: #cdd6f4;", "{confidence_level}% / {distribution}" }
+                    div { style: "color: var(--qualia-text-muted);", "Paradigm:" }
+                    div { style: "color: var(--qualia-text);", "{paradigm}" }
+                    div { style: "color: var(--qualia-text-muted);", "Test:" }
+                    div { style: "color: var(--qualia-text);", "{test_type}" }
+                    div { style: "color: var(--qualia-text-muted);", "α / Power:" }
+                    div { style: "color: var(--qualia-text);", "{alpha:.3} / {power:.2}" }
+                    div { style: "color: var(--qualia-text-muted);", "N:" }
+                    div { style: "color: var(--qualia-text);", "{sample_n}" }
+                    div { style: "color: var(--qualia-text-muted);", "Effect Size:" }
+                    div { style: "color: var(--qualia-text);", "{effect_size_f:.3}" }
+                    div { style: "color: var(--qualia-text-muted);", "CI / Distribution:" }
+                    div { style: "color: var(--qualia-text);", "{confidence_level}% / {distribution}" }
                 }
-                div { style: "font-size: 0.75rem; color: #585b70; margin-top: 12px; border-top: 1px solid #313244; padding-top: 8px;",
+                div { style: "font-size: 0.75rem; color: var(--qualia-text-muted); margin-top: 12px; border-top: 1px solid var(--qualia-border); padding-top: 8px;",
                     "QualiaDB → statistical_analysis engine | Bayesian epistemic | ODE numerical solver"
                 }
             }

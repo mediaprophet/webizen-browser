@@ -9,7 +9,7 @@ pub fn AgentConfig() -> Element {
         div { style: "padding: 24px; background: #111827; color: #f3f4f6; height: 100%; box-sizing: border-box; overflow-y: auto;",
             div { style: "max-width: 800px; margin: 0 auto;",
                 h2 { style: "color: #a78bfa; margin-bottom: 24px; font-size: 28px; border-bottom: 1px solid #374151; padding-bottom: 12px;", "Autonomous Agent Configuration" }
-                
+
                 div { style: "background: #1f2937; padding: 20px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.3);",
                     h3 { style: "margin-top: 0; color: #e5e7eb;", "Inference Hyperparameters" }
                     div { style: "margin-bottom: 16px;",

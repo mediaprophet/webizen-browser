@@ -10,58 +10,80 @@ pub fn CinematographyQapp() -> Element {
     let mut lighting_setup = use_signal(|| "Three-Point".to_string());
     let mut notes = use_signal(|| String::new());
 
-    let camera_formats = ["35mm Film", "16mm Film", "8mm", "Digital Sensor 4K", "Anamorphic", "IMAX", "VR 360"];
-    let lens_types = ["Prime", "Zoom", "Anamorphic", "Fisheye", "Macro", "Tilt-Shift"];
+    let camera_formats = [
+        "35mm Film",
+        "16mm Film",
+        "8mm",
+        "Digital Sensor 4K",
+        "Anamorphic",
+        "IMAX",
+        "VR 360",
+    ];
+    let lens_types = [
+        "Prime",
+        "Zoom",
+        "Anamorphic",
+        "Fisheye",
+        "Macro",
+        "Tilt-Shift",
+    ];
     let colour_sciences = ["Flat Log", "Rec.709", "ACES", "Film Emulation", "HDR"];
-    let lighting_setups = ["Three-Point", "High Key", "Low Key", "Chiaroscuro", "Available Light", "Practical Only"];
+    let lighting_setups = [
+        "Three-Point",
+        "High Key",
+        "Low Key",
+        "Chiaroscuro",
+        "Available Light",
+        "Practical Only",
+    ];
 
     rsx! {
         div {
-            style: "padding: 20px; background: #1e1e2e; color: #cdd6f4; border-radius: 12px; font-family: monospace; display: flex; flex-direction: column; gap: 16px; height: 100%; box-sizing: border-box;",
-            h2 { style: "margin: 0; color: #89dceb; border-bottom: 1px solid #313244; padding-bottom: 8px;", "Cinematography" }
+            style: "padding: 20px; background: var(--qualia-surface); color: var(--qualia-text); border-radius: 12px; font-family: monospace; display: flex; flex-direction: column; gap: 16px; height: 100%; box-sizing: border-box;",
+            h2 { style: "margin: 0; color: var(--qualia-accent); border-bottom: 1px solid var(--qualia-border); padding-bottom: 8px;", "Cinematography" }
 
             div {
                 style: "display: grid; grid-template-columns: 1fr 1fr; gap: 12px;",
                 div {
-                    label { style: "font-size: 0.8rem; color: #a6adc8;", "Camera Format" }
+                    label { style: "font-size: 0.8rem; color: var(--qualia-text-muted);", "Camera Format" }
                     select {
                         value: "{camera_format}",
                         onchange: move |e| camera_format.set(e.value()),
-                        style: "width: 100%; padding: 8px; background: #181825; border: 1px solid #45475a; color: #cdd6f4; border-radius: 4px; margin-top: 4px; box-sizing: border-box;",
+                        style: "width: 100%; padding: 8px; background: var(--qualia-bg); border: 1px solid var(--qualia-border); color: var(--qualia-text); border-radius: 4px; margin-top: 4px; box-sizing: border-box;",
                         for x in camera_formats { option { value: "{x}", "{x}" } }
                     }
                 }
                 div {
-                    label { style: "font-size: 0.8rem; color: #a6adc8;", "Lens Type" }
+                    label { style: "font-size: 0.8rem; color: var(--qualia-text-muted);", "Lens Type" }
                     select {
                         value: "{lens_type}",
                         onchange: move |e| lens_type.set(e.value()),
-                        style: "width: 100%; padding: 8px; background: #181825; border: 1px solid #45475a; color: #cdd6f4; border-radius: 4px; margin-top: 4px; box-sizing: border-box;",
+                        style: "width: 100%; padding: 8px; background: var(--qualia-bg); border: 1px solid var(--qualia-border); color: var(--qualia-text); border-radius: 4px; margin-top: 4px; box-sizing: border-box;",
                         for x in lens_types { option { value: "{x}", "{x}" } }
                     }
                 }
                 div {
-                    label { style: "font-size: 0.8rem; color: #a6adc8;", "Colour Science" }
+                    label { style: "font-size: 0.8rem; color: var(--qualia-text-muted);", "Colour Science" }
                     select {
                         value: "{colour_science}",
                         onchange: move |e| colour_science.set(e.value()),
-                        style: "width: 100%; padding: 8px; background: #181825; border: 1px solid #45475a; color: #cdd6f4; border-radius: 4px; margin-top: 4px; box-sizing: border-box;",
+                        style: "width: 100%; padding: 8px; background: var(--qualia-bg); border: 1px solid var(--qualia-border); color: var(--qualia-text); border-radius: 4px; margin-top: 4px; box-sizing: border-box;",
                         for x in colour_sciences { option { value: "{x}", "{x}" } }
                     }
                 }
                 div {
-                    label { style: "font-size: 0.8rem; color: #a6adc8;", "Lighting Setup" }
+                    label { style: "font-size: 0.8rem; color: var(--qualia-text-muted);", "Lighting Setup" }
                     select {
                         value: "{lighting_setup}",
                         onchange: move |e| lighting_setup.set(e.value()),
-                        style: "width: 100%; padding: 8px; background: #181825; border: 1px solid #45475a; color: #cdd6f4; border-radius: 4px; margin-top: 4px; box-sizing: border-box;",
+                        style: "width: 100%; padding: 8px; background: var(--qualia-bg); border: 1px solid var(--qualia-border); color: var(--qualia-text); border-radius: 4px; margin-top: 4px; box-sizing: border-box;",
                         for x in lighting_setups { option { value: "{x}", "{x}" } }
                     }
                 }
             }
 
             div {
-                label { style: "font-size: 0.8rem; color: #a6adc8;", "f-stop: f/{stop_f:.1}" }
+                label { style: "font-size: 0.8rem; color: var(--qualia-text-muted);", "f-stop: f/{stop_f:.1}" }
                 input {
                     r#type: "range",
                     min: "10",
@@ -74,7 +96,7 @@ pub fn CinematographyQapp() -> Element {
             }
 
             div {
-                label { style: "font-size: 0.8rem; color: #a6adc8;", "Shutter Angle: {shutter_angle}°" }
+                label { style: "font-size: 0.8rem; color: var(--qualia-text-muted);", "Shutter Angle: {shutter_angle}°" }
                 input {
                     r#type: "range",
                     min: "45",
@@ -87,18 +109,18 @@ pub fn CinematographyQapp() -> Element {
 
             div {
                 style: "flex: 1; display: flex; flex-direction: column;",
-                label { style: "font-size: 0.8rem; color: #a6adc8;", "Notes" }
+                label { style: "font-size: 0.8rem; color: var(--qualia-text-muted);", "Notes" }
                 textarea {
                     value: "{notes}",
                     oninput: move |e| notes.set(e.value()),
-                    style: "flex: 1; width: 100%; padding: 8px; background: #181825; border: 1px solid #45475a; color: #cdd6f4; border-radius: 4px; margin-top: 4px; resize: none; box-sizing: border-box; min-height: 60px;"
+                    style: "flex: 1; width: 100%; padding: 8px; background: var(--qualia-bg); border: 1px solid var(--qualia-border); color: var(--qualia-text); border-radius: 4px; margin-top: 4px; resize: none; box-sizing: border-box; min-height: 60px;"
                 }
             }
 
             div {
-                style: "background: #11111b; padding: 12px 16px; border-radius: 8px; border-left: 4px solid #89dceb;",
-                span { style: "font-size: 0.8rem; color: #a6adc8;", "{camera_format} | {lens_type} | f/{stop_f:.1} | {shutter_angle}° | {colour_science} | {lighting_setup}" }
-                div { style: "font-size: 0.75rem; color: #585b70; margin-top: 6px;", "QualiaDB → cinematography engine | exposure sieve | colour science anchor" }
+                style: "background: var(--qualia-bg); padding: 12px 16px; border-radius: 8px; border-left: 4px solid var(--qualia-accent);",
+                span { style: "font-size: 0.8rem; color: var(--qualia-text-muted);", "{camera_format} | {lens_type} | f/{stop_f:.1} | {shutter_angle}° | {colour_science} | {lighting_setup}" }
+                div { style: "font-size: 0.75rem; color: var(--qualia-text-muted); margin-top: 6px;", "QualiaDB → cinematography engine | exposure sieve | colour science anchor" }
             }
         }
     }

@@ -5,7 +5,7 @@ pub fn KeyVaultManager() -> Element {
     rsx! {
         div {
             style: "flex: 1; padding: 2rem; background: rgba(10, 15, 20, 0.95); border-radius: 16px; border: 1px solid rgba(0, 255, 170, 0.15); color: #FFF;",
-            
+
             h2 {
                 style: "font-family: 'Space Grotesk', sans-serif; font-size: 2rem; color: #00FFAA; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;",
                 "🔐 Key Vault Manager"
@@ -13,7 +13,7 @@ pub fn KeyVaultManager() -> Element {
 
             div {
                 style: "background: rgba(0,255,170,0.03); border: 1px solid rgba(0,255,170,0.1); border-radius: 12px; padding: 2rem;",
-                
+
                 div {
                     style: "display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 1px solid rgba(255,255,255,0.05);",
                     div {
@@ -27,7 +27,7 @@ pub fn KeyVaultManager() -> Element {
                 }
 
                 h3 { style: "color: #CCC; margin-bottom: 1rem;", "Derived Lane Keys" }
-                
+
                 table {
                     style: "width: 100%; border-collapse: collapse;",
                     thead {

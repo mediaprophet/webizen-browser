@@ -8,7 +8,7 @@ pub fn InferenceMonitor() -> Element {
                 span { style: "font-size: 1.2rem; font-weight: bold;", "INFERENCE STREAM MONITOR [tty1]" }
                 span { "STATUS: REALTIME_ACTIVE" }
             }
-            
+
             div { style: "display: flex; gap: 16px; margin-bottom: 16px;",
                 div { style: "flex: 1; border: 1px solid #0f0; padding: 12px;",
                     div { "TOKENS / SEC" }

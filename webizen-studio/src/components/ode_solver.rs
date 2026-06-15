@@ -3,7 +3,7 @@ use dioxus::prelude::*;
 #[component]
 pub fn OdeSolver() -> Element {
     let mut equation = use_signal(|| "dy/dt = -k * y".to_string());
-    
+
     rsx! {
         div {
             style: "padding: 20px; background: #1e1e2e; color: #cdd6f4; border-radius: 12px; font-family: monospace; display: flex; flex-direction: column; gap: 16px; height: 100%;",

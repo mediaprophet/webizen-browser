@@ -6,13 +6,13 @@ use serde::de::DeserializeOwned;
 #[cfg(target_arch = "wasm32")]
 use serde_json::json;
 #[cfg(target_arch = "wasm32")]
-use wasm_bindgen::closure::Closure;
-#[cfg(target_arch = "wasm32")]
-use wasm_bindgen::prelude::*;
-#[cfg(target_arch = "wasm32")]
 use wasm_bindgen::JsCast;
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::JsValue;
+#[cfg(target_arch = "wasm32")]
+use wasm_bindgen::closure::Closure;
+#[cfg(target_arch = "wasm32")]
+use wasm_bindgen::prelude::*;
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen_futures::JsFuture;
 
@@ -109,9 +109,12 @@ async fn sleep_ms(ms: i32) -> Result<(), String> {
 
 #[cfg(target_arch = "wasm32")]
 fn is_tauri() -> bool {
-    js_sys::Reflect::get(&js_sys::global(), &wasm_bindgen::JsValue::from_str("__TAURI__"))
-        .map(|v| !v.is_undefined() && !v.is_null())
-        .unwrap_or(false)
+    js_sys::Reflect::get(
+        &js_sys::global(),
+        &wasm_bindgen::JsValue::from_str("__TAURI__"),
+    )
+    .map(|v| !v.is_undefined() && !v.is_null())
+    .unwrap_or(false)
 }
 
 #[cfg(target_arch = "wasm32")]
@@ -156,17 +159,12 @@ async fn run_benchmark_sweep() -> Result<BenchmarkReport, String> {
         return Err("Benchmark requires the Webizen desktop app (Tauri runtime). \
                     Running in a plain browser is not supported — launch the desktop build to use this tool.".to_string());
     }
-    let preview_probe = invoke_tauri_json::<LocalPreviewProbe>(
-        "probe_localhost_preview",
-        json!({}),
-    )
-    .await
-    .ok();
-    let health_before = invoke_tauri_json::<RuntimeLedgerHealth>(
-        "get_diffusion_ledger_health",
-        json!({}),
-    )
-    .await?;
+    let preview_probe =
+        invoke_tauri_json::<LocalPreviewProbe>("probe_localhost_preview", json!({}))
+            .await
+            .ok();
+    let health_before =
+        invoke_tauri_json::<RuntimeLedgerHealth>("get_diffusion_ledger_health", json!({})).await?;
     let initial_snapshot = invoke_tauri_json::<Option<RuntimeSnapshotRecord>>(
         "get_latest_diffusion_snapshot",
         json!({}),
@@ -208,20 +206,20 @@ async fn run_benchmark_sweep() -> Result<BenchmarkReport, String> {
         }),
     )
     .await?;
-    let reconfigure_ack_ms = match measure_reconfigure_ack(last_snapshot.epoch, expanded_dimensions).await
-    {
-        Ok(latency) => {
-            notes.push(format!(
-                "Resize to {}x{} acknowledged in {:.1} ms.",
-                expanded_dimensions.0, expanded_dimensions.1, latency
-            ));
-            Some(latency)
-        }
-        Err(err) => {
-            notes.push(err);
-            None
-        }
-    };
+    let reconfigure_ack_ms =
+        match measure_reconfigure_ack(last_snapshot.epoch, expanded_dimensions).await {
+            Ok(latency) => {
+                notes.push(format!(
+                    "Resize to {}x{} acknowledged in {:.1} ms.",
+                    expanded_dimensions.0, expanded_dimensions.1, latency
+                ));
+                Some(latency)
+            }
+            Err(err) => {
+                notes.push(err);
+                None
+            }
+        };
 
     for _ in 0..6 {
         let (snapshot, latency_ms) = measure_snapshot_call().await?;
@@ -243,19 +241,20 @@ async fn run_benchmark_sweep() -> Result<BenchmarkReport, String> {
         }),
     )
     .await?;
-    let restore_ack_ms = match measure_reconfigure_ack(last_snapshot.epoch, original_dimensions).await {
-        Ok(latency) => {
-            notes.push(format!(
-                "Restore to {}x{} acknowledged in {:.1} ms.",
-                original_dimensions.0, original_dimensions.1, latency
-            ));
-            Some(latency)
-        }
-        Err(err) => {
-            notes.push(err);
-            None
-        }
-    };
+    let restore_ack_ms =
+        match measure_reconfigure_ack(last_snapshot.epoch, original_dimensions).await {
+            Ok(latency) => {
+                notes.push(format!(
+                    "Restore to {}x{} acknowledged in {:.1} ms.",
+                    original_dimensions.0, original_dimensions.1, latency
+                ));
+                Some(latency)
+            }
+            Err(err) => {
+                notes.push(err);
+                None
+            }
+        };
 
     for _ in 0..5 {
         let (snapshot, latency_ms) = measure_snapshot_call().await?;
@@ -267,11 +266,8 @@ async fn run_benchmark_sweep() -> Result<BenchmarkReport, String> {
     }
 
     latencies.sort_by(|a, b| a.total_cmp(b));
-    let health_after = invoke_tauri_json::<RuntimeLedgerHealth>(
-        "get_diffusion_ledger_health",
-        json!({}),
-    )
-    .await?;
+    let health_after =
+        invoke_tauri_json::<RuntimeLedgerHealth>("get_diffusion_ledger_health", json!({})).await?;
     let duration_ms = (js_sys::Date::now() - sweep_started).max(1.0);
     let epoch_delta = last_snapshot.epoch.saturating_sub(initial_snapshot.epoch);
     let epoch_rate = epoch_delta as f64 / (duration_ms / 1000.0);
@@ -332,7 +328,8 @@ pub fn BenchmarkHarness() -> Element {
         }
     });
     #[cfg(not(target_arch = "wasm32"))]
-    let mut status = use_signal(|| "Benchmark harness is only active in the webview runtime.".to_string());
+    let mut status =
+        use_signal(|| "Benchmark harness is only active in the webview runtime.".to_string());
     let report = use_signal(|| None::<BenchmarkReport>);
 
     let run_benchmark = move |_| {
@@ -374,8 +371,14 @@ pub fn BenchmarkHarness() -> Element {
     let latest_report = report();
     let health_delta = latest_report.as_ref().map(|result| {
         (
-            result.health_after.dropped_events.saturating_sub(result.health_before.dropped_events),
-            result.health_after.gap_events.saturating_sub(result.health_before.gap_events),
+            result
+                .health_after
+                .dropped_events
+                .saturating_sub(result.health_before.dropped_events),
+            result
+                .health_after
+                .gap_events
+                .saturating_sub(result.health_before.gap_events),
             result
                 .health_after
                 .recovery_events

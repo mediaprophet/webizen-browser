@@ -1,16 +1,24 @@
 #![allow(non_snake_case)]
 
-mod pane_registry;
-mod studio_canvas;
-mod theme_engine;
 pub mod components;
+mod endpoints;
+mod pane_registry;
+mod render;
+mod studio_canvas;
 pub mod telemetry;
+mod theme_engine;
 
 use dioxus::prelude::*;
 use studio_canvas::DynamicPage;
 use theme_engine::ResolvedTheme;
 
 fn main() {
+    // Surface panics with a readable message + stack in the browser console.
+    // Without this, `panic = "abort"` yields an opaque `unreachable` and any
+    // boot-time panic is undiagnosable.
+    #[cfg(target_arch = "wasm32")]
+    console_error_panic_hook::set_once();
+
     dioxus::launch(App);
 }
 
@@ -39,7 +47,6 @@ pub enum Route {
     NexusRoute {},
 
     #[end_layout]
-
     #[route("/:..path")]
     DynamicPage { path: Vec<String> },
 }
@@ -84,17 +91,32 @@ fn NexusRoute() -> Element {
     rsx! { components::nexus::Nexus {} }
 }
 
-const SHOELACE_CSS: &str = "https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.15.0/cdn/themes/dark.css";
-const SHOELACE_JS: &str = "https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.15.0/cdn/shoelace-autoloader.js";
-const INTER_FONT: &str = "https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap";
+const SHOELACE_CSS: &str =
+    "https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.15.0/cdn/themes/dark.css";
+const SHOELACE_JS: &str =
+    "https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.15.0/cdn/shoelace-autoloader.js";
+const INTER_FONT: &str =
+    "https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap";
 
 #[component]
 fn AppLayout() -> Element {
     let theme_state = consume_context::<Signal<ResolvedTheme>>();
     let t = theme_state();
-    let accent = t.tokens.get("accent").cloned().unwrap_or("#e07a5f".to_string());
-    let text = t.tokens.get("text").cloned().unwrap_or("#2d2824".to_string());
-    let text_muted = t.tokens.get("text-muted").cloned().unwrap_or("#8b8178".to_string());
+    let accent = t
+        .tokens
+        .get("accent")
+        .cloned()
+        .unwrap_or("#e07a5f".to_string());
+    let text = t
+        .tokens
+        .get("text")
+        .cloned()
+        .unwrap_or("#2d2824".to_string());
+    let text_muted = t
+        .tokens
+        .get("text-muted")
+        .cloned()
+        .unwrap_or("#8b8178".to_string());
 
     rsx! {
         div {
@@ -238,13 +260,40 @@ fn App() -> Element {
 
     let t = theme_state();
     let bg = t.tokens.get("bg").cloned().unwrap_or("#fbf9f6".to_string());
-    let surface = t.tokens.get("surface").cloned().unwrap_or("rgba(255,255,255,0.72)".to_string());
-    let border = t.tokens.get("border").cloned().unwrap_or("rgba(220,210,200,0.55)".to_string());
-    let text = t.tokens.get("text").cloned().unwrap_or("#2d2824".to_string());
-    let text_muted = t.tokens.get("text-muted").cloned().unwrap_or("#8b8178".to_string());
-    let accent = t.tokens.get("accent").cloned().unwrap_or("#e07a5f".to_string());
-    let accent_glow = t.tokens.get("accent-glow").cloned().unwrap_or("rgba(224,122,95,0.18)".to_string());
-    let bg_gradient = t.tokens.get("bg-gradient").cloned()
+    let surface = t
+        .tokens
+        .get("surface")
+        .cloned()
+        .unwrap_or("rgba(255,255,255,0.72)".to_string());
+    let border = t
+        .tokens
+        .get("border")
+        .cloned()
+        .unwrap_or("rgba(220,210,200,0.55)".to_string());
+    let text = t
+        .tokens
+        .get("text")
+        .cloned()
+        .unwrap_or("#2d2824".to_string());
+    let text_muted = t
+        .tokens
+        .get("text-muted")
+        .cloned()
+        .unwrap_or("#8b8178".to_string());
+    let accent = t
+        .tokens
+        .get("accent")
+        .cloned()
+        .unwrap_or("#e07a5f".to_string());
+    let accent_glow = t
+        .tokens
+        .get("accent-glow")
+        .cloned()
+        .unwrap_or("rgba(224,122,95,0.18)".to_string());
+    let bg_gradient = t
+        .tokens
+        .get("bg-gradient")
+        .cloned()
         .unwrap_or(format!("linear-gradient(160deg, {bg} 0%, {bg} 100%)"));
 
     rsx! {

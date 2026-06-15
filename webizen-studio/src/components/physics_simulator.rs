@@ -5,69 +5,23 @@ use std::cell::{Cell, RefCell};
 #[cfg(target_arch = "wasm32")]
 use std::rc::Rc;
 #[cfg(target_arch = "wasm32")]
-use wasm_bindgen::closure::Closure;
-#[cfg(target_arch = "wasm32")]
 use wasm_bindgen::JsCast;
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::JsValue;
 #[cfg(target_arch = "wasm32")]
+use wasm_bindgen::closure::Closure;
+#[cfg(target_arch = "wasm32")]
 use web_sys::{CanvasRenderingContext2d, HtmlCanvasElement};
+
+// 3D math, camera, projection, and the Canvas 2D draw backend now live in the
+// shared, backend-agnostic `render` module so a future GPU (WebGPU) backend can
+// implement the same `Renderer` trait.
+#[cfg(target_arch = "wasm32")]
+use crate::render::{Camera, Canvas2dRenderer, Renderer, ScreenPoint, Vec3};
 
 const CANVAS_ID: &str = "physics-engine-surface";
 const SURFACE_WIDTH: u32 = 960;
 const SURFACE_HEIGHT: u32 = 540;
-
-#[cfg(target_arch = "wasm32")]
-#[derive(Clone, Copy, Debug, Default)]
-struct Vec3 {
-    x: f64,
-    y: f64,
-    z: f64,
-}
-
-#[cfg(target_arch = "wasm32")]
-impl Vec3 {
-    fn new(x: f64, y: f64, z: f64) -> Self {
-        Self { x, y, z }
-    }
-
-    fn sub(self, other: Self) -> Self {
-        Self::new(self.x - other.x, self.y - other.y, self.z - other.z)
-    }
-
-    fn dot(self, other: Self) -> f64 {
-        self.x * other.x + self.y * other.y + self.z * other.z
-    }
-
-    fn cross(self, other: Self) -> Self {
-        Self::new(
-            self.y * other.z - self.z * other.y,
-            self.z * other.x - self.x * other.z,
-            self.x * other.y - self.y * other.x,
-        )
-    }
-
-    fn length(self) -> f64 {
-        self.dot(self).sqrt()
-    }
-
-    fn normalize(self) -> Self {
-        let len = self.length();
-        if len <= f64::EPSILON {
-            Self::default()
-        } else {
-            Self::new(self.x / len, self.y / len, self.z / len)
-        }
-    }
-}
-
-#[cfg(target_arch = "wasm32")]
-#[derive(Clone, Copy, Default)]
-struct ProjectedPoint {
-    x: f64,
-    y: f64,
-    depth: f64,
-}
 
 #[cfg(target_arch = "wasm32")]
 fn get_canvas_context() -> Result<(HtmlCanvasElement, CanvasRenderingContext2d), String> {
@@ -98,67 +52,6 @@ fn sample_height(x: f64, z: f64, phase: f64, amplitude: f64, pulse: f64) -> f64 
 }
 
 #[cfg(target_arch = "wasm32")]
-fn project_point(
-    point: Vec3,
-    camera: Vec3,
-    target: Vec3,
-    viewport: (f64, f64),
-) -> Option<ProjectedPoint> {
-    let forward = target.sub(camera).normalize();
-    let right = forward.cross(Vec3::new(0.0, 1.0, 0.0)).normalize();
-    let up = right.cross(forward).normalize();
-    let relative = point.sub(camera);
-
-    let view_x = relative.dot(right);
-    let view_y = relative.dot(up);
-    let view_z = relative.dot(forward);
-
-    if view_z <= 0.2 {
-        return None;
-    }
-
-    let focal = viewport.0.min(viewport.1) * 0.88;
-    Some(ProjectedPoint {
-        x: viewport.0 * 0.5 + (view_x / view_z) * focal,
-        y: viewport.1 * 0.52 - (view_y / view_z) * focal,
-        depth: view_z,
-    })
-}
-
-#[cfg(target_arch = "wasm32")]
-fn draw_line(
-    context: &CanvasRenderingContext2d,
-    a: ProjectedPoint,
-    b: ProjectedPoint,
-    alpha: f64,
-    width: f64,
-    color: &str,
-) {
-    context.begin_path();
-    context.set_global_alpha(alpha.clamp(0.04, 1.0));
-    context.set_line_width(width);
-    context.set_stroke_style(&JsValue::from_str(color));
-    context.move_to(a.x, a.y);
-    context.line_to(b.x, b.y);
-    context.stroke();
-}
-
-#[cfg(target_arch = "wasm32")]
-fn draw_disc(
-    context: &CanvasRenderingContext2d,
-    point: ProjectedPoint,
-    radius: f64,
-    alpha: f64,
-    color: &str,
-) {
-    context.begin_path();
-    context.set_global_alpha(alpha.clamp(0.08, 1.0));
-    context.set_fill_style(&JsValue::from_str(color));
-    let _ = context.arc(point.x, point.y, radius, 0.0, std::f64::consts::TAU);
-    context.fill();
-}
-
-#[cfg(target_arch = "wasm32")]
 fn draw_scene(
     canvas: &HtmlCanvasElement,
     context: &CanvasRenderingContext2d,
@@ -173,23 +66,33 @@ fn draw_scene(
     let height = canvas.height() as f64;
     let viewport = (width, height);
 
-    context.set_global_alpha(1.0);
-    context.set_fill_style(&JsValue::from_str("#040712"));
-    context.fill_rect(0.0, 0.0, width, height);
+    // The Canvas 2D backend of the shared `Renderer` trait. Swapping in a GPU
+    // backend later means changing only this constructor.
+    let mut renderer = Canvas2dRenderer::new(context.clone(), viewport);
+    renderer.clear("#040712");
 
+    // Backend-specific atmosphere wash (kept on the raw context).
     context.set_fill_style(&JsValue::from_str("rgba(24, 76, 123, 0.18)"));
     context.fill_rect(0.0, height * 0.48, width, height * 0.52);
     context.set_fill_style(&JsValue::from_str("rgba(255, 214, 102, 0.035)"));
     context.fill_rect(0.0, height * 0.18, width, height * 0.32);
 
     let orbit_angle = phase * orbit_speed * 0.55 + 0.25;
-    let camera = Vec3::new(orbit_angle.cos() * 19.0, 9.5 + pulse * 2.4, orbit_angle.sin() * 19.0);
-    let target = Vec3::new(0.0, 0.5, 0.0);
+    renderer.set_camera(Camera {
+        eye: Vec3::new(
+            orbit_angle.cos() * 19.0,
+            9.5 + pulse * 2.4,
+            orbit_angle.sin() * 19.0,
+        ),
+        target: Vec3::new(0.0, 0.5, 0.0),
+        world_up: Vec3::new(0.0, 1.0, 0.0),
+        focal_scale: 0.88,
+    });
     let span = 14.0;
     let steps = grid_density.max(8) as usize;
     let step = span * 2.0 / steps as f64;
 
-    let mut grid = vec![ProjectedPoint::default(); (steps + 1) * (steps + 1)];
+    let mut grid = vec![ScreenPoint::default(); (steps + 1) * (steps + 1)];
     let mut visible = vec![false; (steps + 1) * (steps + 1)];
     let index = |x: usize, z: usize| z * (steps + 1) + x;
 
@@ -200,7 +103,7 @@ fn draw_scene(
             let crest = sample_height(world_x, world_z, phase, amplitude, pulse);
             let world = Vec3::new(world_x, crest, world_z);
             let idx = index(x, z);
-            if let Some(projected) = project_point(world, camera, target, viewport) {
+            if let Some(projected) = renderer.project(world) {
                 grid[idx] = projected;
                 visible[idx] = true;
             }
@@ -208,7 +111,6 @@ fn draw_scene(
     }
 
     if !wireframe {
-        context.set_fill_style(&JsValue::from_str("rgba(66, 153, 225, 0.16)"));
         for z in 0..steps {
             for x in 0..steps {
                 let a_idx = index(x, z);
@@ -224,14 +126,8 @@ fn draw_scene(
                 let c = grid[c_idx];
                 let d = grid[d_idx];
                 let avg_depth = (a.depth + b.depth + c.depth + d.depth) * 0.25;
-                context.begin_path();
-                context.set_global_alpha((0.24 - avg_depth * 0.008).clamp(0.03, 0.16));
-                context.move_to(a.x, a.y);
-                context.line_to(b.x, b.y);
-                context.line_to(c.x, c.y);
-                context.line_to(d.x, d.y);
-                context.close_path();
-                context.fill();
+                let alpha = (0.24 - avg_depth * 0.008).clamp(0.03, 0.16);
+                renderer.fill_polygon(&[a, b, c, d], "rgba(66, 153, 225, 0.16)", alpha);
             }
         }
     }
@@ -244,7 +140,7 @@ fn draw_scene(
                 let a = grid[a_idx];
                 let b = grid[b_idx];
                 let alpha = (0.85 - ((a.depth + b.depth) * 0.5) * 0.03).clamp(0.08, 0.6);
-                draw_line(context, a, b, alpha, 1.1, "#67e8f9");
+                renderer.line(a, b, "#67e8f9", alpha, 1.1);
             }
         }
     }
@@ -257,7 +153,7 @@ fn draw_scene(
                 let a = grid[a_idx];
                 let b = grid[b_idx];
                 let alpha = (0.72 - ((a.depth + b.depth) * 0.5) * 0.026).clamp(0.06, 0.42);
-                draw_line(context, a, b, alpha, 0.9, "#60a5fa");
+                renderer.line(a, b, "#60a5fa", alpha, 0.9);
             }
         }
     }
@@ -268,17 +164,17 @@ fn draw_scene(
             let world_z = -span + z as f64 * step;
             let base_y = sample_height(world_x, world_z, phase, amplitude, pulse);
             let height_scale = 1.6 + ((world_x * 0.33 + phase).cos() + 1.0) * 1.1;
-            let base = project_point(Vec3::new(world_x, base_y, world_z), camera, target, viewport);
-            let tip = project_point(
-                Vec3::new(world_x, base_y + height_scale, world_z),
-                camera,
-                target,
-                viewport,
-            );
+            let base = renderer.project(Vec3::new(world_x, base_y, world_z));
+            let tip = renderer.project(Vec3::new(world_x, base_y + height_scale, world_z));
             if let (Some(base), Some(tip)) = (base, tip) {
                 let alpha = (0.95 - tip.depth * 0.035).clamp(0.09, 0.65);
-                draw_line(context, base, tip, alpha, 1.4, "#f59e0b");
-                draw_disc(context, tip, (4.8 - tip.depth * 0.08).clamp(1.3, 3.4), alpha, "#fde68a");
+                renderer.line(base, tip, "#f59e0b", alpha, 1.4);
+                renderer.point(
+                    tip,
+                    (4.8 - tip.depth * 0.08).clamp(1.3, 3.4),
+                    "#fde68a",
+                    alpha,
+                );
             }
         }
     }
@@ -290,10 +186,10 @@ fn draw_scene(
             3.5 + (angle * 1.7).sin() * 1.2,
             angle.sin() * (7.0 + orbit as f64 * 0.15),
         );
-        if let Some(point) = project_point(world, camera, target, viewport) {
+        if let Some(point) = renderer.project(world) {
             let alpha = (0.92 - point.depth * 0.03).clamp(0.16, 0.85);
             let radius = (5.2 - point.depth * 0.06).clamp(1.6, 3.8);
-            draw_disc(context, point, radius, alpha, "#f472b6");
+            renderer.point(point, radius, "#f472b6", alpha);
         }
     }
 
@@ -303,7 +199,11 @@ fn draw_scene(
     let _ = context.fill_text("Webizen Spatial Physics Surface", 18.0, 28.0);
     context.set_global_alpha(0.55);
     context.set_font("12px 'Segoe UI', sans-serif");
-    let _ = context.fill_text("Procedural 3D mesh | orbit camera | direct canvas raster", 18.0, 48.0);
+    let _ = context.fill_text(
+        "Procedural 3D mesh | orbit camera | direct canvas raster",
+        18.0,
+        48.0,
+    );
     context.set_global_alpha(1.0);
 }
 
@@ -371,7 +271,8 @@ pub fn PhysicsSimulator() -> Element {
 
                         if let Some(window) = web_sys::window() {
                             if let Some(callback) = raf_loop_handle.borrow().as_ref() {
-                                let _ = window.request_animation_frame(callback.as_ref().unchecked_ref());
+                                let _ = window
+                                    .request_animation_frame(callback.as_ref().unchecked_ref());
                             }
                         }
                     })
@@ -379,7 +280,8 @@ pub fn PhysicsSimulator() -> Element {
 
                     if let Some(window) = web_sys::window() {
                         if let Some(callback) = raf_loop.borrow().as_ref() {
-                            let _ = window.request_animation_frame(callback.as_ref().unchecked_ref());
+                            let _ =
+                                window.request_animation_frame(callback.as_ref().unchecked_ref());
                         }
                     }
                 }
@@ -396,7 +298,11 @@ pub fn PhysicsSimulator() -> Element {
     let is_paused = paused();
     let estimated_vertices = (density + 1) * (density + 1);
     let energy_score = (amplitude * pulse * orbit * 42.0).round() as i64;
-    let style_chip = if is_wireframe { "Wireframe mesh" } else { "Filled terrain" };
+    let style_chip = if is_wireframe {
+        "Wireframe mesh"
+    } else {
+        "Filled terrain"
+    };
     let status_text = status();
 
     rsx! {

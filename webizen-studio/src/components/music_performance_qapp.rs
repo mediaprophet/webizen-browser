@@ -11,41 +11,77 @@ pub fn MusicPerformanceQapp() -> Element {
     let mut edition = use_signal(|| String::new());
     let mut interpretation_notes = use_signal(|| String::new());
 
-    let instruments = ["Piano", "Violin", "Viola", "Cello", "Double Bass", "Flute", "Oboe", "Clarinet", "Bassoon", "Trumpet", "French Horn", "Trombone", "Tuba", "Harp", "Guitar", "Harpsichord", "Organ", "Voice (Soprano)", "Voice (Mezzo)", "Voice (Tenor)", "Voice (Bass)"];
-    let dynamics = ["ppp", "pp", "p", "mp", "mf", "f", "ff", "fff", "fp", "sfz", "cresc.", "dim."];
-    let articulations = ["Legato", "Staccato", "Staccatissimo", "Tenuto", "Marcato", "Portato", "Spiccato (strings)", "Col legno (strings)", "Sul ponticello", "Pizzicato", "Flutter tongue (winds)"];
+    let instruments = [
+        "Piano",
+        "Violin",
+        "Viola",
+        "Cello",
+        "Double Bass",
+        "Flute",
+        "Oboe",
+        "Clarinet",
+        "Bassoon",
+        "Trumpet",
+        "French Horn",
+        "Trombone",
+        "Tuba",
+        "Harp",
+        "Guitar",
+        "Harpsichord",
+        "Organ",
+        "Voice (Soprano)",
+        "Voice (Mezzo)",
+        "Voice (Tenor)",
+        "Voice (Bass)",
+    ];
+    let dynamics = [
+        "ppp", "pp", "p", "mp", "mf", "f", "ff", "fff", "fp", "sfz", "cresc.", "dim.",
+    ];
+    let articulations = [
+        "Legato",
+        "Staccato",
+        "Staccatissimo",
+        "Tenuto",
+        "Marcato",
+        "Portato",
+        "Spiccato (strings)",
+        "Col legno (strings)",
+        "Sul ponticello",
+        "Pizzicato",
+        "Flutter tongue (winds)",
+    ];
 
     rsx! {
         div {
-            style: "padding: 20px; background: #1e1e2e; color: #cdd6f4; border-radius: 12px; font-family: monospace; display: flex; flex-direction: column; gap: 16px; height: 100%; box-sizing: border-box;",
-            h2 { style: "margin: 0; color: #cba6f7; border-bottom: 1px solid #313244; padding-bottom: 8px;", "Music Performance" }
+            style: "padding: 20px; background: var(--qualia-surface); color: var(--qualia-text); border-radius: 12px; font-family: monospace; display: flex; flex-direction: column; gap: 16px; height: 100%; box-sizing: border-box;",
+            h2 { style: "margin: 0; color: var(--qualia-accent); border-bottom: 1px solid var(--qualia-border); padding-bottom: 8px;", "Music Performance" }
 
             div {
                 style: "display: grid; grid-template-columns: 1fr 1fr; gap: 12px;",
                 div {
-                    label { style: "font-size: 0.8rem; color: #a6adc8;", "Instrument / Voice Type" }
+                    label { style: "font-size: 0.8rem; color: var(--qualia-text-muted);", "Instrument / Voice Type" }
                     select {
                         value: "{instrument}",
                         onchange: move |e| instrument.set(e.value()),
-                        style: "width: 100%; padding: 8px; background: #181825; border: 1px solid #45475a; color: #cdd6f4; border-radius: 4px; margin-top: 4px;",
+                        style: "width: 100%; padding: 8px; background: var(--qualia-bg); border: 1px solid var(--qualia-border); color: var(--qualia-text); border-radius: 4px; margin-top: 4px;",
                         for i in instruments { option { value: "{i}", "{i}" } }
                     }
                 }
                 div {
-                    label { style: "font-size: 0.8rem; color: #a6adc8;", "Articulation" }
+                    label { style: "font-size: 0.8rem; color: var(--qualia-text-muted);", "Articulation" }
                     select {
                         value: "{articulation}",
                         onchange: move |e| articulation.set(e.value()),
-                        style: "width: 100%; padding: 8px; background: #181825; border: 1px solid #45475a; color: #cdd6f4; border-radius: 4px; margin-top: 4px;",
+                        style: "width: 100%; padding: 8px; background: var(--qualia-bg); border: 1px solid var(--qualia-border); color: var(--qualia-text); border-radius: 4px; margin-top: 4px;",
                         for a in articulations { option { value: "{a}", "{a}" } }
                     }
                 }
             }
 
             div {
-                label { style: "font-size: 0.8rem; color: #a6adc8;", "Tempo: {tempo_bpm} BPM" }
+                label { style: "font-size: 0.8rem; color: var(--qualia-text-muted);", "Tempo: {tempo_bpm} BPM" }
                 input {
-                    type: "range", min: "20", max: "300",
+                    r#type: "range", min: "20", max: "300",
                     value: "{tempo_bpm}",
                     oninput: move |e| tempo_bpm.set(e.value().parse().unwrap_or(120)),
                     style: "width: 100%; margin-top: 4px;"
@@ -55,18 +91,18 @@ pub fn MusicPerformanceQapp() -> Element {
             div {
                 style: "display: grid; grid-template-columns: 1fr 1fr; gap: 12px;",
                 div {
-                    label { style: "font-size: 0.8rem; color: #a6adc8;", "Dynamic Level" }
+                    label { style: "font-size: 0.8rem; color: var(--qualia-text-muted);", "Dynamic Level" }
                     select {
                         value: "{dynamic}",
                         onchange: move |e| dynamic.set(e.value()),
-                        style: "width: 100%; padding: 8px; background: #181825; border: 1px solid #45475a; color: #cdd6f4; border-radius: 4px; margin-top: 4px;",
+                        style: "width: 100%; padding: 8px; background: var(--qualia-bg); border: 1px solid var(--qualia-border); color: var(--qualia-text); border-radius: 4px; margin-top: 4px;",
                         for d in dynamics { option { value: "{d}", "{d}" } }
                     }
                 }
                 div {
-                    label { style: "font-size: 0.8rem; color: #a6adc8;", "Rubato / Flexibility: {rubato:+}%" }
+                    label { style: "font-size: 0.8rem; color: var(--qualia-text-muted);", "Rubato / Flexibility: {rubato:+}%" }
                     input {
-                        type: "range", min: "-30", max: "30",
+                        r#type: "range", min: "-30", max: "30",
                         value: "{rubato}",
                         oninput: move |e| rubato.set(e.value().parse().unwrap_or(0)),
                         style: "width: 100%; margin-top: 12px;"
@@ -77,43 +113,43 @@ pub fn MusicPerformanceQapp() -> Element {
             div {
                 style: "display: grid; grid-template-columns: 1fr 1fr; gap: 12px;",
                 div {
-                    label { style: "font-size: 0.8rem; color: #a6adc8;", "Expression Marking" }
+                    label { style: "font-size: 0.8rem; color: var(--qualia-text-muted);", "Expression Marking" }
                     input {
-                        type: "text", placeholder: "e.g. espressivo, con fuoco, dolce…",
+                        r#type: "text", placeholder: "e.g. espressivo, con fuoco, dolce…",
                         value: "{expression_marking}",
                         oninput: move |e| expression_marking.set(e.value()),
-                        style: "width: 100%; padding: 8px; background: #181825; border: 1px solid #45475a; color: #cdd6f4; border-radius: 4px; margin-top: 4px; box-sizing: border-box;"
+                        style: "width: 100%; padding: 8px; background: var(--qualia-bg); border: 1px solid var(--qualia-border); color: var(--qualia-text); border-radius: 4px; margin-top: 4px; box-sizing: border-box;"
                     }
                 }
                 div {
-                    label { style: "font-size: 0.8rem; color: #a6adc8;", "Edition / Urtext Source" }
+                    label { style: "font-size: 0.8rem; color: var(--qualia-text-muted);", "Edition / Urtext Source" }
                     input {
-                        type: "text", placeholder: "e.g. Bärenreiter BA 4711, Henle 461…",
+                        r#type: "text", placeholder: "e.g. Bärenreiter BA 4711, Henle 461…",
                         value: "{edition}",
                         oninput: move |e| edition.set(e.value()),
-                        style: "width: 100%; padding: 8px; background: #181825; border: 1px solid #45475a; color: #cdd6f4; border-radius: 4px; margin-top: 4px; box-sizing: border-box;"
+                        style: "width: 100%; padding: 8px; background: var(--qualia-bg); border: 1px solid var(--qualia-border); color: var(--qualia-text); border-radius: 4px; margin-top: 4px; box-sizing: border-box;"
                     }
                 }
             }
 
             div {
                 style: "flex: 1; display: flex; flex-direction: column;",
-                label { style: "font-size: 0.8rem; color: #a6adc8;", "Interpretation Notes" }
+                label { style: "font-size: 0.8rem; color: var(--qualia-text-muted);", "Interpretation Notes" }
                 textarea {
                     value: "{interpretation_notes}",
                     oninput: move |e| interpretation_notes.set(e.value()),
-                    style: "flex: 1; width: 100%; padding: 8px; background: #181825; border: 1px solid #45475a; color: #cdd6f4; border-radius: 4px; margin-top: 4px; resize: none; box-sizing: border-box; min-height: 60px;"
+                    style: "flex: 1; width: 100%; padding: 8px; background: var(--qualia-bg); border: 1px solid var(--qualia-border); color: var(--qualia-text); border-radius: 4px; margin-top: 4px; resize: none; box-sizing: border-box; min-height: 60px;"
                 }
             }
 
             div {
-                style: "background: #11111b; padding: 12px 16px; border-radius: 8px; border-left: 4px solid #cba6f7; display: flex; gap: 16px; flex-wrap: wrap;",
-                span { style: "font-size: 0.8rem; color: #cdd6f4; font-weight: bold;", "{instrument}" }
-                span { style: "font-size: 0.8rem; color: #a6adc8;", "{tempo_bpm} BPM" }
-                span { style: "font-size: 0.8rem; color: #a6adc8;", "{dynamic}" }
-                span { style: "font-size: 0.8rem; color: #a6adc8;", "{articulation}" }
-                if rubato() != 0 { span { style: "font-size: 0.8rem; color: #f9e2af;", "Rubato: {rubato:+}%" } }
-                div { style: "font-size: 0.75rem; color: #585b70; width: 100%;", "QualiaDB → Allen Interval rhythm engine | expressive parameter sieve" }
+                style: "background: var(--qualia-bg); padding: 12px 16px; border-radius: 8px; border-left: 4px solid var(--qualia-accent); display: flex; gap: 16px; flex-wrap: wrap;",
+                span { style: "font-size: 0.8rem; color: var(--qualia-text); font-weight: bold;", "{instrument}" }
+                span { style: "font-size: 0.8rem; color: var(--qualia-text-muted);", "{tempo_bpm} BPM" }
+                span { style: "font-size: 0.8rem; color: var(--qualia-text-muted);", "{dynamic}" }
+                span { style: "font-size: 0.8rem; color: var(--qualia-text-muted);", "{articulation}" }
+                if rubato() != 0 { span { style: "font-size: 0.8rem; color: var(--qualia-accent);", "Rubato: {rubato:+}%" } }
+                div { style: "font-size: 0.75rem; color: var(--qualia-text-muted); width: 100%;", "QualiaDB → Allen Interval rhythm engine | expressive parameter sieve" }
             }
         }
     }

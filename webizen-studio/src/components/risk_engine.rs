@@ -9,9 +9,13 @@ pub fn RiskEngine() -> Element {
 
     let z_score = use_memo(move || {
         let cl = confidence_level();
-        if cl >= 99.0 { 2.33 }
-        else if cl >= 95.0 { 1.645 }
-        else { 1.28 }
+        if cl >= 99.0 {
+            2.33
+        } else if cl >= 95.0 {
+            1.645
+        } else {
+            1.28
+        }
     });
 
     let parametric_var = use_memo(move || {
@@ -34,12 +38,12 @@ pub fn RiskEngine() -> Element {
     rsx! {
         div {
             style: "flex: 1; padding: 2.5rem; background: linear-gradient(135deg, #18181b, #27272a); border-radius: 16px; color: #f4f4f5; font-family: 'Inter', system-ui, sans-serif; box-shadow: 0 20px 40px rgba(0,0,0,0.5); display: flex; flex-direction: column; gap: 2rem; overflow-y: auto;",
-            
+
             div {
                 style: "display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 1rem;",
-                h2 { 
-                    style: "margin: 0; font-size: 2.5rem; font-weight: 800; background: linear-gradient(to right, #f43f5e, #fb923c); -webkit-background-clip: text; -webkit-text-fill-color: transparent;", 
-                    "Risk Engine (VaR)" 
+                h2 {
+                    style: "margin: 0; font-size: 2.5rem; font-weight: 800; background: linear-gradient(to right, #f43f5e, #fb923c); -webkit-background-clip: text; -webkit-text-fill-color: transparent;",
+                    "Risk Engine (VaR)"
                 }
                 div {
                     style: "background: rgba(244, 63, 94, 0.1); border: 1px solid rgba(244, 63, 94, 0.3); padding: 0.5rem 1rem; border-radius: 9999px; font-size: 0.875rem; color: #f43f5e; display: flex; align-items: center; gap: 0.5rem;",
@@ -50,7 +54,7 @@ pub fn RiskEngine() -> Element {
 
             div {
                 style: "display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem;",
-                
+
                 div {
                     style: "background: rgba(255,255,255,0.03); padding: 1.5rem; border-radius: 16px; border: 1px solid rgba(255,255,255,0.05); backdrop-filter: blur(10px);",
                     label { style: "display: block; color: #a1a1aa; font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem;", "Portfolio Value ($)" }
@@ -100,7 +104,7 @@ pub fn RiskEngine() -> Element {
             // Results Panel
             div {
                 style: "background: rgba(0,0,0,0.2); border-radius: 16px; padding: 2rem; border: 1px solid rgba(255,255,255,0.05); display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem; text-align: center; box-shadow: inset 0 2px 10px rgba(0,0,0,0.2);",
-                
+
                 div {
                     h3 { style: "color: #94a3b8; font-size: 1rem; font-weight: 500; margin-bottom: 0.5rem;", "Parametric VaR" }
                     div { style: "font-size: 2.5rem; font-weight: 700; color: #fb923c;", "${parametric_var():.0}" }
@@ -124,15 +128,15 @@ pub fn RiskEngine() -> Element {
                     div { style: "color: #ef4444; font-size: 0.9rem; margin-top: 0.5rem;", "Average loss beyond VaR" }
                 }
             }
-            
+
             div {
                 style: "background: linear-gradient(90deg, rgba(244, 63, 94, 0.1), rgba(0,0,0,0)); padding: 1.5rem; border-left: 4px solid #f43f5e; border-radius: 0 8px 8px 0;",
                 h4 { style: "margin: 0 0 0.5rem 0; color: #f43f5e; font-size: 1.1rem;", "Executive Summary" }
-                p { 
+                p {
                     style: "margin: 0; color: #d4d4d8; line-height: 1.6; font-size: 1rem;",
-                    "Under normal market conditions, there is a " span { style: "font-weight: bold; color: white;", "{100.0 - confidence_level():.0}%" } 
-                    " chance that the portfolio will lose more than " 
-                    span { style: "color: #f43f5e; font-weight: bold;", "${parametric_var():.0}" } 
+                    "Under normal market conditions, there is a " span { style: "font-weight: bold; color: white;", "{100.0 - confidence_level():.0}%" }
+                    " chance that the portfolio will lose more than "
+                    span { style: "color: #f43f5e; font-weight: bold;", "${parametric_var():.0}" }
                     " over the next " span { style: "font-weight: bold; color: white;", "{time_horizon()} days" } "."
                 }
             }

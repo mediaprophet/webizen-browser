@@ -10,14 +10,14 @@ pub fn EarthScienceQapp() -> Element {
 
     rsx! {
         div {
-            style: "padding: 20px; background: #1e1e2e; color: #cdd6f4; border-radius: 12px; font-family: monospace; display: flex; flex-direction: column; gap: 16px; height: 100%; box-sizing: border-box;",
-            h2 { style: "margin: 0; color: #fab387; border-bottom: 1px solid #313244; padding-bottom: 8px;", "Earth Science QApp" }
+            style: "padding: 20px; background: var(--qualia-surface); color: var(--qualia-text); border-radius: 12px; font-family: monospace; display: flex; flex-direction: column; gap: 16px; height: 100%; box-sizing: border-box;",
+            h2 { style: "margin: 0; color: var(--qualia-accent); border-bottom: 1px solid var(--qualia-border); padding-bottom: 8px;", "Earth Science QApp" }
 
             div { style: "display: grid; grid-template-columns: 1fr 1fr; gap: 12px;",
                 div {
-                    label { style: "font-size: 0.8rem; color: #a6adc8;", "Subdiscipline" }
+                    label { style: "font-size: 0.8rem; color: var(--qualia-text-muted);", "Subdiscipline" }
                     select {
-                        style: "width: 100%; padding: 6px; background: #181825; border: 1px solid #45475a; color: #cdd6f4; border-radius: 4px; margin-top: 4px; box-sizing: border-box;",
+                        style: "width: 100%; padding: 6px; background: var(--qualia-bg); border: 1px solid var(--qualia-border); color: var(--qualia-text); border-radius: 4px; margin-top: 4px; box-sizing: border-box;",
                         onchange: move |e| subdiscipline.set(e.value()),
                         option { "Geology" }
                         option { "Geomorphology" }
@@ -33,9 +33,9 @@ pub fn EarthScienceQapp() -> Element {
                     }
                 }
                 div {
-                    label { style: "font-size: 0.8rem; color: #a6adc8;", "Geological Timescale" }
+                    label { style: "font-size: 0.8rem; color: var(--qualia-text-muted);", "Geological Timescale" }
                     select {
-                        style: "width: 100%; padding: 6px; background: #181825; border: 1px solid #45475a; color: #cdd6f4; border-radius: 4px; margin-top: 4px; box-sizing: border-box;",
+                        style: "width: 100%; padding: 6px; background: var(--qualia-bg); border: 1px solid var(--qualia-border); color: var(--qualia-text); border-radius: 4px; margin-top: 4px; box-sizing: border-box;",
                         onchange: move |e| timescale.set(e.value()),
                         option { "Holocene" }
                         option { "Pleistocene" }
@@ -56,9 +56,9 @@ pub fn EarthScienceQapp() -> Element {
                     }
                 }
                 div {
-                    label { style: "font-size: 0.8rem; color: #a6adc8;", "Rock Type" }
+                    label { style: "font-size: 0.8rem; color: var(--qualia-text-muted);", "Rock Type" }
                     select {
-                        style: "width: 100%; padding: 6px; background: #181825; border: 1px solid #45475a; color: #cdd6f4; border-radius: 4px; margin-top: 4px; box-sizing: border-box;",
+                        style: "width: 100%; padding: 6px; background: var(--qualia-bg); border: 1px solid var(--qualia-border); color: var(--qualia-text); border-radius: 4px; margin-top: 4px; box-sizing: border-box;",
                         onchange: move |e| rock_type.set(e.value()),
                         option { "Igneous" }
                         option { "Sedimentary" }
@@ -71,9 +71,9 @@ pub fn EarthScienceQapp() -> Element {
                     }
                 }
                 div {
-                    label { style: "font-size: 0.8rem; color: #a6adc8;", "Tectonic Setting" }
+                    label { style: "font-size: 0.8rem; color: var(--qualia-text-muted);", "Tectonic Setting" }
                     select {
-                        style: "width: 100%; padding: 6px; background: #181825; border: 1px solid #45475a; color: #cdd6f4; border-radius: 4px; margin-top: 4px; box-sizing: border-box;",
+                        style: "width: 100%; padding: 6px; background: var(--qualia-bg); border: 1px solid var(--qualia-border); color: var(--qualia-text); border-radius: 4px; margin-top: 4px; box-sizing: border-box;",
                         onchange: move |e| tectonic_setting.set(e.value()),
                         option { "Subduction Zone" }
                         option { "Mid-Ocean Ridge" }
@@ -88,9 +88,9 @@ pub fn EarthScienceQapp() -> Element {
             }
 
             div {
-                label { style: "font-size: 0.8rem; color: #a6adc8;", "Feature Notes" }
+                label { style: "font-size: 0.8rem; color: var(--qualia-text-muted);", "Feature Notes" }
                 textarea {
-                    style: "width: 100%; padding: 8px; background: #181825; border: 1px solid #45475a; color: #cdd6f4; border-radius: 4px; margin-top: 4px; min-height: 80px; box-sizing: border-box; resize: vertical;",
+                    style: "width: 100%; padding: 8px; background: var(--qualia-bg); border: 1px solid var(--qualia-border); color: var(--qualia-text); border-radius: 4px; margin-top: 4px; min-height: 80px; box-sizing: border-box; resize: vertical;",
                     placeholder: "Describe geological features, sample locations, stratigraphic context...",
                     oninput: move |e| feature_notes.set(e.value()),
                     "{feature_notes}"
@@ -98,19 +98,19 @@ pub fn EarthScienceQapp() -> Element {
             }
 
             div {
-                style: "background: #11111b; padding: 16px; border-radius: 8px; border-left: 4px solid #fab387; flex: 1;",
-                h3 { style: "margin-top: 0; color: #fab387; font-size: 0.9rem;", "Output / Analysis" }
+                style: "background: var(--qualia-bg); padding: 16px; border-radius: 8px; border-left: 4px solid var(--qualia-accent); flex: 1;",
+                h3 { style: "margin-top: 0; color: var(--qualia-accent); font-size: 0.9rem;", "Output / Analysis" }
                 div { style: "display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 0.8rem;",
-                    div { style: "color: #a6adc8;", "Subdiscipline:" }
-                    div { style: "color: #cdd6f4;", "{subdiscipline}" }
-                    div { style: "color: #a6adc8;", "Timescale:" }
-                    div { style: "color: #cdd6f4;", "{timescale}" }
-                    div { style: "color: #a6adc8;", "Rock Type:" }
-                    div { style: "color: #cdd6f4;", "{rock_type}" }
-                    div { style: "color: #a6adc8;", "Tectonic Setting:" }
-                    div { style: "color: #cdd6f4;", "{tectonic_setting}" }
+                    div { style: "color: var(--qualia-text-muted);", "Subdiscipline:" }
+                    div { style: "color: var(--qualia-text);", "{subdiscipline}" }
+                    div { style: "color: var(--qualia-text-muted);", "Timescale:" }
+                    div { style: "color: var(--qualia-text);", "{timescale}" }
+                    div { style: "color: var(--qualia-text-muted);", "Rock Type:" }
+                    div { style: "color: var(--qualia-text);", "{rock_type}" }
+                    div { style: "color: var(--qualia-text-muted);", "Tectonic Setting:" }
+                    div { style: "color: var(--qualia-text);", "{tectonic_setting}" }
                 }
-                div { style: "font-size: 0.75rem; color: #585b70; margin-top: 12px; border-top: 1px solid #313244; padding-top: 8px;",
+                div { style: "font-size: 0.75rem; color: var(--qualia-text-muted); margin-top: 12px; border-top: 1px solid var(--qualia-border); padding-top: 8px;",
                     "QualiaDB → Allen Interval temporal engine | geochemistry sieve | stratigraphic graph"
                 }
             }

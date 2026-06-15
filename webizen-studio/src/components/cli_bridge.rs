@@ -17,7 +17,7 @@ pub fn CliBridge() -> Element {
                 div { style: "margin-bottom: 8px;", span { style: "color: #ce9178;", "Connection established to Webizen UI." } }
                 div { style: "margin-bottom: 8px;", span { style: "color: #569cd6;", "qualia" } " p2p swarm status" }
                 div { style: "margin-bottom: 8px;", "Connected to 42 peers." }
-                
+
                 div { style: "display: flex; align-items: center; margin-top: 16px;",
                     span { style: "color: #dcdcaa; margin-right: 8px;", "C:\\Projects\\qualia>" }
                     input { style: "flex: 1; background: transparent; border: none; color: #d4d4d4; font-family: 'Fira Code', monospace; outline: none; font-size: 16px;", autofocus: true }

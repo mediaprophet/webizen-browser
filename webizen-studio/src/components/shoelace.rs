@@ -2,8 +2,8 @@
 // These components wrap Shoelace Custom Elements in Dioxus macros.
 
 #![allow(non_snake_case)]
-use dioxus::prelude::*;
 use core::option::Option;
+use dioxus::prelude::*;
 
 /// Dioxus wrapper for `sl-alert`
 #[component]
@@ -318,10 +318,7 @@ pub fn SlButtonGroup(
 
 /// Dioxus wrapper for `sl-card`
 #[component]
-pub fn SlCard(
-    hasSlotController: Option<String>,
-    children: Element,
-) -> Element {
+pub fn SlCard(hasSlotController: Option<String>, children: Element) -> Element {
     rsx! {
         sl-card {
             style: "--sl-color-primary-500: var(--qualia-primary); --sl-color-primary-600: var(--qualia-primary-hover); --sl-color-success-500: var(--qualia-success); --sl-color-danger-500: var(--qualia-danger); --sl-color-neutral-500: var(--qualia-neutral); --sl-color-neutral-0: var(--qualia-bg);",
@@ -392,9 +389,7 @@ pub fn SlCarousel(
 
 /// Dioxus wrapper for `sl-carousel-item`
 #[component]
-pub fn SlCarouselItem(
-    children: Element,
-) -> Element {
+pub fn SlCarouselItem(children: Element) -> Element {
     rsx! {
         sl-carousel-item {
             style: "--sl-color-primary-500: var(--qualia-primary); --sl-color-primary-600: var(--qualia-primary-hover); --sl-color-success-500: var(--qualia-success); --sl-color-danger-500: var(--qualia-danger); --sl-color-neutral-500: var(--qualia-neutral); --sl-color-neutral-0: var(--qualia-bg);",
@@ -658,10 +653,7 @@ pub fn SlDialog(
 
 /// Dioxus wrapper for `sl-divider`
 #[component]
-pub fn SlDivider(
-    vertical: Option<bool>,
-    children: Element,
-) -> Element {
+pub fn SlDivider(vertical: Option<bool>, children: Element) -> Element {
     rsx! {
         sl-divider {
             style: "--sl-color-primary-500: var(--qualia-primary); --sl-color-primary-600: var(--qualia-primary-hover); --sl-color-success-500: var(--qualia-success); --sl-color-danger-500: var(--qualia-danger); --sl-color-neutral-500: var(--qualia-neutral); --sl-color-neutral-0: var(--qualia-bg);",
@@ -1061,10 +1053,7 @@ pub fn SlInput(
 
 /// Dioxus wrapper for `sl-menu`
 #[component]
-pub fn SlMenu(
-    defaultSlot: Option<String>,
-    children: Element,
-) -> Element {
+pub fn SlMenu(defaultSlot: Option<String>, children: Element) -> Element {
     rsx! {
         sl-menu {
             style: "--sl-color-primary-500: var(--qualia-primary); --sl-color-primary-600: var(--qualia-primary-hover); --sl-color-success-500: var(--qualia-success); --sl-color-danger-500: var(--qualia-danger); --sl-color-neutral-500: var(--qualia-neutral); --sl-color-neutral-0: var(--qualia-bg);",
@@ -1076,9 +1065,7 @@ pub fn SlMenu(
 
 /// Dioxus wrapper for `sl-menu-label`
 #[component]
-pub fn SlMenuLabel(
-    children: Element,
-) -> Element {
+pub fn SlMenuLabel(children: Element) -> Element {
     rsx! {
         sl-menu-label {
             style: "--sl-color-primary-500: var(--qualia-primary); --sl-color-primary-600: var(--qualia-primary-hover); --sl-color-success-500: var(--qualia-success); --sl-color-danger-500: var(--qualia-danger); --sl-color-neutral-500: var(--qualia-neutral); --sl-color-neutral-0: var(--qualia-bg);",
@@ -1587,10 +1574,7 @@ pub fn SlResizeObserver(
 
 /// Dioxus wrapper for `sl-skeleton`
 #[component]
-pub fn SlSkeleton(
-    effect: Option<String>,
-    children: Element,
-) -> Element {
+pub fn SlSkeleton(effect: Option<String>, children: Element) -> Element {
     rsx! {
         sl-skeleton {
             style: "--sl-color-primary-500: var(--qualia-primary); --sl-color-primary-600: var(--qualia-primary-hover); --sl-color-success-500: var(--qualia-success); --sl-color-danger-500: var(--qualia-danger); --sl-color-neutral-500: var(--qualia-neutral); --sl-color-neutral-0: var(--qualia-bg);",
@@ -1699,10 +1683,7 @@ pub fn SlSelect(
 
 /// Dioxus wrapper for `sl-spinner`
 #[component]
-pub fn SlSpinner(
-    localize: Option<String>,
-    children: Element,
-) -> Element {
+pub fn SlSpinner(localize: Option<String>, children: Element) -> Element {
     rsx! {
         sl-spinner {
             style: "--sl-color-primary-500: var(--qualia-primary); --sl-color-primary-600: var(--qualia-primary-hover); --sl-color-success-500: var(--qualia-success); --sl-color-danger-500: var(--qualia-danger); --sl-color-neutral-500: var(--qualia-neutral); --sl-color-neutral-0: var(--qualia-bg);",
@@ -2146,9 +2127,7 @@ pub fn SlTreeItem(
 
 /// Dioxus wrapper for `sl-visually-hidden`
 #[component]
-pub fn SlVisuallyHidden(
-    children: Element,
-) -> Element {
+pub fn SlVisuallyHidden(children: Element) -> Element {
     rsx! {
         sl-visually-hidden {
             style: "--sl-color-primary-500: var(--qualia-primary); --sl-color-primary-600: var(--qualia-primary-hover); --sl-color-success-500: var(--qualia-success); --sl-color-danger-500: var(--qualia-danger); --sl-color-neutral-500: var(--qualia-neutral); --sl-color-neutral-0: var(--qualia-bg);",
@@ -2156,4 +2135,3 @@ pub fn SlVisuallyHidden(
         }
     }
 }
-

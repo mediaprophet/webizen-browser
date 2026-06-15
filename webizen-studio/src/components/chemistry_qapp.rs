@@ -13,14 +13,14 @@ pub fn ChemistryQapp() -> Element {
 
     rsx! {
         div {
-            style: "padding: 20px; background: #1e1e2e; color: #cdd6f4; border-radius: 12px; font-family: monospace; display: flex; flex-direction: column; gap: 16px; height: 100%; box-sizing: border-box;",
-            h2 { style: "margin: 0; color: #f9e2af; border-bottom: 1px solid #313244; padding-bottom: 8px;", "Chemistry QApp" }
+            style: "padding: 20px; background: var(--qualia-surface); color: var(--qualia-text); border-radius: 12px; font-family: monospace; display: flex; flex-direction: column; gap: 16px; height: 100%; box-sizing: border-box;",
+            h2 { style: "margin: 0; color: var(--qualia-accent); border-bottom: 1px solid var(--qualia-border); padding-bottom: 8px;", "Chemistry QApp" }
 
             div { style: "display: grid; grid-template-columns: 1fr 1fr; gap: 12px;",
                 div {
-                    label { style: "font-size: 0.8rem; color: #a6adc8;", "Subdiscipline" }
+                    label { style: "font-size: 0.8rem; color: var(--qualia-text-muted);", "Subdiscipline" }
                     select {
-                        style: "width: 100%; padding: 6px; background: #181825; border: 1px solid #45475a; color: #cdd6f4; border-radius: 4px; margin-top: 4px; box-sizing: border-box;",
+                        style: "width: 100%; padding: 6px; background: var(--qualia-bg); border: 1px solid var(--qualia-border); color: var(--qualia-text); border-radius: 4px; margin-top: 4px; box-sizing: border-box;",
                         onchange: move |e| subdiscipline.set(e.value()),
                         option { "Organic" }
                         option { "Inorganic" }
@@ -35,9 +35,9 @@ pub fn ChemistryQapp() -> Element {
                     }
                 }
                 div {
-                    label { style: "font-size: 0.8rem; color: #a6adc8;", "Reaction Type" }
+                    label { style: "font-size: 0.8rem; color: var(--qualia-text-muted);", "Reaction Type" }
                     select {
-                        style: "width: 100%; padding: 6px; background: #181825; border: 1px solid #45475a; color: #cdd6f4; border-radius: 4px; margin-top: 4px; box-sizing: border-box;",
+                        style: "width: 100%; padding: 6px; background: var(--qualia-bg); border: 1px solid var(--qualia-border); color: var(--qualia-text); border-radius: 4px; margin-top: 4px; box-sizing: border-box;",
                         onchange: move |e| reaction_type.set(e.value()),
                         option { "Substitution SN1" }
                         option { "Substitution SN2" }
@@ -52,7 +52,7 @@ pub fn ChemistryQapp() -> Element {
                     }
                 }
                 div {
-                    label { style: "font-size: 0.8rem; color: #a6adc8;", "Temperature (K): {temperature_k:.0}" }
+                    label { style: "font-size: 0.8rem; color: var(--qualia-text-muted);", "Temperature (K): {temperature_k:.0}" }
                     input {
                         r#type: "range",
                         min: "0",
@@ -64,7 +64,7 @@ pub fn ChemistryQapp() -> Element {
                     }
                 }
                 div {
-                    label { style: "font-size: 0.8rem; color: #a6adc8;", "Pressure (atm): {pressure_atm:.2}" }
+                    label { style: "font-size: 0.8rem; color: var(--qualia-text-muted);", "Pressure (atm): {pressure_atm:.2}" }
                     input {
                         r#type: "range",
                         min: "0.01",
@@ -76,18 +76,18 @@ pub fn ChemistryQapp() -> Element {
                     }
                 }
                 div {
-                    label { style: "font-size: 0.8rem; color: #a6adc8;", "Concentration (M)" }
+                    label { style: "font-size: 0.8rem; color: var(--qualia-text-muted);", "Concentration (M)" }
                     input {
                         r#type: "number",
                         value: "{concentration_m}",
                         step: "0.001",
                         min: "0",
-                        style: "width: 100%; padding: 6px; background: #181825; border: 1px solid #45475a; color: #cdd6f4; border-radius: 4px; margin-top: 4px; box-sizing: border-box;",
+                        style: "width: 100%; padding: 6px; background: var(--qualia-bg); border: 1px solid var(--qualia-border); color: var(--qualia-text); border-radius: 4px; margin-top: 4px; box-sizing: border-box;",
                         oninput: move |e| concentration_m.set(e.value().parse().unwrap_or(1.0)),
                     }
                 }
                 div {
-                    label { style: "font-size: 0.8rem; color: #a6adc8;", "pH: {ph:.2}" }
+                    label { style: "font-size: 0.8rem; color: var(--qualia-text-muted);", "pH: {ph:.2}" }
                     input {
                         r#type: "range",
                         min: "0",
@@ -99,9 +99,9 @@ pub fn ChemistryQapp() -> Element {
                     }
                 }
                 div {
-                    label { style: "font-size: 0.8rem; color: #a6adc8;", "Solvent" }
+                    label { style: "font-size: 0.8rem; color: var(--qualia-text-muted);", "Solvent" }
                     select {
-                        style: "width: 100%; padding: 6px; background: #181825; border: 1px solid #45475a; color: #cdd6f4; border-radius: 4px; margin-top: 4px; box-sizing: border-box;",
+                        style: "width: 100%; padding: 6px; background: var(--qualia-bg); border: 1px solid var(--qualia-border); color: var(--qualia-text); border-radius: 4px; margin-top: 4px; box-sizing: border-box;",
                         onchange: move |e| solvent.set(e.value()),
                         option { "Water" }
                         option { "Ethanol" }
@@ -118,9 +118,9 @@ pub fn ChemistryQapp() -> Element {
             }
 
             div {
-                label { style: "font-size: 0.8rem; color: #a6adc8;", "Reagent Notes" }
+                label { style: "font-size: 0.8rem; color: var(--qualia-text-muted);", "Reagent Notes" }
                 textarea {
-                    style: "width: 100%; padding: 8px; background: #181825; border: 1px solid #45475a; color: #cdd6f4; border-radius: 4px; margin-top: 4px; min-height: 60px; box-sizing: border-box; resize: vertical;",
+                    style: "width: 100%; padding: 8px; background: var(--qualia-bg); border: 1px solid var(--qualia-border); color: var(--qualia-text); border-radius: 4px; margin-top: 4px; min-height: 60px; box-sizing: border-box; resize: vertical;",
                     placeholder: "Enter reagents, catalysts, expected products, yield targets...",
                     oninput: move |e| reagent_notes.set(e.value()),
                     "{reagent_notes}"
@@ -128,23 +128,23 @@ pub fn ChemistryQapp() -> Element {
             }
 
             div {
-                style: "background: #11111b; padding: 16px; border-radius: 8px; border-left: 4px solid #f9e2af; flex: 1;",
-                h3 { style: "margin-top: 0; color: #f9e2af; font-size: 0.9rem;", "Output / Analysis" }
+                style: "background: var(--qualia-bg); padding: 16px; border-radius: 8px; border-left: 4px solid var(--qualia-accent); flex: 1;",
+                h3 { style: "margin-top: 0; color: var(--qualia-accent); font-size: 0.9rem;", "Output / Analysis" }
                 div { style: "display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 0.8rem;",
-                    div { style: "color: #a6adc8;", "Subdiscipline:" }
-                    div { style: "color: #cdd6f4;", "{subdiscipline}" }
-                    div { style: "color: #a6adc8;", "Reaction:" }
-                    div { style: "color: #cdd6f4;", "{reaction_type}" }
-                    div { style: "color: #a6adc8;", "Temperature:" }
-                    div { style: "color: #cdd6f4;", "{temperature_k:.0} K" }
-                    div { style: "color: #a6adc8;", "Pressure:" }
-                    div { style: "color: #cdd6f4;", "{pressure_atm:.2} atm" }
-                    div { style: "color: #a6adc8;", "pH:" }
-                    div { style: "color: #cdd6f4;", "{ph:.2}" }
-                    div { style: "color: #a6adc8;", "Solvent:" }
-                    div { style: "color: #cdd6f4;", "{solvent}" }
+                    div { style: "color: var(--qualia-text-muted);", "Subdiscipline:" }
+                    div { style: "color: var(--qualia-text);", "{subdiscipline}" }
+                    div { style: "color: var(--qualia-text-muted);", "Reaction:" }
+                    div { style: "color: var(--qualia-text);", "{reaction_type}" }
+                    div { style: "color: var(--qualia-text-muted);", "Temperature:" }
+                    div { style: "color: var(--qualia-text);", "{temperature_k:.0} K" }
+                    div { style: "color: var(--qualia-text-muted);", "Pressure:" }
+                    div { style: "color: var(--qualia-text);", "{pressure_atm:.2} atm" }
+                    div { style: "color: var(--qualia-text-muted);", "pH:" }
+                    div { style: "color: var(--qualia-text);", "{ph:.2}" }
+                    div { style: "color: var(--qualia-text-muted);", "Solvent:" }
+                    div { style: "color: var(--qualia-text);", "{solvent}" }
                 }
-                div { style: "font-size: 0.75rem; color: #585b70; margin-top: 12px; border-top: 1px solid #313244; padding-top: 8px;",
+                div { style: "font-size: 0.75rem; color: var(--qualia-text-muted); margin-top: 12px; border-top: 1px solid var(--qualia-border); padding-top: 8px;",
                     "QualiaDB → chemistry_modeler engine | ODE thermodynamic solver | reaction pathway sieve"
                 }
             }

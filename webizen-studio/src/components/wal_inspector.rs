@@ -5,7 +5,7 @@ pub fn WalInspector() -> Element {
     rsx! {
         div { style: "padding: 24px; background: #fafafa; color: #333; height: 100%; font-family: 'Inter', sans-serif;",
             h1 { style: "margin-top: 0; color: #111;", "Write-Ahead Log (WAL) Inspector" }
-            
+
             div { style: "display: flex; gap: 12px; margin-bottom: 24px;",
                 div { style: "padding: 16px; background: white; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); flex: 1;",
                     div { style: "font-size: 12px; color: #666; text-transform: uppercase;", "Current LSN" }
