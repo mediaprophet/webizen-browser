@@ -6,6 +6,12 @@
 //! and a single capability gate (`is_native_host`) so the network effects only
 //! fire where a daemon can actually exist.
 
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum HostSurface {
+    PublicWeb,
+    DesktopWebview,
+}
+
 /// Base URL of the local Webizen daemon HTTP server (manifest, telemetry).
 pub const DAEMON_HTTP: &str = "http://127.0.0.1:8080";
 /// Local native-LLM / handshake WebSocket.
@@ -30,16 +36,36 @@ pub fn telemetry_url() -> String {
 /// (the GitHub Pages demo) returns false so callers can skip daemon traffic.
 #[cfg(target_arch = "wasm32")]
 pub fn is_native_host() -> bool {
-    js_sys::Reflect::get(
-        &js_sys::global(),
-        &wasm_bindgen::JsValue::from_str("__TAURI__"),
-    )
-    .map(|v| !v.is_undefined() && !v.is_null())
-    .unwrap_or(false)
+    current_host_surface() != HostSurface::PublicWeb
 }
 
 /// True when a local Webizen daemon could plausibly be reached (always, native).
 #[cfg(not(target_arch = "wasm32"))]
 pub fn is_native_host() -> bool {
     true
+}
+
+#[cfg(target_arch = "wasm32")]
+pub fn current_host_surface() -> HostSurface {
+    let tauri_present = js_sys::Reflect::get(
+        &js_sys::global(),
+        &wasm_bindgen::JsValue::from_str("__TAURI__"),
+    )
+    .map(|v| !v.is_undefined() && !v.is_null())
+    .unwrap_or(false);
+
+    if tauri_present {
+        HostSurface::DesktopWebview
+    } else {
+        HostSurface::PublicWeb
+    }
+}
+
+#[cfg(not(target_arch = "wasm32"))]
+pub fn current_host_surface() -> HostSurface {
+    HostSurface::DesktopWebview
+}
+
+pub fn supports_browser_pane() -> bool {
+    matches!(current_host_surface(), HostSurface::DesktopWebview)
 }

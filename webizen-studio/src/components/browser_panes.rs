@@ -35,6 +35,10 @@ pub struct BrowserTab {
 
 #[component]
 pub fn WebBrowserPane() -> Element {
+    if !crate::endpoints::supports_browser_pane() {
+        return rsx! { crate::components::browser_unavailable::BrowserUnavailable {} };
+    }
+
     let mut tabs = use_signal(|| {
         vec![BrowserTab {
             id: Uuid::new_v4().to_string(),

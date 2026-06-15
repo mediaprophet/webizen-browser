@@ -11,6 +11,20 @@ mod theme_engine;
 use dioxus::prelude::*;
 use studio_canvas::DynamicPage;
 use theme_engine::ResolvedTheme;
+#[cfg(target_arch = "wasm32")]
+use wasm_bindgen::JsCast;
+#[cfg(target_arch = "wasm32")]
+use wasm_bindgen::prelude::*;
+
+#[cfg(target_arch = "wasm32")]
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(js_namespace = ["window", "__TAURI__", "event"], js_name = listen, catch)]
+    async fn tauri_listen(
+        event: &str,
+        handler: &js_sys::Function,
+    ) -> Result<js_sys::Function, wasm_bindgen::JsValue>;
+}
 
 fn main() {
     // Surface panics with a readable message + stack in the browser console.
@@ -33,6 +47,12 @@ pub enum Route {
 
     #[route("/browser")]
     BrowserRoute {},
+
+    #[route("/settings")]
+    SettingsRoute {},
+
+    #[route("/about")]
+    AboutRoute {},
 
     #[route("/context-studio")]
     ContextStudioRoute {},
@@ -68,11 +88,15 @@ fn QAppsRoute() -> Element {
 
 #[component]
 fn BrowserRoute() -> Element {
-    rsx! {
-        div {
-            style: "flex: 1; display: flex; overflow: hidden;",
-            components::browser_panes::WebBrowserPane {}
+    if crate::endpoints::supports_browser_pane() {
+        rsx! {
+            div {
+                style: "flex: 1; display: flex; overflow: hidden;",
+                components::browser_panes::WebBrowserPane {}
+            }
         }
+    } else {
+        rsx! { components::browser_unavailable::BrowserUnavailable {} }
     }
 }
 
@@ -91,6 +115,16 @@ fn NexusRoute() -> Element {
     rsx! { components::nexus::Nexus {} }
 }
 
+#[component]
+fn SettingsRoute() -> Element {
+    rsx! { components::settings_page::SettingsPage {} }
+}
+
+#[component]
+fn AboutRoute() -> Element {
+    rsx! { components::about_page::AboutPage {} }
+}
+
 const SHOELACE_CSS: &str =
     "https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.15.0/cdn/themes/dark.css";
 const SHOELACE_JS: &str =
@@ -101,6 +135,12 @@ const INTER_FONT: &str =
 #[component]
 fn AppLayout() -> Element {
     let theme_state = consume_context::<Signal<ResolvedTheme>>();
+    let navigator = use_navigator();
+    let settings_listener_started = use_signal(|| false);
+    #[cfg(not(target_arch = "wasm32"))]
+    let _ = navigator;
+    #[cfg(not(target_arch = "wasm32"))]
+    let _ = settings_listener_started;
     let t = theme_state();
     let accent = t
         .tokens
@@ -117,6 +157,37 @@ fn AppLayout() -> Element {
         .get("text-muted")
         .cloned()
         .unwrap_or("#8b8178".to_string());
+
+    use_effect(move || {
+        #[cfg(target_arch = "wasm32")]
+        {
+            if crate::endpoints::current_host_surface() != crate::endpoints::HostSurface::DesktopWebview
+                || settings_listener_started()
+            {
+                return;
+            }
+
+            settings_listener_started.set(true);
+            let navigator = navigator;
+
+            wasm_bindgen_futures::spawn_local(async move {
+                let callback = Closure::<dyn FnMut(JsValue)>::wrap(Box::new(move |_event| {
+                    let _ = navigator.push(Route::SettingsRoute {});
+                }));
+
+                match tauri_listen("open-settings", callback.as_ref().unchecked_ref()).await {
+                    Ok(_unlisten) => {
+                        callback.forget();
+                    }
+                    Err(err) => {
+                        web_sys::console::error_1(
+                            &format!("settings tray listener failed: {err:?}").into(),
+                        );
+                    }
+                }
+            });
+        }
+    });
 
     rsx! {
         div {
@@ -154,12 +225,14 @@ fn AppLayout() -> Element {
                     sl-icon { "name": "grid", style: "font-size: 0.9rem;" }
                     "QApps"
                 }
-                Link {
-                    to: Route::BrowserRoute {},
-                    class: "nav-item",
-                    style: "color: {text_muted};",
-                    sl-icon { "name": "globe2", style: "font-size: 0.9rem;" }
-                    "Browser"
+                if crate::endpoints::supports_browser_pane() {
+                    Link {
+                        to: Route::BrowserRoute {},
+                        class: "nav-item",
+                        style: "color: {text_muted};",
+                        sl-icon { "name": "globe2", style: "font-size: 0.9rem;" }
+                        "Browser"
+                    }
                 }
                 div {
                     class: "nav-item",
@@ -190,17 +263,19 @@ fn AppLayout() -> Element {
 
                 div { style: "flex: 1;" }
 
-                div {
+                Link {
+                    to: Route::SettingsRoute {},
                     class: "nav-item",
-                    style: "color: {text_muted}; cursor: default;",
+                    style: "color: {text_muted};",
                     sl-icon { "name": "gear", style: "font-size: 0.9rem;" }
                     "Settings"
                 }
-                div {
+                Link {
+                    to: Route::AboutRoute {},
                     class: "nav-item",
-                    style: "color: {text_muted}; cursor: default;",
+                    style: "color: {text_muted};",
                     sl-icon { "name": "person-circle", style: "font-size: 0.9rem;" }
-                    "Account"
+                    "About"
                 }
             }
 

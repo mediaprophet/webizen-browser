@@ -116,8 +116,12 @@ fn main() {
             }
             SystemTrayEvent::MenuItemClick { id, .. } => {
                 match id.as_str() {
-                    "show" | "settings" | "logs" => {
+                    "show" | "logs" => {
                         show_main_window(app);
+                    }
+                    "settings" => {
+                        show_main_window(app);
+                        let _ = app.emit_all("open-settings", "settings");
                     }
                     "localhost_preview" => {
                         let _ = open::that("http://127.0.0.1:8080/");

@@ -15,7 +15,9 @@ pub mod shoelace;
 
 pub mod agent_config;
 pub mod agreements_rights;
+pub mod about_page;
 pub mod benchmark_harness;
+pub mod browser_unavailable;
 pub mod bioinformatics_lab;
 pub mod chemistry_modeler;
 pub mod cli_bridge;
@@ -47,6 +49,7 @@ pub mod quantum_dft;
 pub mod rdf_star_editor;
 pub mod risk_engine;
 pub mod shacl_validator;
+pub mod settings_page;
 pub mod solid_ldp_browser;
 pub mod sparql_explorer;
 pub mod statistical_analysis;
