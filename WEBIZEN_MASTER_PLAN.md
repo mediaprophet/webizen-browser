@@ -80,7 +80,7 @@ The user's "two/three functions" map cleanly onto **one shared Dioxus UI crate**
 ```
 
 - **(A) Public WASM** = "webizen wasm". Excludes the browser pane and any daemon-only feature; uses the deterministic engine **stub**. This is the Pages demo and the embeddable surface. The 3D (`webizen-runtime` → WebGPU `Renderer` backend) lands here, so yes — "webizen wasm" becomes the QApps + 3D surface, **without** an embedded browser.
-- **(B) Desktop webview** = the local install. The Tauri shell bundles the *same* wasm (`distDir: ../webizen-studio/dist`) but the webview exposes `window.__TAURI__`, so `is_native_host()` is true and the full feature set unlocks: real QualiaDB, browser pane, system tray, settings, about, port-4242 relay.
+- **(B) Desktop webview** = the local install, **and this *is* the new browser** — not merely a Studio host. The QualiaDB daemon baked into it is the local agent; the user's machine becomes a globally discoverable hub via QDP DNS + Front Door DIDs, with all inbound contact funnelled through one HCAI-agreement chokepoint. The Tauri shell bundles the *same* wasm (`distDir: ../webizen-studio/dist`) but the webview exposes `window.__TAURI__`, so `is_native_host()` is true and the full feature set unlocks: real QualiaDB, the browser pane, system tray, settings, about, the port-4242 relay, **and the socially-defined network layer** (QDP / Front Door / HCAI / Nym / WebRTC / WebTorrent). See **`WEBIZEN_NETWORK.md`** — much of this (`resolve_qdp_did`, `generate_front_door`, `toggle_nym_relay`, semantic handshake) is *already* live as Tauri commands; the gaps are the `did.json` frontdoor server, the HCAI endpoint, and the Dioxus UI.
 - **(C) Browser projection** = an opt-in toggle in the desktop install that serves the wasm from the desktop's own localhost server (`:8080`) and opens it in the user's system browser. That browser tab talks back to the desktop daemon on `:4242`. Same `is_native_host()` capability path (detect daemon reachability instead of `__TAURI__` — see §5.3).
 
 **Key insight:** capability gating is *runtime*, not a second build. One wasm artifact serves all three; features light up based on `endpoints::is_native_host()` / daemon reachability. This avoids a CI matrix and keeps "no Node" trivially true.
@@ -171,6 +171,7 @@ UI is always a Dioxus thin-client; the "engine" column names the **QualiaDB modu
 | F13 | QApp manifest v2 + hypermedia container | ← `extension_manifest`, `extension_bus`, `q42_*`, `webtorrent_seeder` (see `WEBIZEN_HYPERMEDIA_FORMAT.md`) | P2 |
 | F14 | Tripwire / synthesis (logic rules) | dashboards ← `modalities` (paraconsistent/ASP/deontic), `neuro_symbolic_sieve` | P2 |
 | F15 | Wire remaining 271 QApps to `qapp_engine` | mechanical: `EnginePanel` per discipline (pattern proven) | P1 |
+| F16 | **Browser network layer** (QDP / Front Door / HCAI / Nym / VerifiedComms / browser pane) | omnibox router + Shield overlay ← `resolver`/`dns_resolver`, `webizen_identifiers`, `webizen_server`, `deontic_logic`, `nym_adapter`, `p2p`. **Much already live** — see `WEBIZEN_NETWORK.md` | P0 (this *is* the browser) |
 
 ---
 
