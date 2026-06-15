@@ -44,6 +44,8 @@ Per the gap audit, rendering exists nowhere in QualiaDB (only compute). So the 3
 The naming collision is actively confusing ("the chat graph code" could mean the DAG engine *or* the misnamed UI pane). Renaming the browser file removes the ambiguity and is a safe, mechanical change.
 
 > Related: the full chat system is `qualia-client-core/chat_{session,inference,retrieval,relay,agents,files,ontology,graph}` — eight modules. The browser should have **one** chat feature area (Dioxus) that surfaces all of them, not scattered, ad-hoc panes.
+>
+> **Naming:** call that consolidated browser chat feature **`qualia-chat`** (module `webizen-studio/src/qualia_chat/`, or a `webizen-qualia-chat` crate if it grows). It surfaces the client-core `chat_*` engine modules; the misnamed `chat_graph.rs` pane folds into it. The Flutter app (§3a) shows the full target shape — chat with a DAG graph panel, citation/provenance chips, files, images, reactions, sub-agents, environment bar.
 
 ---
 
