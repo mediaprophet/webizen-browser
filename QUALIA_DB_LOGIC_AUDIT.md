@@ -28,7 +28,7 @@ Below is the definitive taxonomy of the systems fully integrated and compiled in
 ## 3. The Specialized Scientific Engines (`src/specialized_libs/`)
 The sheer volume of implemented scientific calculus in the DB layer is massive. These modules back the respective QApps without needing external Python dependencies.
 - **Medical Computing (`112KB`):** FHIR/LOINC bridges, Framingham, CHA₂DS₂-VASc, drug contraindications.
-- **Cryptographic Library (`104KB`):** zk-SNARK/STARK proofs, post-quantum ML-DSA signatures.
+- **Cryptographic Library (`104KB`):** Real primitives — Ed25519 signatures, **post-quantum ML-DSA-65 (FIPS-204, via `fips204`)**, AES-256-GCM / ChaCha20-Poly1305 / XChaCha20-Poly1305 AEAD, SHA-256/512 + BLAKE3 hashing, HKDF-SHA256. zk-SNARK/STARK proof types are present as scaffolding only (commitment checks, **not** real proofs — Halo2/arkworks backend still planned). See `qualiaDB/CRYPTO_IMPLEMENTATION_PLAN.md` and `qualiaDB/docs/CRYPTO_STATUS_2026-06-15.md`.
 - **Financial Modeling (`103KB`):** Monte Carlo VaR, Geometric Brownian Motion, Black-Scholes, portfolio risk engines.
 - **Physics Simulation (`86KB`):** Thermodynamics MCMC, DFT ground states, physical systems modeling.
 - **Machine Learning (`85KB`):** Neural inference layers directly mapped onto Quins.
