@@ -13,7 +13,7 @@ serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 sysinfo = "0.30"
 tokio = { version = "1", features = ["full"] }
-reqwest = { version = "0.12", default-features = false, features = ["rustls-tls", "json", "stream"] }
+reqwest = { version = "0.13", default-features = false, features = ["rustls", "json", "stream"] }
 axum = { version = "0.7", features = ["ws"] }
 tower-http = { version = "0.5", features = ["cors", "fs", "set-header"] }
 base64 = "0.22"
@@ -21,6 +21,8 @@ open = "5"
 qualia-core-db = { path = "../../qualiaDB/crates/qualia-core-db" }
 qualia-client-core = { path = "../../qualiaDB/crates/qualia-client-core" }
 webizen-runtime = { path = "../webizen-runtime" }
+webizen-render = { path = "../webizen-render" }
+webizen-studio = { path = "../webizen-studio" }
 futures-util = "0.3"
 mime_guess = "2.0"
 pdf-extract = "0.7"

@@ -67,8 +67,7 @@ pub enum RuntimeCommand {
 pub struct NullLedgerSink;
 
 impl LedgerSink for NullLedgerSink {
-    fn record(&self, _record: LedgerRecord) {
-    }
+    fn record(&self, _record: LedgerRecord) {}
 }
 
 pub struct SimulationKernel<B, L>
@@ -193,7 +192,10 @@ mod tests {
         assert_eq!(kernel.advance_elapsed(Duration::from_millis(8)).unwrap(), 0);
         assert!(kernel.latest_snapshot().is_none());
 
-        assert_eq!(kernel.advance_elapsed(Duration::from_millis(24)).unwrap(), 2);
+        assert_eq!(
+            kernel.advance_elapsed(Duration::from_millis(24)).unwrap(),
+            2
+        );
         assert_eq!(kernel.field().epoch, 2);
         assert_eq!(kernel.latest_snapshot().unwrap().epoch, 2);
     }

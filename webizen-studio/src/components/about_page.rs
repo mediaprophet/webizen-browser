@@ -47,12 +47,47 @@ struct WalletStatusSnapshot {
     nym_connected: bool,
 }
 
+#[derive(Clone, Debug, Default, Deserialize, PartialEq)]
+struct LocalPreviewProbe {
+    target_url: String,
+    reachable: bool,
+    status_code: Option<u16>,
+    detail: String,
+}
+
+#[derive(Clone, Debug, Deserialize, PartialEq)]
+struct RuntimeSnapshotRecord {
+    epoch: u64,
+    dimensions: (u32, u32),
+    frame_slot: u8,
+    state_hash: [u8; 32],
+}
+
+#[derive(Clone, Debug, Deserialize, PartialEq)]
+struct RuntimeLedgerHealth {
+    persisted_epoch: u64,
+    dropped_events: u64,
+    gap_events: u64,
+    recovery_events: u64,
+    write_failures: u64,
+    last_gap_from_epoch: Option<u64>,
+    last_gap_to_epoch: Option<u64>,
+    degraded: bool,
+}
+
 #[derive(Clone, Debug, PartialEq)]
 struct RuntimeAboutState {
     daemon_status: String,
     config: Option<AgentConfigSnapshot>,
+    active_daemon_port: Option<u16>,
+    qualia_protocol_port: Option<u16>,
     wallet: Option<WalletStatusSnapshot>,
+    first_run: Option<bool>,
     identity_present: Option<bool>,
+    qualia_root: Option<String>,
+    preview: Option<LocalPreviewProbe>,
+    diffusion: Option<RuntimeSnapshotRecord>,
+    ledger: Option<RuntimeLedgerHealth>,
     status_note: String,
 }
 
@@ -61,9 +96,16 @@ impl Default for RuntimeAboutState {
         Self {
             daemon_status: "unknown".to_string(),
             config: None,
+            active_daemon_port: None,
+            qualia_protocol_port: None,
             wallet: None,
+            first_run: None,
             identity_present: None,
-            status_note: "Waiting for desktop runtime metadata…".to_string(),
+            qualia_root: None,
+            preview: None,
+            diffusion: None,
+            ledger: None,
+            status_note: "Waiting for desktop runtime metadata...".to_string(),
         }
     }
 }
@@ -128,6 +170,7 @@ pub fn AboutPage() -> Element {
                 return;
             }
 
+            let mut load_started = load_started;
             load_started.set(true);
             let mut runtime = runtime;
 
@@ -137,35 +180,88 @@ pub fn AboutPage() -> Element {
                     .unwrap_or_else(|err| format!("Unavailable ({err})"));
                 let config =
                     invoke_tauri_json::<AgentConfigSnapshot>("get_config", json!({})).await.ok();
+                let active_daemon_port =
+                    invoke_tauri_json::<u16>("get_active_daemon_port", json!({}))
+                        .await
+                        .ok();
+                let qualia_protocol_port =
+                    invoke_tauri_json::<u16>("qualia_protocol_port", json!({}))
+                        .await
+                        .ok();
                 let wallet =
                     invoke_tauri_json::<WalletStatusSnapshot>("get_wallet_status", json!({}))
                         .await
                         .ok();
+                let first_run = invoke_tauri_json::<bool>("is_first_run", json!({}))
+                    .await
+                    .ok();
                 let identity = invoke_tauri_json::<Option<serde_json::Value>>(
-                    "read_identity",
+                    "load_identity",
                     json!({}),
                 )
                 .await
                 .ok()
                 .flatten();
+                let preview =
+                    invoke_tauri_json::<LocalPreviewProbe>("probe_localhost_preview", json!({}))
+                        .await
+                        .ok();
+                let diffusion = invoke_tauri_json::<Option<RuntimeSnapshotRecord>>(
+                    "get_latest_diffusion_snapshot",
+                    json!({}),
+                )
+                .await
+                .ok()
+                .flatten();
+                let ledger = invoke_tauri_json::<RuntimeLedgerHealth>(
+                    "get_diffusion_ledger_health",
+                    json!({}),
+                )
+                .await
+                .ok();
+                let qualia_root = identity
+                    .as_ref()
+                    .and_then(|value| value.get("qualia_root"))
+                    .and_then(|value| value.as_str())
+                    .map(ToOwned::to_owned);
 
                 runtime.set(RuntimeAboutState {
                     daemon_status,
                     config,
+                    active_daemon_port,
+                    qualia_protocol_port,
                     wallet,
+                    first_run,
                     identity_present: Some(identity.is_some()),
-                    status_note: "Desktop runtime metadata loaded from native commands.".to_string(),
+                    qualia_root,
+                    preview,
+                    diffusion,
+                    ledger,
+                    status_note:
+                        "Desktop runtime metadata loaded from QualiaDB-backed native commands."
+                            .to_string(),
                 });
             });
         }
     });
 
     let runtime_snapshot = runtime();
-    let daemon_endpoint = runtime_snapshot
+    let configured_daemon_endpoint = runtime_snapshot
         .config
         .as_ref()
         .map(|config| format!("{}:{}", config.daemon_host, config.daemon_port))
         .unwrap_or_else(|| "127.0.0.1:4242".to_string());
+    let active_daemon_endpoint = runtime_snapshot
+        .active_daemon_port
+        .map(|port| {
+            let host = runtime_snapshot
+                .config
+                .as_ref()
+                .map(|config| config.daemon_host.as_str())
+                .unwrap_or("127.0.0.1");
+            format!("{host}:{port}")
+        })
+        .unwrap_or_else(|| configured_daemon_endpoint.clone());
     let storage_path = runtime_snapshot
         .config
         .as_ref()
@@ -179,6 +275,11 @@ pub fn AboutPage() -> Element {
     let identity_status = match runtime_snapshot.identity_present {
         Some(true) => "Configured".to_string(),
         Some(false) => "Not configured".to_string(),
+        None => "Unknown".to_string(),
+    };
+    let first_run_status = match runtime_snapshot.first_run {
+        Some(true) => "Yes".to_string(),
+        Some(false) => "No".to_string(),
         None => "Unknown".to_string(),
     };
     let wallet_summary = runtime_snapshot
@@ -197,6 +298,58 @@ pub fn AboutPage() -> Element {
             )
         })
         .unwrap_or_else(|| "Wallet status unavailable".to_string());
+    let preview_summary = runtime_snapshot
+        .preview
+        .as_ref()
+        .map(|probe| {
+            if probe.reachable {
+                format!(
+                    "{} responded{}",
+                    probe.target_url,
+                    probe.status_code
+                        .map(|status| format!(" ({status})"))
+                        .unwrap_or_default()
+                )
+            } else {
+                format!("{} unreachable ({})", probe.target_url, probe.detail)
+            }
+        })
+        .unwrap_or_else(|| "Preview probe unavailable".to_string());
+    let diffusion_summary = runtime_snapshot
+        .diffusion
+        .as_ref()
+        .map(|snapshot| {
+            format!(
+                "epoch {} / {}x{} / slot {}",
+                snapshot.epoch,
+                snapshot.dimensions.0,
+                snapshot.dimensions.1,
+                snapshot.frame_slot
+            )
+        })
+        .unwrap_or_else(|| "No diffusion snapshot yet".to_string());
+    let ledger_summary = runtime_snapshot
+        .ledger
+        .as_ref()
+        .map(|ledger| {
+            if ledger.degraded {
+                format!(
+                    "Degraded: dropped {} / gaps {} / writes {}",
+                    ledger.dropped_events, ledger.gap_events, ledger.write_failures
+                )
+            } else {
+                format!("Nominal through epoch {}", ledger.persisted_epoch)
+            }
+        })
+        .unwrap_or_else(|| "Ledger status unavailable".to_string());
+    let protocol_port = runtime_snapshot
+        .qualia_protocol_port
+        .map(|port| port.to_string())
+        .unwrap_or_else(|| "Unknown".to_string());
+    let qualia_root = runtime_snapshot
+        .qualia_root
+        .clone()
+        .unwrap_or_else(|| "Unavailable".to_string());
 
     rsx! {
         div { style: PAGE_STYLE,
@@ -236,7 +389,7 @@ pub fn AboutPage() -> Element {
                             }
                             p {
                                 style: "margin: 0; font-size: 0.78rem; color: var(--qualia-text-muted); line-height: 1.62;",
-                                "Webizen is a graph-native environment for working with knowledge, tools, and personal computing systems in one place. For this 0.0.3 slice, the desktop shell now exposes enough runtime state to make the about page useful during setup, screenshots, and debugging."
+                                "Webizen is a graph-native environment for working with knowledge, tools, and personal computing systems in one place. For this 0.0.4 slice, the desktop shell now exposes enough runtime state to make the about page useful during setup, screenshots, and debugging."
                             }
                         }
                         div {
@@ -247,11 +400,11 @@ pub fn AboutPage() -> Element {
                             }
                             span {
                                 style: "font-size: 0.7rem; color: var(--qualia-text); background: rgba(128,128,128,0.08); border: 1px solid var(--qualia-border); border-radius: 999px; padding: 0.24rem 0.58rem;",
-                                "Desktop config"
+                                "QualiaDB runtime"
                             }
                             span {
                                 style: "font-size: 0.7rem; color: var(--qualia-text); background: rgba(128,128,128,0.08); border: 1px solid var(--qualia-border); border-radius: 999px; padding: 0.24rem 0.58rem;",
-                                "0.0.3"
+                                "0.0.4"
                             }
                         }
                     }
@@ -280,10 +433,12 @@ pub fn AboutPage() -> Element {
 
             div {
                 style: "display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.85rem; margin-bottom: 1rem;",
-                InfoPill { label: "Studio Version", value: "0.0.3".to_string() }
+                InfoPill { label: "Studio Version", value: "0.0.4".to_string() }
                 InfoPill { label: "Host Surface", value: host_surface }
                 InfoPill { label: "Browser Pane", value: browser_pane_status }
                 InfoPill { label: "Inference", value: inference_backend.clone() }
+                InfoPill { label: "Preview", value: preview_summary.clone() }
+                InfoPill { label: "Diffusion", value: diffusion_summary.clone() }
             }
 
             div {
@@ -311,10 +466,17 @@ pub fn AboutPage() -> Element {
                     div {
                         style: "display: flex; flex-direction: column;",
                         CopyRow { label: "Daemon", value: runtime_snapshot.daemon_status.clone() }
-                        CopyRow { label: "Endpoint", value: daemon_endpoint }
+                        CopyRow { label: "Endpoint", value: active_daemon_endpoint }
+                        CopyRow { label: "Configured", value: configured_daemon_endpoint }
+                        CopyRow { label: "QApp Port", value: protocol_port }
                         CopyRow { label: "Storage", value: storage_path }
+                        CopyRow { label: "First Run", value: first_run_status }
                         CopyRow { label: "Identity", value: identity_status }
+                        CopyRow { label: "Qualia Root", value: qualia_root }
                         CopyRow { label: "Wallet", value: wallet_summary }
+                        CopyRow { label: "Preview", value: preview_summary }
+                        CopyRow { label: "Diffusion", value: diffusion_summary }
+                        CopyRow { label: "Ledger", value: ledger_summary }
                     }
                 }
 

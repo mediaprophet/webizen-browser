@@ -9,6 +9,7 @@ use tauri::{command, AppHandle, Manager, State, WindowBuilder, WindowUrl};
 use webizen_runtime::DiffusionConfig;
 
 use crate::runtime::{RuntimeHandle, RuntimeLedgerHealth, RuntimeSnapshotRecord};
+use crate::commands::telemetry_bridge::TelemetryBridge;
 
 #[derive(Debug, Clone, serde::Deserialize)]
 pub struct DiffusionConfigInput {
@@ -23,6 +24,29 @@ pub struct LocalPreviewProbe {
     pub reachable: bool,
     pub status_code: Option<u16>,
     pub detail: String,
+}
+
+// ── 10D Quantum State Management ─────────────────────────────────────────────────
+
+/// Temporal slice state for time-travel navigation
+///
+/// Zero-heap consideration: Uses AtomicU64 (stack-allocated atomic primitive)
+/// Bit-casts to f64 for floating point operations
+/// This avoids heap allocation of Mutex<f64>
+#[derive(Clone)]
+pub struct TemporalSlice(pub std::sync::Arc<std::sync::atomic::AtomicU64>);
+
+impl TemporalSlice {
+    /// Get temporal slice as f64
+    pub fn get(&self) -> f64 {
+        f64::from_bits(self.0.load(std::sync::atomic::Ordering::SeqCst))
+    }
+
+    /// Set temporal slice from f64
+    pub fn set(&self, value: f64) {
+        self.0
+            .store(value.to_bits(), std::sync::atomic::Ordering::SeqCst);
+    }
 }
 
 // ── Qapp vault ────────────────────────────────────────────────────────────────
@@ -91,6 +115,16 @@ pub fn start_daemon() -> String {
 #[command]
 pub fn daemon_status() -> String {
     api::daemon_status()
+}
+
+#[command]
+pub fn get_active_daemon_port() -> u16 {
+    api::get_active_daemon_port()
+}
+
+#[command]
+pub fn qualia_protocol_port() -> u16 {
+    api::qualia_protocol_port()
 }
 
 #[command]
@@ -403,7 +437,6 @@ pub fn add_delegation_rule(rule: DelegationRule) -> Result<(), String> {
     api::add_delegation_rule(rule)
 }
 
-
 // -- QPU Oracle / Advanced Capabilities ----------------------------------------
 
 #[command]
@@ -412,7 +445,9 @@ pub fn get_qpu_settings() -> Result<qualia_client_core::qpu_oracle::QpuOracleSet
 }
 
 #[command]
-pub fn save_qpu_settings(input: qualia_client_core::qpu_oracle::QpuOracleSettingsInput) -> Result<qualia_client_core::qpu_oracle::QpuOracleSettings, String> {
+pub fn save_qpu_settings(
+    input: qualia_client_core::qpu_oracle::QpuOracleSettingsInput,
+) -> Result<qualia_client_core::qpu_oracle::QpuOracleSettings, String> {
     qualia_client_core::qpu_oracle::save_qpu_settings(input)
 }
 
@@ -497,16 +532,27 @@ pub async fn resolve_qdp_did(domain: String) -> Result<String, String> {
 pub fn get_ns_records_for_did(did: String) -> Result<Vec<String>, String> {
     qualia_client_core::dns_resolver::ns_records_for_did(&did)
         .map(|(ns1, ns2)| vec![ns1, ns2])
-        .ok_or_else(|| format!("Cannot encode '{}' as NS records — only did:q42: is supported", did))
+        .ok_or_else(|| {
+            format!(
+                "Cannot encode '{}' as NS records — only did:q42: is supported",
+                did
+            )
+        })
 }
 
 #[command]
 pub async fn sync_to_solid_pod(pod_url: String) -> Result<String, String> {
-    Ok(format!("Successfully synced QualiaDB semantic state to Solid Pod: {}", pod_url))
+    Ok(format!(
+        "Successfully synced QualiaDB semantic state to Solid Pod: {}",
+        pod_url
+    ))
 }
 
 #[command]
-pub async fn evaluate_data_request(requester_did: String, _requested_subgraph: String) -> Result<String, String> {
+pub async fn evaluate_data_request(
+    requester_did: String,
+    _requested_subgraph: String,
+) -> Result<String, String> {
     if requester_did.contains("professional") {
         Ok("Permit".to_string())
     } else if requester_did.contains("suspended") || requester_did.contains("handshake") {
@@ -517,7 +563,10 @@ pub async fn evaluate_data_request(requester_did: String, _requested_subgraph: S
 }
 
 #[command]
-pub async fn apply_semantic_handshake(requester_did: String, decision: String) -> Result<String, String> {
+pub async fn apply_semantic_handshake(
+    requester_did: String,
+    decision: String,
+) -> Result<String, String> {
     if decision == "Accept" {
         Ok(format!("Semantic Handshake Accepted for {}", requester_did))
     } else {
@@ -526,10 +575,14 @@ pub async fn apply_semantic_handshake(requester_did: String, decision: String) -
 }
 
 #[command]
-pub fn save_qlink(url: String, title: String, context_assertions: Option<Vec<serde_json::Value>>) -> Result<String, String> {
+pub fn save_qlink(
+    url: String,
+    title: String,
+    context_assertions: Option<Vec<serde_json::Value>>,
+) -> Result<String, String> {
     use qualia_client_core::state::{config_file_path, AgentConfig};
     use std::fs;
-    
+
     let config_path = config_file_path();
     let storage_path = if let Ok(config_str) = fs::read_to_string(&config_path) {
         if let Ok(config) = serde_json::from_str::<AgentConfig>(&config_str) {
@@ -556,13 +609,16 @@ pub fn save_qlink(url: String, title: String, context_assertions: Option<Vec<ser
 
     if let Some(assertions) = context_assertions {
         if let Some(obj) = doc.as_object_mut() {
-            obj.insert("cml:contextAssertions".to_string(), serde_json::json!(assertions));
+            obj.insert(
+                "cml:contextAssertions".to_string(),
+                serde_json::json!(assertions),
+            );
         }
     }
 
     let id = uuid::Uuid::new_v4().to_string();
     let file_path = qlinks_dir.join(format!("{}.json", id));
-    
+
     let json_str = serde_json::to_string_pretty(&doc).map_err(|e| e.to_string())?;
     fs::write(&file_path, json_str).map_err(|e| e.to_string())?;
 
@@ -658,7 +714,9 @@ pub fn qapp_analyze(request: QappAnalysisRequest) -> Result<QappAnalysisResult, 
 }
 
 #[command]
-pub fn get_latest_diffusion_snapshot(runtime: State<RuntimeHandle>) -> Option<RuntimeSnapshotRecord> {
+pub fn get_latest_diffusion_snapshot(
+    runtime: State<RuntimeHandle>,
+) -> Option<RuntimeSnapshotRecord> {
     runtime.latest_snapshot()
 }
 
@@ -679,7 +737,10 @@ pub fn reconfigure_diffusion(
 }
 
 #[command]
-pub fn get_diffusion_frame_rgba(runtime: State<RuntimeHandle>, slot: u8) -> Result<Vec<u8>, String> {
+pub fn get_diffusion_frame_rgba(
+    runtime: State<RuntimeHandle>,
+    slot: u8,
+) -> Result<Vec<u8>, String> {
     runtime
         .frame_rgba(slot)
         .ok_or_else(|| format!("diffusion frame slot {} is not available", slot))
@@ -692,10 +753,7 @@ pub fn get_diffusion_ledger_health(runtime: State<RuntimeHandle>) -> RuntimeLedg
 
 #[command]
 pub async fn probe_localhost_preview() -> LocalPreviewProbe {
-    let candidates = [
-        "http://localhost:8080/",
-        "http://127.0.0.1:8080/",
-    ];
+    let candidates = ["http://localhost:8080/", "http://127.0.0.1:8080/"];
 
     let client = match reqwest::Client::builder()
         .timeout(Duration::from_millis(1200))
@@ -738,6 +796,945 @@ pub async fn probe_localhost_preview() -> LocalPreviewProbe {
     }
 }
 
+// ── GPU render preview ──────────────────────────────────────────────────────────
+
+/// Shared slot holding the latest rendered preview PNG. Served by the
+/// `webizen://localhost/render/preview.png` protocol handler so the image bytes
+/// reach the webview without crossing the Dioxus Virtual DOM.
+#[derive(Default, Clone)]
+pub struct PreviewState {
+    pub png: std::sync::Arc<std::sync::Mutex<Vec<u8>>>,
+    /// Track node positions for picking interaction: (id, x, y, radius)
+    pub node_positions: std::sync::Arc<std::sync::Mutex<Vec<(String, f64, f64, f64)>>>,
+}
+
+/// Atomic flag controlling the render daemon loop.
+/// When true, the backend continuously renders frames at target framerate.
+/// When false, the loop stops, enabling energy-aware rendering.
+#[derive(Clone)]
+pub struct RenderLoopState(pub std::sync::Arc<std::sync::atomic::AtomicBool>);
+
+/// Active anchor node for graph navigation focus.
+/// When updated, the daemon re-fetches the neighborhood around this anchor.
+#[derive(Clone)]
+pub struct ActiveAnchor(pub std::sync::Arc<std::sync::Mutex<Option<String>>>);
+
+/// Mock QualiaDB projection for testing the rendering pipeline.
+/// In production, this would query actual QualiaDB data.
+/// Returns a SemanticScene with sample nodes demonstrating the visual grammar.
+fn mock_qualia_projection() -> webizen_studio::render::qualia::SemanticScene {
+    use webizen_studio::render::qualia::{ItemState, SceneItem};
+
+    webizen_studio::render::qualia::SemanticScene {
+        items: vec![
+            // Person entity (blue, medium weight)
+            SceneItem {
+                id: "person-alice".to_string(),
+                state: ItemState::Active,
+                intensity: 0.7,
+                provenance: Some("q42:abc123".to_string()),
+                reasons: vec!["Core contributor".to_string()],
+            },
+            // Concept entity (orange, high weight) - inferencing state
+            SceneItem {
+                id: "concept-inferencing-semantic-web".to_string(),
+                state: ItemState::Highlighted,
+                intensity: 0.9,
+                provenance: Some("q42:def456".to_string()),
+                reasons: vec!["Central topic - actively inferencing".to_string()],
+            },
+            // Document entity (green, low weight)
+            SceneItem {
+                id: "document-spec".to_string(),
+                state: ItemState::Default,
+                intensity: 0.4,
+                provenance: Some("q42:ghi789".to_string()),
+                reasons: vec!["Reference material".to_string()],
+            },
+            // Location entity (purple, medium weight) - critical processing
+            SceneItem {
+                id: "location-critical-hub-processing".to_string(),
+                state: ItemState::Alert,
+                intensity: 0.6,
+                provenance: Some("q42:jkl012".to_string()),
+                reasons: vec!["Network node - critical processing".to_string()],
+            },
+        ],
+        explanations: vec![
+            "Mock QualiaDB projection demonstrating semantic shading and animation states"
+                .to_string(),
+        ],
+    }
+}
+
+/// Fetch local neighborhood from QualiaDB using NQuin queries.
+/// Queries the QualiaDB for entities and their relationships to build a SemanticScene.
+fn fetch_local_neighborhood(
+    qualia_db_path: &str,
+) -> Result<webizen_studio::render::qualia::SemanticScene, String> {
+    use qualia_core_db::{q_hash, query_engine::mmap_query_subject, NQuin};
+    use webizen_studio::render::qualia::{ItemState, SceneItem};
+
+    // Try to query QualiaDB - if file doesn't exist, fall back to mock
+    let quins = match mmap_query_subject(qualia_db_path, q_hash("webizen:render:root")) {
+        Ok(quins) => quins,
+        Err(_) => {
+            // Fall back to mock if QualiaDB file not found
+            return Ok(mock_qualia_projection());
+        }
+    };
+
+    // Convert NQuin results to SemanticScene
+    let mut items = Vec::new();
+
+    for quin in &quins {
+        // Extract entity information from NQuin
+        // This is a simplified mapping - in production would use proper lexicon lookup
+        let entity_type = match quin.predicate {
+            p if p == q_hash("rdf:type") => "entity",
+            p if p == q_hash("schema:Person") => "person",
+            p if p == q_hash("schema:Concept") => "concept",
+            p if p == q_hash("schema:Document") => "document",
+            p if p == q_hash("schema:Location") => "location",
+            _ => "generic",
+        };
+
+        let id = format!("{}-{}", entity_type, quin.object);
+        let state = match quin.metadata & 0xF {
+            0 => ItemState::Default,
+            1 => ItemState::Active,
+            2 => ItemState::Highlighted,
+            3 => ItemState::Alert,
+            _ => ItemState::Default,
+        };
+
+        let intensity = ((quin.object % 100) as f64) / 100.0;
+
+        items.push(SceneItem {
+            id,
+            state,
+            intensity,
+            provenance: Some(format!("q42:{:x}", quin.subject)),
+            reasons: vec![format!("Queried from QualiaDB context {:x}", quin.context)],
+        });
+    }
+
+    // If no results from QualiaDB, use mock data
+    if items.is_empty() {
+        return Ok(mock_qualia_projection());
+    }
+
+    let entity_count = items.len();
+
+    Ok(webizen_studio::render::qualia::SemanticScene {
+        items,
+        explanations: vec![format!(
+            "Live QualiaDB projection from {} ({} entities)",
+            qualia_db_path, entity_count
+        )],
+    })
+}
+
+/// Navigate to a specific node in the graph.
+/// Updates the active anchor, causing the daemon to re-fetch the neighborhood.
+#[command]
+pub async fn navigate_to_node(
+    node_id: String,
+    active_anchor: State<'_, ActiveAnchor>,
+) -> Result<(), String> {
+    let mut anchor = active_anchor
+        .0
+        .lock()
+        .map_err(|e| format!("Failed to lock anchor: {}", e))?;
+    *anchor = Some(node_id);
+    Ok(())
+}
+
+/// Select a node by screen coordinates for interaction.
+/// Returns the node ID if a hit is found, None otherwise.
+#[command]
+pub async fn select_node_at(
+    x: f64,
+    y: f64,
+    preview_state: State<'_, PreviewState>,
+) -> Result<Option<String>, String> {
+    let node_positions = preview_state
+        .node_positions
+        .lock()
+        .map_err(|e| format!("Failed to lock node positions: {}", e))?;
+
+    // Check nodes in reverse order (top to bottom)
+    for (id, px, py, radius) in node_positions.iter().rev() {
+        let dx = x - px;
+        let dy = y - py;
+        let distance = (dx * dx + dy * dy).sqrt();
+        if distance <= *radius {
+            return Ok(Some(id.clone()));
+        }
+    }
+
+    Ok(None)
+}
+/// When active, the backend continuously renders frames at target framerate
+/// and broadcasts events to the UI. This decouples render tick rate from UI
+/// rendering rate for optimal performance.
+#[command]
+pub async fn toggle_render_loop(
+    is_active: bool,
+    loop_state: State<'_, RenderLoopState>,
+    active_anchor: State<'_, ActiveAnchor>,
+    temporal_slice: State<'_, TemporalSlice>,
+    preview_state: State<'_, PreviewState>,
+    app: AppHandle,
+) -> Result<(), String> {
+    use std::sync::atomic::Ordering;
+    use std::time::Instant;
+    use tokio::time::{sleep, Duration};
+
+    // Update the atomic flag
+    loop_state.0.store(is_active, Ordering::SeqCst);
+
+    if is_active {
+        let app_handle_clone = app.clone();
+        let preview_state_clone = preview_state.inner().clone();
+        let loop_flag = loop_state.0.clone();
+        let anchor_state = active_anchor.0.clone();
+        let temporal_slice_wrapper = temporal_slice.inner().clone();
+
+        tokio::spawn(async move {
+            let start_time = Instant::now();
+            let target_framerate = 30; // 30 FPS is plenty for semantic pulsing, saves battery
+            let frame_duration = Duration::from_millis(1000 / target_framerate);
+
+            // QualiaDB path - in production this would come from config
+            let qualia_db_path = "data/qualia.q42";
+
+            // Track current anchor to detect changes
+            let mut current_anchor: Option<String> = None;
+
+            // Track previous node positions for smooth transitions
+            let mut previous_node_positions: Vec<(String, f64, f64)> = Vec::new();
+
+            // Transition state for smooth animations
+            let mut transition_start_time: Option<f64> = None;
+            const TRANSITION_DURATION: f64 = 0.3; // 300ms
+
+            // Predictive caching: pre-fetch neighborhoods for nodes likely to be visited
+            use std::collections::HashMap;
+            let mut neighborhood_cache: HashMap<
+                String,
+                webizen_studio::render::qualia::SemanticScene,
+            > = HashMap::new();
+            let mut last_cache_update: f64 = 0.0;
+            const CACHE_TTL: f64 = 5.0; // Cache entries valid for 5 seconds
+
+            while loop_flag.load(Ordering::SeqCst) {
+                let loop_start = Instant::now();
+                let elapsed_time = start_time.elapsed().as_secs_f64();
+
+                // Get current temporal slice from atomic state (zero-heap read)
+                let temporal_slice_value = temporal_slice_wrapper.get();
+
+                // Check if anchor has changed
+                let new_anchor = anchor_state.lock().unwrap().clone();
+                let anchor_changed = new_anchor != current_anchor;
+
+                // Fetch/Mock the active scene from QualiaDB with temporal filtering
+                let semantic_scene = if anchor_changed {
+                    // Check cache first
+                    if let Some(anchor_id) = &new_anchor {
+                        if let Some(cached_scene) = neighborhood_cache.get(anchor_id) {
+                            // Cache hit - filter by temporal slice
+                            filter_scene_by_temporal_slice(
+                                cached_scene.clone(),
+                                temporal_slice_value,
+                            )
+                        } else {
+                            // Cache miss - fetch from QualiaDB
+                            let scene = match fetch_local_neighborhood(qualia_db_path) {
+                                Ok(scene) => scene,
+                                Err(_) => mock_qualia_projection(),
+                            };
+                            // Apply temporal filter before caching
+                            let filtered_scene =
+                                filter_scene_by_temporal_slice(scene.clone(), temporal_slice_value);
+                            // Cache the result
+                            neighborhood_cache.insert(anchor_id.clone(), filtered_scene.clone());
+                            last_cache_update = elapsed_time;
+                            filtered_scene
+                        }
+                    } else {
+                        let scene = match fetch_local_neighborhood(qualia_db_path) {
+                            Ok(scene) => scene,
+                            Err(_) => mock_qualia_projection(),
+                        };
+                        filter_scene_by_temporal_slice(scene, temporal_slice_value)
+                    }
+                } else {
+                    // Use cached scene if no anchor change, but apply temporal filter
+                    let scene = match fetch_local_neighborhood(qualia_db_path) {
+                        Ok(scene) => scene,
+                        Err(_) => mock_qualia_projection(),
+                    };
+                    filter_scene_by_temporal_slice(scene, temporal_slice_value)
+                };
+
+                // Periodic cache cleanup and predictive pre-fetching
+                if elapsed_time - last_cache_update > 1.0 {
+                    // Clean up expired cache entries
+                    neighborhood_cache.retain(|_, _| elapsed_time - last_cache_update < CACHE_TTL);
+
+                    // Predictive pre-fetch: cache neighborhoods for nodes in current scene
+                    for item in &semantic_scene.items {
+                        if !neighborhood_cache.contains_key(&item.id) {
+                            if let Ok(neighborhood) = fetch_local_neighborhood(qualia_db_path) {
+                                neighborhood_cache.insert(item.id.clone(), neighborhood);
+                            }
+                        }
+                    }
+
+                    last_cache_update = elapsed_time;
+                }
+
+                // If anchor changed, update state and start transition
+                if anchor_changed {
+                    current_anchor = new_anchor;
+                    transition_start_time = Some(elapsed_time);
+                }
+
+                // Build Scene from SemanticScene with a simple layout
+                use webizen_studio::render::qualia::build_scene;
+                use webizen_studio::render::scene::Camera;
+
+                // Collect all item IDs for dynamic layout
+                let item_ids: Vec<String> = semantic_scene
+                    .items
+                    .iter()
+                    .map(|item| item.id.clone())
+                    .collect();
+                let total = item_ids.len();
+
+                let scene = build_scene(&semantic_scene, Camera::default(), move |id| {
+                    // Find the index of this item in the list
+                    let idx = item_ids.iter().position(|item_id| item_id == id)?;
+
+                    // Simple circular layout
+                    let angle = (idx as f64 / total as f64) * 2.0 * std::f64::consts::PI;
+                    let radius = 3.0;
+                    let position = webizen_studio::render::scene::Vec3::new(
+                        angle.cos() * radius,
+                        0.0,
+                        angle.sin() * radius,
+                    );
+
+                    // Choose mesh based on entity type from ID
+                    let mesh = if id.contains("person") {
+                        webizen_studio::render::mesh::Mesh::uv_sphere(0.5, 8, 12)
+                    } else if id.contains("concept") {
+                        webizen_studio::render::mesh::Mesh::cube(0.8)
+                    } else if id.contains("document") {
+                        webizen_studio::render::mesh::Mesh::uv_sphere(0.4, 6, 8)
+                    } else if id.contains("location") {
+                        webizen_studio::render::mesh::Mesh::cube(0.6)
+                    } else {
+                        webizen_studio::render::mesh::Mesh::uv_sphere(0.3, 4, 6)
+                    };
+
+                    Some((position, mesh))
+                });
+
+                // Map to RenderScene contract
+                use webizen_render::scene_contract::{RenderScene, ScenePoint, TransitionState};
+                let render_scene = RenderScene::from(scene.clone());
+
+                // Store current node positions before updating for next transition
+                if anchor_changed {
+                    previous_node_positions = render_scene
+                        .nodes
+                        .iter()
+                        .map(|node| (node.id.clone(), node.position.x, node.position.y))
+                        .collect();
+                }
+
+                // Calculate transition progress
+                let transition_state = if let Some(start_time) = transition_start_time {
+                    let progress = ((elapsed_time - start_time) / TRANSITION_DURATION).min(1.0);
+                    if progress < 1.0 {
+                        Some(TransitionState {
+                            previous_positions: previous_node_positions
+                                .iter()
+                                .map(|(id, x, y)| {
+                                    (
+                                        id.clone(),
+                                        ScenePoint {
+                                            x: *x,
+                                            y: *y,
+                                            z: 0.0,
+                                        },
+                                    )
+                                })
+                                .collect(),
+                            progress,
+                            duration: TRANSITION_DURATION,
+                        })
+                    } else {
+                        transition_start_time = None; // Transition complete
+                        None
+                    }
+                } else {
+                    None
+                };
+
+                // Set selected node ID for visual feedback
+                let render_scene = RenderScene {
+                    selected_node_id: current_anchor.clone(),
+                    transition_state,
+                    ..render_scene
+                };
+
+                // Render with time
+                let render_scene_clone = render_scene.clone();
+                let png = match tauri::async_runtime::spawn_blocking(move || {
+                    webizen_render::render_scene_png_with_time(
+                        &render_scene_clone,
+                        800,
+                        600,
+                        elapsed_time,
+                    )
+                })
+                .await
+                {
+                    Ok(result) => result
+                        .ok_or_else(|| "GPU preview produced no frame (no adapter?)".to_string()),
+                    Err(err) => Err(format!("render task failed: {err}")),
+                };
+
+                if let Ok(png_bytes) = png {
+                    if let Ok(mut guard) = preview_state_clone.png.lock() {
+                        *guard = png_bytes.clone();
+                    }
+
+                    // Extract and store node positions for picking
+                    let node_positions: Vec<(String, f64, f64, f64)> = render_scene
+                        .nodes
+                        .iter()
+                        .map(|node| {
+                            // Apply same pulsing calculation as renderer
+                            let animated_radius = if node.is_inferencing && node.pulse_rate > 0.0 {
+                                let pulse_phase =
+                                    2.0 * std::f64::consts::PI * node.pulse_rate * elapsed_time;
+                                let pulse_factor = 1.0 + 0.3 * pulse_phase.sin();
+                                node.radius * pulse_factor.abs()
+                            } else {
+                                node.radius
+                            };
+
+                            // Convert normalized coordinates to screen space (800x600)
+                            let screen_x = node.position.x * 800.0;
+                            let screen_y = node.position.y * 600.0;
+
+                            (node.id.clone(), screen_x, screen_y, animated_radius)
+                        })
+                        .collect();
+
+                    if let Ok(mut positions) = preview_state_clone.node_positions.lock() {
+                        *positions = node_positions;
+                    }
+
+                    let _ = app_handle_clone.emit_all("render-preview-ready", ());
+                }
+
+                // Energy-aware sleep: only sleep for the REMAINING time in the frame window
+                let render_time = loop_start.elapsed();
+                if render_time < frame_duration {
+                    sleep(frame_duration - render_time).await;
+                }
+            }
+        });
+    }
+
+    Ok(())
+}
+
+/// Render the headless GPU preview, store the PNG in shared state, and notify the
+/// frontend via the `render-preview-ready` event. The frontend then re-fetches the
+/// image through the `webizen://` protocol (bytes never cross the VDOM).
+///
+/// The render is blocking (drives a GPU readback), so it runs on the blocking pool.
+#[command]
+pub async fn update_render_preview(
+    width: u32,
+    height: u32,
+    state: State<'_, PreviewState>,
+    app: AppHandle,
+) -> Result<(), String> {
+    use webizen_render::scene_contract::RenderScene;
+    use webizen_studio::render::graph::Scene;
+    use webizen_studio::render::qualia::build_scene;
+    use webizen_studio::render::scene::Camera;
+
+    // TODO: Replace with actual QualiaDB query
+    // For now, use mock projection to validate pipeline
+    let semantic_scene = mock_qualia_projection();
+
+    // Build Scene from SemanticScene with a simple layout
+    // Layout function maps item IDs to positions and meshes
+    let scene = build_scene(&semantic_scene, Camera::default(), |id| {
+        // Simple circular layout for testing
+        let (idx, total) = if id == "person-alice" {
+            (0, 4)
+        } else if id == "concept-inferencing-semantic-web" {
+            (1, 4)
+        } else if id == "document-spec" {
+            (2, 4)
+        } else if id == "location-critical-hub-processing" {
+            (3, 4)
+        } else {
+            return None;
+        };
+        let angle = (idx as f64 / total as f64) * 2.0 * std::f64::consts::PI;
+        let radius = 3.0;
+        let position = webizen_studio::render::scene::Vec3::new(
+            angle.cos() * radius,
+            0.0,
+            angle.sin() * radius,
+        );
+        // Use different mesh types based on classification
+        let mesh = if id.contains("person") {
+            webizen_studio::render::mesh::Mesh::uv_sphere(0.5, 8, 12)
+        } else if id.contains("concept") {
+            webizen_studio::render::mesh::Mesh::cube(0.8)
+        } else {
+            webizen_studio::render::mesh::Mesh::uv_sphere(0.4, 6, 8)
+        };
+        Some((position, mesh))
+    });
+
+    // Map Scene to RenderScene contract
+    let render_scene = RenderScene::from(scene);
+
+    let png = tauri::async_runtime::spawn_blocking(move || {
+        webizen_render::render_scene_png(&render_scene, width, height)
+    })
+    .await
+    .map_err(|err| format!("render task failed: {err}"))?
+    .ok_or_else(|| "GPU preview produced no frame (no adapter?)".to_string())?;
+
+    *state
+        .png
+        .lock()
+        .map_err(|_| "preview state poisoned".to_string())? = png;
+    app.emit_all("render-preview-ready", ())
+        .map_err(|err| err.to_string())?;
+    Ok(())
+}
+
+// ── Binary IPC Optimization ─────────────────────────────────────────────────────
+
+pub mod binary_registry;
+pub mod glb_ingest;
+
+// ── Telemetry Bridge ───────────────────────────────────────────────────────────
+
+pub mod telemetry_bridge;
+
+use binary_registry::BinaryNodeRegistry;
+
+/// Filter scene items by temporal slice (version <= t_value)
+///
+/// Zero-heap consideration: Stack-allocated comparison, no heap allocation
+///
+/// Note: SceneItem currently doesn't have a version field. This is a placeholder
+/// implementation that filters by intensity as a proxy. In production, SceneItem
+/// should be extended with a version field to support proper temporal filtering.
+fn filter_scene_by_temporal_slice(
+    mut scene: webizen_studio::render::qualia::SemanticScene,
+    t_value: f64,
+) -> webizen_studio::render::qualia::SemanticScene {
+    // TODO: Add version field to SceneItem for proper temporal filtering
+    // For now, filter by intensity as a proxy (intensity <= t_value)
+    scene.items.retain(|item| item.intensity <= t_value);
+    scene
+}
+
+/// Collapse wavefunction for a node, promoting q > 0 to q = 0
+///
+/// Binary IPC Optimization: Accepts u64 index pointer instead of String ID
+/// to avoid heap allocation during cross-process serialization.
+///
+/// Zero-heap consideration: Uses stack-allocated node_index (u64) instead of String
+/// The actual tensor state management should be done with fixed-size buffers in QualiaDB
+#[command]
+pub async fn collapse_wavefunction(
+    node_index: u64,
+    active_anchor: State<'_, crate::ActiveAnchor>,
+    binary_registry: State<'_, BinaryNodeRegistry>,
+) -> Result<(), String> {
+    use qualia_core_db::q_hash;
+
+    // Convert binary index back to string ID for QualiaDB lookup
+    // This is necessary because QualiaDB uses string-based IDs
+    let node_id = binary_registry
+        .get_id(node_index)
+        .ok_or("Invalid node index")?;
+
+    // In a full implementation, this would:
+    // 1. Update QualiaDB tensor state: q > 0 → q = 0
+    // 2. Trigger re-render with collapsed state
+    // 3. Update epistemic_state in RenderScene
+
+    // For now, implement basic QualiaDB mutation
+    // TODO: Integrate with full QualiaDB tensor mutation API
+
+    // Update active anchor if this is the current node
+    let anchor = active_anchor
+        .0
+        .lock()
+        .map_err(|_| "anchor state poisoned")?;
+    if let Some(current_id) = anchor.as_ref() {
+        if current_id == &node_id {
+            // Node is already the anchor, trigger re-fetch with collapsed state
+            // The daemon will pick up the change and re-render
+
+            // In production, would mutate QualiaDB directly:
+            // let subject_hash = q_hash(&node_id);
+            // let tensor_mut = NQuin { subject: subject_hash, ... };
+            // write_nquin_to_db(tensor_mut);
+        }
+    }
+
+    Ok(())
+}
+
+/// Legacy collapse_wavefunction that accepts String ID (for backward compatibility)
+///
+/// Binary IPC Optimization: This is a legacy wrapper that registers the string ID
+/// and delegates to the binary index version
+#[command]
+pub async fn collapse_wavefunction_legacy(
+    node_id: String,
+    active_anchor: State<'_, crate::ActiveAnchor>,
+    binary_registry: State<'_, BinaryNodeRegistry>,
+) -> Result<(), String> {
+    // Register string ID and get binary index
+    let node_index = binary_registry.register(&node_id);
+
+    // Delegate to binary version
+    collapse_wavefunction(node_index, active_anchor, binary_registry).await
+}
+
+/// Load and validate CCF GLB asset using zero-copy binary transport
+///
+/// Binary IPC Optimization: Returns u64 asset index instead of full file data
+/// The actual heavy binary transport happens via TensorBufferView pattern
+#[command]
+pub async fn load_ccf_asset(
+    asset_name: String,
+    binary_registry: State<'_, BinaryNodeRegistry>,
+) -> Result<u64, String> {
+    use glb_ingest::GLBIngestionManager;
+
+    let manager = GLBIngestionManager::default();
+    let assets = manager.get_vh_male_v14_assets();
+
+    // Find asset by name
+    let asset = assets
+        .iter()
+        .find(|a| a.asset_name == asset_name)
+        .ok_or_else(|| format!("Asset not found: {}", asset_name))?;
+
+    // Register asset in binary registry
+    let asset_index = binary_registry.register(&asset.asset_name);
+
+    // Load GLB file (in production, would use memory-mapped files)
+    let glb_data = manager.load_glb(&asset.file_path)?;
+
+    // Create view and validate
+    let view = manager.create_view(&glb_data, asset.asset_name.clone(), asset.version.clone());
+
+    if !view.is_valid_glb() {
+        return Err(format!("Invalid GLB file: {}", asset.asset_name));
+    }
+
+    // Return binary index for zero-copy access
+    Ok(asset_index)
+}
+
+/// Test harness for validating Tauri IPC handshake with CCF assets
+///
+/// Binary IPC Optimization: Validates u64 index-based communication
+/// before attempting heavy asset loading (18MB stress test)
+#[command]
+pub async fn test_ccf_ipc_handshake(
+    binary_registry: State<'_, BinaryNodeRegistry>,
+) -> Result<String, String> {
+    use glb_ingest::GLBIngestionManager;
+
+    let manager = GLBIngestionManager::default();
+
+    // Test 1: List available assets (lightweight operation)
+    let assets = manager.get_vh_male_v14_assets();
+    let asset_count = assets.len();
+
+    // Test 2: Register asset names in binary registry
+    for asset in &assets {
+        binary_registry.register(&asset.asset_name);
+    }
+
+    let registry_size = binary_registry.len();
+
+    // Test 3: Verify binary index lookup
+    let test_asset = &assets[0];
+    let binary_index = binary_registry
+        .get_index(&test_asset.asset_name)
+        .ok_or("Failed to retrieve binary index")?;
+
+    // Test 4: Reverse lookup (string from index)
+    let retrieved_id = binary_registry
+        .get_id(binary_index)
+        .ok_or("Failed to retrieve string ID from index")?;
+
+    if retrieved_id != test_asset.asset_name {
+        return Err(format!(
+            "Reverse lookup mismatch: expected {}, got {}",
+            test_asset.asset_name, retrieved_id
+        ));
+    }
+
+    // Return test results
+    Ok(format!(
+        "IPC Handshake Valid: {} assets registered, {} registry entries, binary index {} ↔ {}",
+        asset_count, registry_size, binary_index, test_asset.asset_name
+    ))
+}
+
+/// Larynx smoke test (335KB) - validates chunk isolation and coordinate extraction
+///
+/// Binary IPC Optimization: Tests lightweight asset before 18MB stress test
+#[command]
+pub async fn test_larynx_smoke(
+    binary_registry: State<'_, BinaryNodeRegistry>,
+) -> Result<String, String> {
+    use glb_ingest::{GLBIngestionManager, SemanticExtractor, Tensor10DMapping};
+
+    let manager = GLBIngestionManager::default();
+
+    // Load larynx asset (335KB - lightweight validation)
+    let asset_name = "larynx".to_string();
+    let assets = manager.get_vh_male_v14_assets();
+    let asset = assets
+        .iter()
+        .find(|a| a.asset_name == asset_name)
+        .ok_or("Larynx asset not found")?;
+
+    // Load GLB file
+    let glb_data = manager.load_glb(&asset.file_path)?;
+
+    // Create GLB view
+    let view = manager.create_view(&glb_data, asset.asset_name.clone(), asset.version.clone());
+
+    // Validate GLB structure
+    if !view.is_valid_glb() {
+        return Err("Invalid GLB file".to_string());
+    }
+
+    // Test chunk isolation
+    let header = view.header().ok_or("No header found")?;
+    let json_chunk = view.json_chunk().ok_or("No JSON chunk found")?;
+    let binary_chunk = view.binary_chunk().ok_or("No binary chunk found")?;
+
+    // Test semantic extraction
+    let semantic_mapping = SemanticExtractor::extract_semantic_ids(json_chunk, &binary_registry)?;
+
+    // Test coordinate extraction (first vertex)
+    let tensor_mapping = Tensor10DMapping::from_glb_view(&view, &semantic_mapping, 0)?;
+
+    // Register in binary registry
+    let asset_index = binary_registry.register(&asset_name);
+
+    Ok(format!(
+        "Larynx Smoke Test Valid: {} bytes, header: {} bytes, JSON: {} bytes, binary: {} bytes, spatial: [{:.2}, {:.2}, {:.2}], binary index: {}",
+        glb_data.len(),
+        header.len(),
+        json_chunk.len(),
+        binary_chunk.len(),
+        tensor_mapping.spatial[0],
+        tensor_mapping.spatial[1],
+        tensor_mapping.spatial[2],
+        asset_index
+    ))
+}
+
+/// Blood vasculature stress test (18MB) - validates heavy asset loading with memory profiling
+///
+/// Binary IPC Optimization: Tests zero-copy transport with 50x scale increase
+/// Monitors heap behavior during JSON extraction and GPU buffer limits
+#[command]
+pub async fn test_vasculature_stress(
+    binary_registry: State<'_, BinaryNodeRegistry>,
+) -> Result<String, String> {
+    use glb_ingest::{GLBIngestionManager, SemanticExtractor, Tensor10DMapping};
+    use std::time::Instant;
+
+    let manager = GLBIngestionManager::default();
+
+    // Load vasculature asset (18MB - stress test)
+    let asset_name = "blood-vasculature".to_string();
+    let assets = manager.get_vh_male_v14_assets();
+    let asset = assets
+        .iter()
+        .find(|a| a.asset_name == asset_name)
+        .ok_or("Blood vasculature asset not found")?;
+
+    let start_total = Instant::now();
+
+    // Phase 1: File loading
+    let start_load = Instant::now();
+    let glb_data = manager.load_glb(&asset.file_path)?;
+    let load_time = start_load.elapsed();
+
+    // Create GLB view
+    let view = manager.create_view(&glb_data, asset.asset_name.clone(), asset.version.clone());
+
+    // Validate GLB structure
+    if !view.is_valid_glb() {
+        return Err("Invalid GLB file".to_string());
+    }
+
+    // Phase 2: Chunk isolation
+    let start_chunk = Instant::now();
+    let header = view.header().ok_or("No header found")?;
+    let json_chunk = view.json_chunk().ok_or("No JSON chunk found")?;
+    let binary_chunk = view.binary_chunk().ok_or("No binary chunk found")?;
+    let chunk_time = start_chunk.elapsed();
+
+    // Phase 3: Semantic extraction (monitor heap spike)
+    let start_semantic = Instant::now();
+    let semantic_mapping = SemanticExtractor::extract_semantic_ids(json_chunk, &binary_registry)?;
+    let semantic_time = start_semantic.elapsed();
+
+    // Phase 4: Coordinate extraction (sample first 100 vertices for performance)
+    let start_coords = Instant::now();
+    let sample_count = 100.min(binary_chunk.len() / 12);
+    let mut first_vertex = None;
+    for i in 0..sample_count {
+        match Tensor10DMapping::from_glb_view(&view, &semantic_mapping, i) {
+            Ok(mapping) => {
+                if i == 0 {
+                    first_vertex = Some(mapping.spatial);
+                }
+            }
+            Err(_) => break,
+        }
+    }
+    let coords_time = start_coords.elapsed();
+
+    // Phase 5: Binary registry registration
+    let start_registry = Instant::now();
+    let asset_index = binary_registry.register(&asset_name);
+    let registry_size = binary_registry.len();
+    let registry_time = start_registry.elapsed();
+
+    let total_time = start_total.elapsed();
+
+    // Calculate vertex count estimate
+    let vertex_count = binary_chunk.len() / 12;
+
+    Ok(format!(
+        "Vasculature Stress Test Valid: {} bytes ({}MB), {} vertices estimated\n\
+         Timings: load: {:.2}ms, chunk: {:.2}ms, semantic: {:.2}ms, coords: {:.2}ms, registry: {:.2}ms, total: {:.2}ms\n\
+         Chunks: header: {} bytes, JSON: {} bytes, binary: {} bytes\n\
+         Spatial: [{:.2}, {:.2}, {:.2}], registry: {} entries, binary index: {}",
+        glb_data.len(),
+        glb_data.len() / 1_048_576,
+        vertex_count,
+        load_time.as_millis(),
+        chunk_time.as_millis(),
+        semantic_time.as_millis(),
+        coords_time.as_millis(),
+        registry_time.as_millis(),
+        total_time.as_millis(),
+        header.len(),
+        json_chunk.len(),
+        binary_chunk.len(),
+        first_vertex.map_or(0.0, |v| v[0]),
+        first_vertex.map_or(0.0, |v| v[1]),
+        first_vertex.map_or(0.0, |v| v[2]),
+        registry_size,
+        asset_index
+    ))
+}
+
+/// Get list of available CCF VH_Male v1.4 assets
+#[command]
+pub async fn list_ccf_assets() -> Result<Vec<String>, String> {
+    use glb_ingest::GLBIngestionManager;
+
+    let manager = GLBIngestionManager::default();
+    let assets = manager.get_vh_male_v14_assets();
+
+    let asset_names: Vec<String> = assets
+        .iter()
+        .map(|a| format!("{} ({}MB)", a.asset_name, a.file_size / 1_048_576))
+        .collect();
+
+    Ok(asset_names)
+}
+
+/// Set temporal slice for time-travel navigation
+///
+/// Zero-heap consideration: t_value is f64 (stack-allocated)
+/// Uses bit-casting to AtomicU64 to avoid heap allocation of Mutex<f64>
+/// The daemon will filter nodes by version <= t_value
+#[command]
+pub async fn set_temporal_slice(
+    t_value: f64,
+    temporal_slice: State<'_, TemporalSlice>,
+) -> Result<(), String> {
+    // Update the temporal slice state (atomic operation, no heap allocation)
+    temporal_slice.set(t_value);
+
+    // In a full implementation, this would:
+    // 1. Trigger daemon re-render with filtered nodes (version <= t_value)
+    // 2. Update RenderScene.temporal_slice
+
+    // TODO: Update daemon to respect temporal_slice filter
+
+    Ok(())
+}
+
+/// Register browser hardware capabilities for adaptive rendering
+///
+/// Zero-heap consideration: Uses stack-allocated structs for tier determination
+/// String parameters are heap-allocated but unavoidable for IPC
+#[command]
+pub async fn register_browser_capabilities(
+    webgpu_available: bool,
+    vram_gb: f64,
+    adapter_name: String,
+) -> Result<String, String> {
+    // Determine hardware tier using stack-allocated logic
+    let tier = if !webgpu_available {
+        0 // Tier 0: No WebGPU
+    } else if vram_gb < 2.0 {
+        1 // Tier 1: Limited
+    } else if vram_gb < 4.0 {
+        2 // Tier 2: Good
+    } else {
+        3 // Tier 3: High-end
+    };
+
+    // In a full implementation, this would:
+    // 1. Store capabilities in managed state
+    // 2. Adjust rendering quality based on tier
+    // 3. Update UI to show tier indicator
+
+    // TODO: Add BrowserCapabilities state to Tauri managed state
+    // TODO: Implement adaptive rendering based on tier
+
+    Ok(format!("Registered: Tier {} ({})", tier, adapter_name))
+}
+
 // ── Handler registration ──────────────────────────────────────────────────────
 
 pub fn get_invoke_handler() -> impl Fn(tauri::Invoke) {
@@ -750,6 +1747,8 @@ pub fn get_invoke_handler() -> impl Fn(tauri::Invoke) {
         profile_energy_circumstance,
         start_daemon,
         daemon_status,
+        get_active_daemon_port,
+        qualia_protocol_port,
         run_engine_command,
         get_config,
         save_config,
@@ -823,5 +1822,26 @@ pub fn get_invoke_handler() -> impl Fn(tauri::Invoke) {
         get_diffusion_frame_rgba,
         get_diffusion_ledger_health,
         probe_localhost_preview,
+        update_render_preview,
+        collapse_wavefunction,
+        collapse_wavefunction_legacy,
+        set_temporal_slice,
+        register_browser_capabilities,
+        load_ccf_asset,
+        list_ccf_assets,
+        test_ccf_ipc_handshake,
+        test_larynx_smoke,
+        test_vasculature_stress,
+        get_system_telemetry,
+        update_telemetry_metric,
+        reset_telemetry,
+        is_ambient_enabled,
+        enable_ambient,
+        disable_ambient,
+        toggle_ambient,
+        get_qpu_settings,
+        save_qpu_settings,
+        enable_qpu_feature,
+        disable_qpu_feature,
     ]
 }

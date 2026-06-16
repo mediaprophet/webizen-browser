@@ -1,7 +1,7 @@
 [package]
 name = "webizen-studio"
 version = "0.1.0"
-edition = "2024"
+edition = "2021"
 
 [dependencies]
 dioxus = { version = "0.7.9", features = ["router", "web"] }
@@ -21,7 +21,10 @@ serde-wasm-bindgen = "0.6.5"
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 console_error_panic_hook = "0.1.7"
 
-# qualia-core-db is only needed for the native (non-wasm32) build.
-# The wasm32/web build (GitHub Pages demo) uses stub types instead.
+# qualia-core-db and webizen-render are only needed for the native (non-wasm32)
+# build. The wasm32/web build (GitHub Pages demo) uses stub types instead.
+# Both share a single wgpu 0.19 device, so they link one wgpu version (see
+# webizen-render/Cargo.toml).
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
-qualia-core-db = { version = "0.0.12", path = "../../qualiaDB/crates/qualia-core-db" }
+qualia-core-db = { version = "0.0.13", path = "../../qualiaDB/crates/qualia-core-db" }
+webizen-render = { version = "0.0.13", path = "../webizen-render" }

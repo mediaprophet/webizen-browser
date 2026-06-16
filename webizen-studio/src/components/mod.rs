@@ -1,8 +1,11 @@
 pub mod browser_panes;
+pub mod camera_controls;
 pub mod chat_graph;
 pub mod contextual_workspace;
 pub mod dashboard;
 pub mod diffusion_visualizer;
+pub mod render_preview;
+pub mod scene_interaction;
 pub mod hardware_configurator;
 pub mod health_monitor;
 pub mod llm_harness;
@@ -12,6 +15,13 @@ pub mod qapp_dispatcher;
 pub mod qapp_engine;
 pub mod qapps;
 pub mod shoelace;
+
+// 10D Integration Components
+// Fixed: Renamed .rsx files to .rs for Rust module system compatibility
+pub mod epistemic_status;
+pub mod temporal_scrubber; 
+pub mod hardware_capabilities;
+pub mod anatomy_test;
 
 pub mod agent_config;
 pub mod agreements_rights;

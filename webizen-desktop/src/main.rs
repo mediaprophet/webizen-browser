@@ -4,10 +4,14 @@
 )]
 
 use std::path::PathBuf;
-use tauri::{Manager, SystemTray, SystemTrayMenu, SystemTrayMenuItem, CustomMenuItem, SystemTrayEvent};
+use tauri::{
+    CustomMenuItem, Manager, SystemTray, SystemTrayEvent, SystemTrayMenu, SystemTrayMenuItem,
+};
 
 pub mod commands;
 pub mod runtime;
+pub mod telemetry_bridge;
+pub mod telemetry_hooks;
 pub use commands::*;
 
 use qualia_client_core::qapp_registry::QAPPS_DIR;
@@ -16,10 +20,7 @@ use runtime::{spawn_runtime, RuntimeHandle};
 
 type ProtocolResult = Result<tauri::http::Response, Box<dyn std::error::Error>>;
 
-fn diffusion_frame_response(
-    app: &tauri::AppHandle,
-    slot: u8,
-) -> ProtocolResult {
+fn diffusion_frame_response(app: &tauri::AppHandle, slot: u8) -> ProtocolResult {
     match app.try_state::<RuntimeHandle>() {
         Some(runtime) => match runtime.frame_rgba(slot) {
             Some(frame) => tauri::http::ResponseBuilder::new()
@@ -36,19 +37,45 @@ fn diffusion_frame_response(
     }
 }
 
+fn render_preview_response(app: &tauri::AppHandle) -> ProtocolResult {
+    match app.try_state::<PreviewState>() {
+        Some(state) => {
+            let bytes = state
+                .png
+                .lock()
+                .map(|guard| guard.clone())
+                .unwrap_or_default();
+            if bytes.is_empty() {
+                tauri::http::ResponseBuilder::new()
+                    .status(404)
+                    .body(Vec::new())
+            } else {
+                tauri::http::ResponseBuilder::new()
+                    .mimetype("image/png")
+                    .status(200)
+                    .body(bytes)
+            }
+        }
+        None => tauri::http::ResponseBuilder::new()
+            .status(503)
+            .body(Vec::new()),
+    }
+}
+
 fn webizen_protocol_response(
     app: &tauri::AppHandle,
     request: &tauri::http::Request,
 ) -> ProtocolResult {
     let uri = request.uri();
-    let request_path = uri
-        .strip_prefix("webizen://localhost/")
-        .unwrap_or("");
+    let request_path = uri.strip_prefix("webizen://localhost/").unwrap_or("");
     let path = request_path
         .split_once('?')
         .map(|(path, _)| path)
         .unwrap_or(request_path);
-    let segments: Vec<&str> = path.split('/').filter(|segment| !segment.is_empty()).collect();
+    let segments: Vec<&str> = path
+        .split('/')
+        .filter(|segment| !segment.is_empty())
+        .collect();
 
     match segments.as_slice() {
         ["diffusion", "frame", slot] => match slot.parse::<u8>() {
@@ -57,6 +84,7 @@ fn webizen_protocol_response(
                 .status(400)
                 .body(Vec::new()),
         },
+        ["render", "preview.png"] => render_preview_response(app),
         _ => tauri::http::ResponseBuilder::new()
             .status(404)
             .body(Vec::new()),
@@ -86,6 +114,7 @@ fn main() {
         CustomMenuItem::new("localhost_preview".to_string(), "Open localhost:8080");
     let revoke = CustomMenuItem::new("revoke".to_string(), "Revoke Sessions");
     let daemon_status = CustomMenuItem::new("daemon_status".to_string(), "Daemon Status");
+    let toggle_ambient = CustomMenuItem::new("toggle_ambient".to_string(), "Toggle Ambient Visualization");
     let quit = CustomMenuItem::new("quit".to_string(), "Quit");
 
     let tray_menu = SystemTrayMenu::new()
@@ -98,6 +127,7 @@ fn main() {
         .add_item(revoke)
         .add_native_item(SystemTrayMenuItem::Separator)
         .add_item(daemon_status)
+        .add_item(toggle_ambient)
         .add_native_item(SystemTrayMenuItem::Separator)
         .add_item(quit);
 
@@ -109,9 +139,7 @@ fn main() {
     tauri::Builder::default()
         .system_tray(system_tray)
         .on_system_tray_event(move |app, event| match event {
-            SystemTrayEvent::LeftClick {
-                ..
-            } => {
+            SystemTrayEvent::LeftClick { .. } => {
                 show_main_window(app);
             }
             SystemTrayEvent::MenuItemClick { id, .. } => {
@@ -131,6 +159,9 @@ fn main() {
                     }
                     "daemon_status" => {
                         // We could show a simple native notification here in the future
+                    }
+                    "toggle_ambient" => {
+                        let _ = tx_for_tray.try_send("TOGGLE_AMBIENT".to_string());
                     }
                     "quit" => {
                         std::process::exit(0);
@@ -170,6 +201,18 @@ fn main() {
             webizen_protocol_response(app, request)
         })
         .manage(app_state.clone())
+        .manage(PreviewState::default())
+        .manage(RenderLoopState(std::sync::Arc::new(
+            std::sync::atomic::AtomicBool::new(false),
+        )))
+        .manage(commands::ActiveAnchor(std::sync::Arc::new(
+            std::sync::Mutex::new(None),
+        )))
+        .manage(commands::TemporalSlice(std::sync::Arc::new(
+            std::sync::atomic::AtomicU64::new(0.0_f64.to_bits()),
+        )))
+        .manage(commands::binary_registry::BinaryNodeRegistry::new())
+        .manage(commands::telemetry_bridge::TelemetryBridge::new())
         .setup(move |app| {
             let handle = app.handle();
             let runtime_handle = spawn_runtime(handle.clone(), app_state.clone())
@@ -203,6 +246,27 @@ fn main() {
                 }
             });
 
+            // ── Periodic Telemetry Collection for Ambient Visualization ───────
+            let bridge_handle = handle.clone();
+            let bridge_handle_for_daemon = handle.clone();
+            tauri::async_runtime::spawn(async move {
+                loop {
+                    // Only collect and update if ambient visualization is enabled
+                    if let Some(bridge) = bridge_handle.try_state::<commands::telemetry_bridge::TelemetryBridge>() {
+                        if bridge.is_enabled() {
+                            // Collect system telemetry (stack-allocated operation)
+                            let telemetry = commands::telemetry_bridge::collect_system_telemetry();
+
+                            // Update the bridge state (minimal CPU overhead)
+                            bridge.set_telemetry(telemetry);
+                        }
+                    }
+
+                    // Update at 30 FPS for smooth visualization (33.33ms)
+                    tokio::time::sleep(std::time::Duration::from_millis(33)).await;
+                }
+            });
+
             // ── Start daemon ──────────────────────────────────────────────────
             // ── Start daemon ──────────────────────────────────────────────────────────
             let flag = daemon_flag.clone();
@@ -232,6 +296,7 @@ fn main() {
             }
 
             let final_port = target_port;
+            qualia_client_core::api::set_active_daemon_port(final_port);
 
             let vault_clone = vault_for_daemon.clone();
 
@@ -240,14 +305,25 @@ fn main() {
                 if let Some(item) = tray_h.tray_handle().try_get_item("daemon_status") {
                     let _ = item.set_title(&format!("Daemon: running (:{})", final_port));
                 }
-                
-                let control_tx = qualia_core_db::daemon::start_local_daemon_with_options(final_port, false, vault_clone).await;
-                
+
+                let control_tx = qualia_core_db::daemon::start_local_daemon_with_options(
+                    final_port,
+                    false,
+                    vault_clone,
+                )
+                .await;
+
                 // Forward tray commands to daemon
                 while let Some(cmd) = rx.recv().await {
+                    if cmd == "TOGGLE_AMBIENT" {
+                        if let Some(bridge) = bridge_handle.try_state::<commands::telemetry_bridge::TelemetryBridge>() {
+                            let new_state = bridge.toggle();
+                            eprintln!("Ambient visualization: {}", if new_state { "enabled" } else { "disabled" });
+                        }
+                    }
                     let _ = control_tx.send(cmd).await;
                 }
-                
+
                 *flag.lock().unwrap() = false;
                 if let Some(item) = tray_h.tray_handle().try_get_item("daemon_status") {
                     let _ = item.set_title("Daemon: stopped");

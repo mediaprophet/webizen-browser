@@ -33,11 +33,7 @@ impl SharedFrameBuffer {
         Some(reader(&guard))
     }
 
-    pub(crate) fn overwrite_slot(
-        &self,
-        slot: usize,
-        writer: impl FnOnce(&mut [u8]),
-    ) -> Option<()> {
+    pub(crate) fn overwrite_slot(&self, slot: usize, writer: impl FnOnce(&mut [u8])) -> Option<()> {
         let slot = self.slots.get(slot)?;
         let mut guard = slot.lock().ok()?;
         writer(&mut guard);

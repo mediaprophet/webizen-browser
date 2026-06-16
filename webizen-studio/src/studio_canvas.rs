@@ -607,7 +607,7 @@ pub fn DynamicPage(path: Vec<String>, #[props(default)] app_id: Option<String>) 
     });
 
     // 🔴🔴 Telemetry SSE 🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴
-    let mut telemetry_logs = use_signal(Vec::<String>::new);
+    let telemetry_logs = use_signal(Vec::<String>::new);
 
     #[cfg(target_arch = "wasm32")]
     use_effect(move || {
@@ -1365,7 +1365,7 @@ fn render_placed_pane(
     let is_selected = *selected.read() == Some(idx);
 
     // Look up the display name from the registry
-    let display_name = find_pane(&pane.component_id)
+    let _display_name = find_pane(&pane.component_id)
         .map(|p| p.display_name)
         .unwrap_or_else(|| pane.component_id.clone());
 

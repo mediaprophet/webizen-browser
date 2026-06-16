@@ -2,7 +2,8 @@
 members = [
     "webizen-desktop",
     "webizen-runtime",
-    "webizen-studio"
+    "webizen-studio",
+    "webizen-render"
 ]
 resolver = "2"
 

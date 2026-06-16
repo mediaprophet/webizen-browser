@@ -12,29 +12,39 @@
 
 pub mod graph;
 pub mod mesh;
+pub mod motion;
 pub mod qualia;
 pub mod scene;
+pub mod scene_to_contract;
+pub mod tensor_buffer;
 
 #[cfg(target_arch = "wasm32")]
 pub mod canvas2d;
 
+#[cfg(not(target_arch = "wasm32"))]
+pub mod native;
+
 pub use graph::{Node, Scene, Style};
 pub use mesh::{Mesh, Transform};
-pub use qualia::{ItemState, SceneItem, SceneSource, SemanticScene, build_scene, item_color};
+pub use qualia::{build_scene, item_color, ItemState, SceneItem, SceneSource, SemanticScene};
 pub use scene::{Camera, ScreenPoint, Vec3};
 
 #[cfg(target_arch = "wasm32")]
 pub use canvas2d::Canvas2dRenderer;
 
+#[cfg(not(target_arch = "wasm32"))]
+pub use native::NativeRenderer;
+
 /// Ergonomic single-import surface for building scenes:
 /// `use crate::render::prelude::*;`
 pub mod prelude {
-    pub use super::Renderer;
     #[cfg(target_arch = "wasm32")]
     pub use super::canvas2d::Canvas2dRenderer;
     pub use super::graph::{Node, Scene, Style};
     pub use super::mesh::{Mesh, Transform};
-    pub use super::qualia::{ItemState, SceneItem, SemanticScene, build_scene, item_color};
+    #[cfg(not(target_arch = "wasm32"))]
+    pub use super::native::NativeRenderer;
+    pub use super::qualia::{build_scene, item_color, ItemState, SceneItem, SemanticScene};
     pub use super::scene::{Camera, ScreenPoint, Vec3};
 }
 

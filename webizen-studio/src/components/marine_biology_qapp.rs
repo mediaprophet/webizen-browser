@@ -8,7 +8,7 @@ pub fn MarineBiologyQapp() -> Element {
     let mut temperature_c = use_signal(|| 15.0f64);
     let mut salinity_ppt = use_signal(|| 35.0f64);
     let mut ph = use_signal(|| 8.1f64);
-    let mut dissolved_o2_mgl = use_signal(|| 7.0f64);
+    let dissolved_o2_mgl = use_signal(|| 7.0f64);
     let mut notes = use_signal(|| String::new());
 
     let ecosystems = [
@@ -124,7 +124,7 @@ pub fn MarineBiologyQapp() -> Element {
 
             div {
                 style: "background: var(--qualia-bg); padding: 12px 16px; border-radius: 8px; border-left: 4px solid var(--qualia-accent);",
-                span { style: "font-size: 0.8rem; color: var(--qualia-text-muted);", "{ecosystem} | {taxonomic_group} | {depth_m}m | {temperature_c:.1}°C | pH{ph:.2} | Sal:{salinity_ppt:.0}ppt" }
+                span { style: "font-size: 0.8rem; color: var(--qualia-text-muted);", "{ecosystem} | {taxonomic_group} | {depth_m}m | {temperature_c:.1}°C | pH{ph:.2} | Sal:{salinity_ppt:.0}ppt | O2:{dissolved_o2_mgl:.1}mg/L" }
                 div { style: "font-size: 0.75rem; color: var(--qualia-text-muted); margin-top: 6px;", "QualiaDB → marine biogeography engine | oceanographic sieve | taxonomic anchor" }
             }
         }

@@ -7,3 +7,7 @@ dist/
 legacy/
 *.env
 legacy.zip
+transcripts/
+design-docs/
+.claude/
+*.rlib

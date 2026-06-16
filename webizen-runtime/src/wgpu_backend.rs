@@ -10,6 +10,32 @@ use wgpu::util::DeviceExt;
 
 const WORKGROUP_SIZE: u32 = 8;
 
+// Render pipeline shader (basic vertex + fragment)
+const RENDER_SHADER: &str = r#"
+struct VertexInput {
+    @location(0) position: vec3<f32>,
+    @location(1) color: vec4<f32>,
+}
+
+struct VertexOutput {
+    @builtin(position) clip_position: vec4<f32>,
+    @location(0) color: vec4<f32>,
+}
+
+@vertex
+fn vertex_main(input: VertexInput) -> VertexOutput {
+    var output: VertexOutput;
+    output.clip_position = vec4<f32>(input.position, 1.0);
+    output.color = input.color;
+    return output;
+}
+
+@fragment
+fn fragment_main(input: VertexOutput) -> @location(0) vec4<f32> {
+    return input.color;
+}
+"#;
+
 const DIFFUSION_SHADER: &str = r#"
 struct DiffusionUniforms {
     width: u32,
@@ -75,7 +101,14 @@ struct DiffusionUniforms {
     pad: f32,
 }
 
-pub struct WgpuDiffusionBackend {
+#[repr(C)]
+#[derive(Clone, Copy, Pod, Zeroable)]
+struct Vertex {
+    position: [f32; 3],
+    color: [f32; 4],
+}
+
+pub struct WgpuDiffusionBackend<'a> {
     config: DiffusionConfig,
     device: Arc<wgpu::Device>,
     queue: Arc<wgpu::Queue>,
@@ -87,19 +120,47 @@ pub struct WgpuDiffusionBackend {
     staging_buffer: wgpu::Buffer,
     frames: SharedFrameBuffer,
     read_index: usize,
+    // Render pipeline fields (Phase 1.1) - planned for future use
+    #[allow(dead_code)]
+    surface: Option<wgpu::Surface<'a>>,
+    #[allow(dead_code)]
+    render_pipeline: Option<wgpu::RenderPipeline>,
+    #[allow(dead_code)]
+    vertex_buffer: Option<wgpu::Buffer>,
+    #[allow(dead_code)]
+    index_buffer: Option<wgpu::Buffer>,
+    #[allow(dead_code)]
+    depth_texture: Option<wgpu::Texture>,
+    #[allow(dead_code)]
+    depth_texture_view: Option<wgpu::TextureView>,
 }
 
-impl WgpuDiffusionBackend {
+impl<'a> WgpuDiffusionBackend<'a> {
     pub async fn new(config: DiffusionConfig) -> Result<Self, RuntimeError> {
         let instance = wgpu::Instance::default();
+
+        // CRITICAL FIX: Use HighPerformance on native desktop to capture NVIDIA GPU
+        // LowPower bypasses discrete NVIDIA GPU on Windows
+        #[cfg(not(target_arch = "wasm32"))]
+        let power_preference = wgpu::PowerPreference::HighPerformance;
+        #[cfg(target_arch = "wasm32")]
+        let power_preference = wgpu::PowerPreference::LowPower;
+
         let adapter = instance
             .request_adapter(&wgpu::RequestAdapterOptions {
-                power_preference: wgpu::PowerPreference::LowPower,
+                power_preference,
                 compatible_surface: None,
                 force_fallback_adapter: false,
             })
             .await
             .ok_or(RuntimeError::AdapterUnavailable)?;
+
+        let adapter_info = adapter.get_info();
+        log::info!(
+            "wGPU adapter selected: {} (Backend: {:?})",
+            adapter_info.name,
+            adapter_info.backend
+        );
 
         let (device, queue) = adapter
             .request_device(
@@ -172,6 +233,14 @@ impl WgpuDiffusionBackend {
         let (uniform_buffer, state_buffers, bind_groups, staging_buffer, frames) =
             Self::allocate_io_resources(&device, &bind_group_layout, config);
 
+        // Phase 1.1: Initialize render pipeline (without surface for now)
+        let render_pipeline = Self::create_render_pipeline(&device);
+        let vertex_buffer = None;
+        let index_buffer = None;
+        let depth_texture = None;
+        let depth_texture_view = None;
+        let surface = None;
+
         Ok(Self {
             config,
             device,
@@ -184,7 +253,78 @@ impl WgpuDiffusionBackend {
             staging_buffer,
             frames,
             read_index: 0,
+            surface,
+            render_pipeline,
+            vertex_buffer,
+            index_buffer,
+            depth_texture,
+            depth_texture_view,
         })
+    }
+
+    fn create_render_pipeline(device: &wgpu::Device) -> Option<wgpu::RenderPipeline> {
+        let shader = device.create_shader_module(wgpu::ShaderModuleDescriptor {
+            label: Some("webizen-render-shader"),
+            source: wgpu::ShaderSource::Wgsl(RENDER_SHADER.into()),
+        });
+
+        let pipeline_layout = device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
+            label: Some("webizen-render-pipeline-layout"),
+            bind_group_layouts: &[],
+            push_constant_ranges: &[],
+        });
+
+        Some(
+            device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
+                label: Some("webizen-render-pipeline"),
+                layout: Some(&pipeline_layout),
+                vertex: wgpu::VertexState {
+                    module: &shader,
+                    entry_point: "vertex_main",
+                    buffers: &[wgpu::VertexBufferLayout {
+                        array_stride: std::mem::size_of::<Vertex>() as wgpu::BufferAddress,
+                        step_mode: wgpu::VertexStepMode::Vertex,
+                        attributes: &[
+                            wgpu::VertexAttribute {
+                                offset: 0,
+                                shader_location: 0,
+                                format: wgpu::VertexFormat::Float32x3,
+                            },
+                            wgpu::VertexAttribute {
+                                offset: std::mem::size_of::<[f32; 3]>() as wgpu::BufferAddress,
+                                shader_location: 1,
+                                format: wgpu::VertexFormat::Float32x4,
+                            },
+                        ],
+                    }],
+                },
+                fragment: Some(wgpu::FragmentState {
+                    module: &shader,
+                    entry_point: "fragment_main",
+                    targets: &[Some(wgpu::ColorTargetState {
+                        format: wgpu::TextureFormat::Bgra8UnormSrgb,
+                        blend: Some(wgpu::BlendState::REPLACE),
+                        write_mask: wgpu::ColorWrites::ALL,
+                    })],
+                }),
+                primitive: wgpu::PrimitiveState {
+                    topology: wgpu::PrimitiveTopology::TriangleList,
+                    strip_index_format: None,
+                    front_face: wgpu::FrontFace::Ccw,
+                    cull_mode: Some(wgpu::Face::Back),
+                    polygon_mode: wgpu::PolygonMode::Fill,
+                    unclipped_depth: false,
+                    conservative: false,
+                },
+                depth_stencil: None,
+                multisample: wgpu::MultisampleState {
+                    count: 1,
+                    mask: !0,
+                    alpha_to_coverage_enabled: false,
+                },
+                multiview: None,
+            }),
+        )
     }
 
     fn allocate_io_resources(
@@ -217,13 +357,17 @@ impl WgpuDiffusionBackend {
         let state_buffer_a = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
             label: Some("webizen-diffusion-state-a"),
             contents: raw_bytes,
-            usage: wgpu::BufferUsages::STORAGE | wgpu::BufferUsages::COPY_SRC | wgpu::BufferUsages::COPY_DST,
+            usage: wgpu::BufferUsages::STORAGE
+                | wgpu::BufferUsages::COPY_SRC
+                | wgpu::BufferUsages::COPY_DST,
         });
 
         let state_buffer_b = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
             label: Some("webizen-diffusion-state-b"),
             contents: raw_bytes,
-            usage: wgpu::BufferUsages::STORAGE | wgpu::BufferUsages::COPY_SRC | wgpu::BufferUsages::COPY_DST,
+            usage: wgpu::BufferUsages::STORAGE
+                | wgpu::BufferUsages::COPY_SRC
+                | wgpu::BufferUsages::COPY_DST,
         });
 
         let staging_buffer = device.create_buffer(&wgpu::BufferDescriptor {
@@ -313,7 +457,7 @@ impl WgpuDiffusionBackend {
     }
 }
 
-impl ComputeBackend for WgpuDiffusionBackend {
+impl<'a> ComputeBackend for WgpuDiffusionBackend<'a> {
     fn step(&mut self, epoch: u64) -> Result<SimulationSnapshot, RuntimeError> {
         let write_index = (self.read_index + 1) % 2;
         let mut encoder = self

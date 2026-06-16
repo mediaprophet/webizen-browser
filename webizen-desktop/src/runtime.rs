@@ -182,11 +182,15 @@ impl RuntimeHandle {
     }
 }
 
-pub fn spawn_runtime(app_handle: AppHandle, app_state: Arc<AppState>) -> Result<RuntimeHandle, String> {
+pub fn spawn_runtime(
+    app_handle: AppHandle,
+    app_state: Arc<AppState>,
+) -> Result<RuntimeHandle, String> {
     let backend = pollster::block_on(WgpuDiffusionBackend::new(DEFAULT_DIFFUSION_CONFIG))
         .map_err(|err| err.to_string())?;
     let ledger_metrics = Arc::new(LedgerMetrics::default());
-    let (ledger_sink, ledger_rx) = DesktopLedgerSink::bounded(LEDGER_CHANNEL_CAPACITY, ledger_metrics.clone());
+    let (ledger_sink, ledger_rx) =
+        DesktopLedgerSink::bounded(LEDGER_CHANNEL_CAPACITY, ledger_metrics.clone());
     let (kernel, _snapshot_rx, kernel_control_tx) = SimulationKernel::new(
         DEFAULT_TIMESTEP,
         DEFAULT_DIFFUSION_CONFIG,
@@ -218,7 +222,7 @@ pub fn spawn_runtime(app_handle: AppHandle, app_state: Arc<AppState>) -> Result<
         ledger_rx,
         ledger_metrics_thread.clone(),
     )
-        .map_err(|err| err.to_string())?;
+    .map_err(|err| err.to_string())?;
 
     thread::Builder::new()
         .name("webizen-runtime-kernel".to_string())
@@ -299,17 +303,22 @@ fn spawn_persistence_worker(
                 let _ = std::fs::create_dir_all(parent);
             }
 
-            let mut appender = match qualia_core_db::q42_volume::StreamingVolumeAppender::new(&volume_path) {
-                Ok(a) => a,
-                Err(err) => {
-                    metrics.note_write_failure();
-                    let _ = emit_ledger_health(&app_handle, &metrics);
-                    eprintln!("failed to init streaming appender for {}: {}", volume_path.display(), err);
-                    return;
-                }
-            };
+            let mut appender =
+                match qualia_core_db::q42_volume::StreamingVolumeAppender::new(&volume_path) {
+                    Ok(a) => a,
+                    Err(err) => {
+                        metrics.note_write_failure();
+                        let _ = emit_ledger_health(&app_handle, &metrics);
+                        eprintln!(
+                            "failed to init streaming appender for {}: {}",
+                            volume_path.display(),
+                            err
+                        );
+                        return;
+                    }
+                };
 
-            use qualia_core_db::{QUINS_PER_BLOCK, NQuin};
+            use qualia_core_db::{NQuin, QUINS_PER_BLOCK};
 
             let mut block_buffer = Vec::with_capacity(QUINS_PER_BLOCK);
             let mut last_persisted_epoch = 0u64;
@@ -327,7 +336,7 @@ fn spawn_persistence_worker(
             while let Ok(record) = ledger_rx.recv() {
                 if last_persisted_epoch != 0 && record.epoch > last_persisted_epoch + 1 {
                     metrics.note_gap(last_persisted_epoch, record.epoch);
-                    
+
                     let mut marker = NQuin {
                         subject: q_hash("urn:webizen:runtime:diffusion"),
                         predicate: q_hash("q42:ledgerBaselineReset"),
@@ -341,7 +350,7 @@ fn spawn_persistence_worker(
                     if block_buffer.len() == QUINS_PER_BLOCK {
                         flush_block(&mut block_buffer, record.epoch);
                     }
-                    
+
                     let _ = emit_ledger_health(&app_handle, &metrics);
                 }
 
@@ -391,7 +400,7 @@ fn spawn_persistence_worker(
                 last_persisted_epoch = record.epoch;
                 metrics.note_persisted(record.epoch);
             }
-            
+
             flush_block(&mut block_buffer, last_persisted_epoch);
         })
         .map(|_| ())
@@ -402,9 +411,7 @@ fn emit_ledger_health(app_handle: &AppHandle, metrics: &LedgerMetrics) -> Result
 }
 
 fn diffusion_wal_path(storage_path: &Path) -> PathBuf {
-    storage_path
-        .join("runtime")
-        .join("diffusion-session.q42")
+    storage_path.join("runtime").join("diffusion-session.q42")
 }
 
 fn pack_dimensions(dimensions: (u32, u32)) -> u64 {

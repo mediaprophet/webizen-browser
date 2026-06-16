@@ -4,8 +4,8 @@
 //! [`Camera::project`] and strokes/fills into a `CanvasRenderingContext2d`. A
 //! future `WgpuRenderer` implements the same [`Renderer`] trait against WebGPU.
 
-use super::Renderer;
 use super::scene::{Camera, ScreenPoint, Vec3};
+use super::Renderer;
 use wasm_bindgen::JsValue;
 use web_sys::CanvasRenderingContext2d;
 

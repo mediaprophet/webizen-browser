@@ -40,7 +40,10 @@ fn main() {
 pub enum Route {
     #[layout(AppLayout)]
     #[route("/")]
-    DashboardRoute {},
+    DashboardRoute {},  // Temporarily revert to test basic functionality
+
+    #[route("/anatomy-test")]
+    AnatomyTestRoute {},  // Access via /anatomy-test route
 
     #[route("/qapps")]
     QAppsRoute {},
@@ -63,12 +66,23 @@ pub enum Route {
     #[route("/qapp-studio/:app_id")]
     StudioEditRoute { app_id: String },
 
+    #[route("/render-preview")]
+    RenderPreviewRoute {},
+
+    #[route("/scene-interaction")]
+    SceneInteractionRoute {},
+
     #[route("/nexus")]
     NexusRoute {},
 
     #[end_layout]
     #[route("/:..path")]
     DynamicPage { path: Vec<String> },
+}
+
+#[component]
+fn AnatomyTestRoute() -> Element {
+    rsx! { components::anatomy_test::AnatomyTest {} }
 }
 
 #[component]
@@ -108,6 +122,16 @@ fn StudioEditRoute(app_id: String) -> Element {
 #[component]
 fn StudioRoute() -> Element {
     rsx! { DynamicPage { path: vec![] } }
+}
+
+#[component]
+fn RenderPreviewRoute() -> Element {
+    rsx! { components::render_preview::RenderPreview { width: 800, height: 600 } }
+}
+
+#[component]
+fn SceneInteractionRoute() -> Element {
+    rsx! { components::scene_interaction::SceneInteraction {} }
 }
 
 #[component]
@@ -167,6 +191,7 @@ fn AppLayout() -> Element {
                 return;
             }
 
+            let mut settings_listener_started = settings_listener_started;
             settings_listener_started.set(true);
             let navigator = navigator;
 
@@ -214,9 +239,16 @@ fn AppLayout() -> Element {
                 Link {
                     to: Route::DashboardRoute {},
                     class: "nav-item",
-                    style: "color: {text};",
+                    style: "color: {text_muted};",
                     sl-icon { "name": "grid-1x2", style: "font-size: 0.9rem;" }
                     "Dashboard"
+                }
+                Link {
+                    to: Route::AnatomyTestRoute {},
+                    class: "nav-item",
+                    style: "color: {accent}; font-weight: 600;",
+                    sl-icon { "name": "activity", style: "font-size: 0.9rem;" }
+                    "Anatomy Test"
                 }
                 Link {
                     to: Route::QAppsRoute {},
@@ -253,6 +285,20 @@ fn AppLayout() -> Element {
                     style: "color: {text_muted};",
                     sl-icon { "name": "layers", style: "font-size: 0.9rem;" }
                     "QApp Studio"
+                }
+                Link {
+                    to: Route::RenderPreviewRoute {},
+                    class: "nav-item",
+                    style: "color: {text_muted};",
+                    sl-icon { "name": "eye", style: "font-size: 0.9rem;" }
+                    "Render Preview"
+                }
+                Link {
+                    to: Route::SceneInteractionRoute {},
+                    class: "nav-item",
+                    style: "color: {text_muted};",
+                    sl-icon { "name": "cursor", style: "font-size: 0.9rem;" }
+                    "Scene Interaction"
                 }
                 div {
                     class: "nav-item",

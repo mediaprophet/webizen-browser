@@ -3,4 +3,5 @@ name = "webizen-studio"
 default_theme = "dark"
 
 [web.app]
-base_path = "webizen-browser"
+# base_path removed for Tauri desktop app compatibility
+# base_path = "webizen-browser"  # This is for GitHub Pages, not Tauri

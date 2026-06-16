@@ -8,7 +8,7 @@ pub fn MeteorologyQapp() -> Element {
     let mut pressure_hpa = use_signal(|| 1013.25f64);
     let mut wind_speed_kph = use_signal(|| 30.0f64);
     let mut precipitation_mm = use_signal(|| 10.0f64);
-    let mut visibility_km = use_signal(|| 10.0f64);
+    let visibility_km = use_signal(|| 10.0f64);
     let mut notes = use_signal(|| String::new());
 
     let weather_systems = [
@@ -123,7 +123,7 @@ pub fn MeteorologyQapp() -> Element {
 
             div {
                 style: "background: var(--qualia-bg); padding: 12px 16px; border-radius: 8px; border-left: 4px solid var(--qualia-accent);",
-                span { style: "font-size: 0.8rem; color: var(--qualia-text-muted);", "{weather_system} | {forecast_method} | {temperature_c:.0}°C | {pressure_hpa:.0}hPa | {wind_speed_kph:.0}kph" }
+                span { style: "font-size: 0.8rem; color: var(--qualia-text-muted);", "{weather_system} | {forecast_method} | {temperature_c:.0}°C | {pressure_hpa:.0}hPa | {wind_speed_kph:.0}kph | Vis:{visibility_km:.0}km" }
                 div { style: "font-size: 0.75rem; color: var(--qualia-text-muted); margin-top: 6px;", "QualiaDB → NWP engine | synoptic sieve | mesoscale anchor" }
             }
         }
